@@ -1,3 +1,27 @@
+Skip to content
+Navigation Menu
+nhnacademy-be7-heukbaekbook
+/
+heukbaekbook-shop
+
+Type / to search
+Code
+Issues
+1
+Pull requests
+Actions
+Projects
+Wiki
+Security
+2
+Insights
+Settings
+Java CI with Maven
+Update maven.yml #2
+Jobs
+Run details
+Workflow file for this run
+.github/workflows/maven.yml at d612662
 # This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
 
@@ -53,6 +77,5 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.SSH_PORT }}
         script_stop: true
-        script: |
-          chmod +x ./startup.sh
-          ./startup.sh
+        script: "./startup.sh"
+        
