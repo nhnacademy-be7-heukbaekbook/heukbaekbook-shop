@@ -54,6 +54,6 @@ jobs:
         port: ${{ secrets.SSH_PORT }}
         script_stop: true
         script: |
-          chmod +x ./startup.sh
-          ./startup.sh
-        
+          chmod +x /home/ubuntu/startup.sh
+          /home/ubuntu/startup.sh
+          
