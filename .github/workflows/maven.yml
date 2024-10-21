@@ -52,8 +52,7 @@ jobs:
         username: ${{ secrets.SSH_ID }}
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.SSH_PORT }}
-        script_stop: true
+        workdir: /home/ubuntu
         script: |
-          chmod +x /home/ubuntu/startup.sh
-          /home/ubuntu/startup.sh
-          
+          chmod +x ./startup.sh
+          ./startup.sh
