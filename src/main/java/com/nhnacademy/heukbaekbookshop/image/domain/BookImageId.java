@@ -1,4 +1,4 @@
-package com.nhnacademy.heukbaekbookshop.coupon.domain;
+package com.nhnacademy.heukbaekbookshop.image.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,23 +12,21 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookCouponId implements Serializable {
-
-    private long couponId;
+public class BookImageId implements Serializable {
+    private long imageId;
     private long bookId;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        BookCouponId that = (BookCouponId) o;
-        return Objects.equals(couponId, that.couponId) &&
+        BookImageId that = (BookImageId) o;
+        return Objects.equals(imageId, that.imageId) &&
                 Objects.equals(bookId, that.bookId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(couponId, bookId);
+        return Objects.hash(imageId, bookId);
     }
-
 }

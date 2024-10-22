@@ -1,34 +1,33 @@
-package com.nhnacademy.heukbaekbookshop.coupon.domain;
+package com.nhnacademy.heukbaekbookshop.order.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookCouponId implements Serializable {
-
-    private long couponId;
+public class OrderBookReturnId {
+    private long orderId;
     private long bookId;
+    private long returnId;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        BookCouponId that = (BookCouponId) o;
-        return Objects.equals(couponId, that.couponId) &&
-                Objects.equals(bookId, that.bookId);
+        OrderBookReturnId that = (OrderBookReturnId) o;
+        return Objects.equals(orderId, that.orderId) &&
+                Objects.equals(bookId, that.bookId) &&
+                Objects.equals(returnId, that.returnId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(couponId, bookId);
+        return Objects.hash(orderId, bookId, returnId);
     }
-
 }

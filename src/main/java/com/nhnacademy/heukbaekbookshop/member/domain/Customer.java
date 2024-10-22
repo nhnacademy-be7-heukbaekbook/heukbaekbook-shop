@@ -37,6 +37,7 @@ public class Customer {
 
     @NotNull
     @Email
+    @Length(max = 30)
     @Column(name = "customer_email")
     private String email;
 }

@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.point.domain;
 
 import com.nhnacademy.heukbaekbookshop.member.domain.Member;
+import com.nhnacademy.heukbaekbookshop.order.domain.Order;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,9 @@ public class PointHistory {
     @JoinColumn(name = "customer_id")
     private Member member;
 
-    // TODO #2: 주문번호 외래 키 추가
+    @OneToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
 
     @ManyToOne
     @JoinColumn(name = "point_earn_standard_id")

@@ -1,5 +1,8 @@
 package com.nhnacademy.heukbaekbookshop.coupon.domain;
 
+import com.nhnacademy.heukbaekbookshop.book.domain.Book;
+import com.nhnacademy.heukbaekbookshop.order.domain.Order;
+import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -28,5 +31,10 @@ public class CouponHistory {
     @Column(name = "coupon_used_at")
     private LocalDateTime usedAt;
 
-    // TODO #1: 도서번호, 주문번호 외래 키 추가
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "order_id", referencedColumnName = "order_id"),
+            @JoinColumn(name = "book_id", referencedColumnName = "book_id")
+    })
+    private OrderBook orderBook;
 }
