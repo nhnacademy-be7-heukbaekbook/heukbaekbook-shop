@@ -12,7 +12,7 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewId implements Serializable {
+public class ReviewPK implements Serializable {
     private long customerId;
     private long bookId;
     private long orderId;
@@ -21,7 +21,7 @@ public class ReviewId implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ReviewId that = (ReviewId) o;
+        ReviewPK that = (ReviewPK) o;
         return Objects.equals(customerId, that.customerId) &&
                 Objects.equals(orderId, that.orderId) &&
                 Objects.equals(bookId, that.bookId);
@@ -31,6 +31,5 @@ public class ReviewId implements Serializable {
     public int hashCode() {
         return Objects.hash(customerId, orderId, bookId);
     }
-
 
 }

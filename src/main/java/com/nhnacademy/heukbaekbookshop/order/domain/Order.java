@@ -14,6 +14,7 @@ import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -66,5 +67,8 @@ public class Order {
     @Length(max = 30)
     @Column(name = "order_customer_email")
     private String customerEmail;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<OrderBook> orderBooks;
 
 }

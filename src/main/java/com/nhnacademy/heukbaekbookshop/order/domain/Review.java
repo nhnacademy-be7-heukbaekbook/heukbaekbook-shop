@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(ReviewId.class)
+@IdClass(ReviewPK.class)
 @Table(name = "reviews")
 public class Review {
 

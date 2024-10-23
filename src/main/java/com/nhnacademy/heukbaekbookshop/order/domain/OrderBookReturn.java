@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(OrderBookReturnId.class)
+@IdClass(OrderBookReturnPK.class)
 @Table(name = "orders_books_returns")
 public class OrderBookReturn {
 

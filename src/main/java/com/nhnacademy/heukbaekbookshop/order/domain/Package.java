@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(OrderBookId.class)
+@IdClass(OrderBookPK.class)
 @Table(name = "packaging")
 public class Package {
 

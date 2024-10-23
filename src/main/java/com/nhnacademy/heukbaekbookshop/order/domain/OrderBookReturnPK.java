@@ -5,13 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderBookReturnId {
+public class OrderBookReturnPK implements Serializable {
     private long orderId;
     private long bookId;
     private long returnId;
@@ -20,7 +21,7 @@ public class OrderBookReturnId {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        OrderBookReturnId that = (OrderBookReturnId) o;
+        OrderBookReturnPK that = (OrderBookReturnPK) o;
         return Objects.equals(orderId, that.orderId) &&
                 Objects.equals(bookId, that.bookId) &&
                 Objects.equals(returnId, that.returnId);

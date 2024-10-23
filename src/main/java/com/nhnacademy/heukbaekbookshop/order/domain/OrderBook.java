@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(OrderBookId.class)
+@IdClass(OrderBookPK.class)
 @Table(name = "orders_books")
 public class OrderBook {
 
@@ -29,12 +29,12 @@ public class OrderBook {
 
     @ManyToOne
     @MapsId("bookId")
-    @JoinColumn(name = "book_id")
+    @JoinColumn(name = "book_id", insertable = false, updatable = false)
     private Book book;
 
     @ManyToOne
     @MapsId("orderId")
-    @JoinColumn(name = "order_id")
+    @JoinColumn(name = "order_id", insertable = false, updatable = false)
     private Order order;
 
     @NotNull

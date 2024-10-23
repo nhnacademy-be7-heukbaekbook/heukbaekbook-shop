@@ -1,10 +1,8 @@
 package com.nhnacademy.heukbaekbookshop.book.domain;
 
 import com.nhnacademy.heukbaekbookshop.cart.domain.Cart;
-import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.Publisher;
-import com.nhnacademy.heukbaekbookshop.member.domain.Member;
-import com.nhnacademy.heukbaekbookshop.tag.domain.Tag;
+import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -80,26 +78,18 @@ public class Book {
     @Column(name = "book_status")
     private BookStatus status;
 
-    @ManyToMany
-    @JoinTable(
-            name = "books_tags",
-            joinColumns = @JoinColumn(name = "book_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
-    private Set<Tag> tags;
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<BookTag> tags;
 
-    @ManyToMany
-    @JoinTable(
-            name = "books_categories",
-            joinColumns = @JoinColumn(name = "book_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
-    private Set<Category> categories;
-
-    @ManyToMany(mappedBy = "books")
-    private Set<Member> members;
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Like> like;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Cart> carts;
 
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<BookCategory> categories;
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<OrderBook> orderBooks;
 }

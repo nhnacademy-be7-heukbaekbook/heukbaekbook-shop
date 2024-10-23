@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.category.domain;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
+import com.nhnacademy.heukbaekbookshop.book.domain.BookCategory;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -37,5 +38,8 @@ public class Category {
 
     @ManyToMany(mappedBy = "categories")
     private Set<Book> books;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<BookCategory> bookCategories;
 
 }

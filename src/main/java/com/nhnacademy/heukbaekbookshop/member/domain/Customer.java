@@ -1,5 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.member.domain;
 
+import com.nhnacademy.heukbaekbookshop.cart.domain.Cart;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -9,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
+
+import java.util.Set;
 
 @Entity
 @Getter
@@ -24,6 +27,9 @@ public class Customer {
 
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private Member member;
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Cart> carts;
 
     @NotNull
     @Length(min = 1, max = 20)

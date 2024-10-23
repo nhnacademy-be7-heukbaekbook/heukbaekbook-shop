@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.member.domain;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
+import com.nhnacademy.heukbaekbookshop.book.domain.Like;
 import com.nhnacademy.heukbaekbookshop.cart.domain.Cart;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -61,13 +62,8 @@ public class Member {
     @JoinColumn(name = "grade_id")
     private Grade grade;
 
-    @ManyToMany
-    @JoinTable(
-            name = "likes",
-            joinColumns = @JoinColumn(name = "customer_id"),
-            inverseJoinColumns = @JoinColumn(name = "book_id")
-    )
-    private Set<Book> books;
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Like> likes;
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private Cart cart;
