@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.member.domain;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
+import com.nhnacademy.heukbaekbookshop.cart.domain.Cart;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -20,13 +21,14 @@ import java.util.Set;
 @AllArgsConstructor
 @Table(name = "members")
 public class Member {
+
     @Id
     @Column(name = "customer_id")
     private long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId  // customer_id를 외래 키로 사용
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "customer_id", insertable = false, updatable = false)
     private Customer customer;
 
     @NotNull
@@ -66,5 +68,8 @@ public class Member {
             inverseJoinColumns = @JoinColumn(name = "book_id")
     )
     private Set<Book> books;
+
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Cart cart;
 
 }

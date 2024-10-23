@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Table(name = "points_earns_standards")
 public class PointEarnStandard {
+
     @Id
     @Column(name = "point_earn_standard_id")
     private long id;

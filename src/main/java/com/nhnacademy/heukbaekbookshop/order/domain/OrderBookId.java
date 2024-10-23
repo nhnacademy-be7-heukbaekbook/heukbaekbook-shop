@@ -1,6 +1,5 @@
 package com.nhnacademy.heukbaekbookshop.order.domain;
 
-import com.nhnacademy.heukbaekbookshop.coupon.domain.BookCouponId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

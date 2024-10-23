@@ -26,17 +26,18 @@ public class Cart {
     @Column(name = "customer_id")
     private long customerId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("bookId")
-    @JoinColumn(name = "book_id")
+    @JoinColumn(name = "book_id", insertable = false, updatable = false)
     private Book book;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId("customerId")
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "customer_id", insertable = false, updatable = false)
     private Member member;
 
     @NotNull
     @Column(name = "book_amount")
     private int amount;
+
 }

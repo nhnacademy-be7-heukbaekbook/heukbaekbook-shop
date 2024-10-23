@@ -12,25 +12,19 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(BookImageId.class)
 @Table(name = "books_images")
 public class BookImage {
 
     @Id
     @Column(name = "image_id")
-    private long imageId;
+    private long id;
 
-    @Id
-    @Column(name = "book_id")
-    private long bookId;
-
-    @OneToOne
-    @MapsId("imageId")
-    @JoinColumn(name = "image_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "image_id", insertable = false, updatable = false)
     private Image image;
 
     @ManyToOne
-    @MapsId("bookId")
     @JoinColumn(name = "book_id")
     private Book book;
 

@@ -25,7 +25,7 @@ public class Delivery {
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = "order_id")
+    @JoinColumn(name = "order_id", insertable = false, updatable = false)
     private Order order;
 
     @NotNull

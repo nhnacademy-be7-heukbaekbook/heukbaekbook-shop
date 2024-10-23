@@ -43,5 +43,6 @@ public class Package {
 
     @NotNull
     @Column(name = "packaging_price")
-    private BigDecimal packagingPrice;
+    private BigDecimal price;
+
 }

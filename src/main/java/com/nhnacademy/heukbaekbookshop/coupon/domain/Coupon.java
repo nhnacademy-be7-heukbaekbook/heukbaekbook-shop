@@ -24,6 +24,12 @@ public class Coupon {
     @JoinColumn(name = "policy_id")
     private Policy policy;
 
+    @OneToOne(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
+    private BookCoupon bookCoupon;
+
+    @OneToOne(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
+    private CategoryCoupon categoryCoupon;
+
     @ManyToOne
     @JoinColumn(name = "coupon_type_id")
     private CouponType couponType;

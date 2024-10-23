@@ -1,9 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.member.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -25,6 +22,9 @@ public class Customer {
     @Column(name = "customer_id")
     private long id;
 
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Member member;
+
     @NotNull
     @Length(min = 1, max = 20)
     @Column(name = "customer_name")
@@ -40,4 +40,5 @@ public class Customer {
     @Length(max = 30)
     @Column(name = "customer_email")
     private String email;
+
 }

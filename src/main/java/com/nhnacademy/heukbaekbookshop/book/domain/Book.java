@@ -1,5 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.book.domain;
 
+import com.nhnacademy.heukbaekbookshop.cart.domain.Cart;
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.Publisher;
 import com.nhnacademy.heukbaekbookshop.member.domain.Member;
@@ -97,5 +98,8 @@ public class Book {
 
     @ManyToMany(mappedBy = "books")
     private Set<Member> members;
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Cart> carts;
 
 }

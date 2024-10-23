@@ -31,6 +31,9 @@ public class Order {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Delivery delivery;
+
     @ManyToOne
     @JoinColumn(name = "delivery_fee_id")
     private DeliveryFee deliveryFee;

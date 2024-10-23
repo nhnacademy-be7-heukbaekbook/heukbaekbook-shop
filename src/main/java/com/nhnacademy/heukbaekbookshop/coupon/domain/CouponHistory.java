@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Table(name = "coupons_histories")
 public class CouponHistory {
+
     @Id
     @Column(name = "coupon_history_id")
     private long id;
@@ -37,4 +38,5 @@ public class CouponHistory {
             @JoinColumn(name = "book_id", referencedColumnName = "book_id")
     })
     private OrderBook orderBook;
+
 }

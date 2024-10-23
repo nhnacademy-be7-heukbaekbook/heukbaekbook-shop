@@ -1,9 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.image.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,4 +24,14 @@ public class Image {
     @Length(max = 255)
     @Column(name = "image_url")
     private String url;
+
+    @OneToOne(mappedBy = "image", cascade = CascadeType.ALL, orphanRemoval = true)
+    private BookImage bookImage;
+
+    @OneToOne(mappedBy = "image", cascade = CascadeType.ALL, orphanRemoval = true)
+    private WrappingPaperImage wrappingPaperImage;
+
+    @OneToOne(mappedBy = "image", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ReviewImage reviewImage;
+
 }

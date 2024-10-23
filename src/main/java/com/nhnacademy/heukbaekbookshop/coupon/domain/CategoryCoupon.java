@@ -12,7 +12,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(CategoryCouponId.class)
 @Table(name = "categories_coupons")
 public class CategoryCoupon {
 
@@ -20,17 +19,12 @@ public class CategoryCoupon {
     @Column(name = "coupon_id")
     private long couponId;
 
-    @Id
-    @Column(name = "category_id")
-    private long categoryId;
-
-    @OneToOne
-    @MapsId("couponId")
-    @JoinColumn(name = "coupon_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "coupon_id", insertable = false, updatable = false)
     private Coupon coupon;
 
     @ManyToOne
-    @MapsId("categoryId")
     @JoinColumn(name = "category_id")
     private Category category;
 

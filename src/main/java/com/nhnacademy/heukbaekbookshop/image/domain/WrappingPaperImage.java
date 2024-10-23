@@ -12,25 +12,20 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(WrappingPaperImageId.class)
 @Table(name = "wrapping_papers_images")
 public class WrappingPaperImage {
 
     @Id
-    @Column(name = "wrapping_paper_id")
-    private long wrappingPaperId;
-
-    @Id
     @Column(name = "image_id")
-    private long imageId;
+    private long id;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "image_id", insertable = false, updatable = false)
+    private Image image;
 
     @OneToOne
-    @MapsId("wrappingPaperId")
     @JoinColumn(name = "wrapping_paper_id")
     private WrappingPaper wrappingPaper;
 
-    @OneToOne
-    @MapsId("imageId")
-    @JoinColumn(name = "image_id")
-    private Image image;
 }
