@@ -1,6 +1,5 @@
 package com.nhnacademy.heukbaekbookshop.tag.domain;
 
-import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import com.nhnacademy.heukbaekbookshop.book.domain.BookTag;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -28,9 +27,6 @@ public class Tag {
     @Length(min = 1, max = 100)
     @Column(name = "tag_name")
     private String name;
-
-    @ManyToMany(mappedBy = "tags")
-    private Set<Book> books;
 
     @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookTag> bookTags;
