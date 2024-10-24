@@ -1,29 +1,72 @@
 package com.nhnacademy.heukbaekbookshop.book.service;
 
-import com.nhnacademy.heukbaekbookshop.book.dto.BookSearchApiResponse;
-import com.nhnacademy.heukbaekbookshop.book.dto.BookSearchRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.BookSearchResponse;
+import com.nhnacademy.heukbaekbookshop.book.domain.Book;
+import com.nhnacademy.heukbaekbookshop.book.domain.BookCategory;
+import com.nhnacademy.heukbaekbookshop.book.domain.BookStatus;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.BookCreateRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.BookSearchRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.BookUpdateRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.BookCreateResponse;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.BookResponse;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.BookSearchApiResponse;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.BookSearchResponse;
+import com.nhnacademy.heukbaekbookshop.book.exception.BookAlreadyExistsException;
+import com.nhnacademy.heukbaekbookshop.book.exception.BookNotFoundException;
 import com.nhnacademy.heukbaekbookshop.book.exception.BookSearchException;
+import com.nhnacademy.heukbaekbookshop.book.repository.BookRepository;
+import com.nhnacademy.heukbaekbookshop.category.domain.Category;
+import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
+import com.nhnacademy.heukbaekbookshop.contributor.domain.*;
+import com.nhnacademy.heukbaekbookshop.contributor.repository.ContributorRepository;
+import com.nhnacademy.heukbaekbookshop.contributor.repository.PublisherRepository;
+import com.nhnacademy.heukbaekbookshop.contributor.repository.RoleRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class BookService {
 
     private final RestTemplate restTemplate;
+    private final BookRepository bookRepository;
+    private final PublisherRepository publisherRepository;
+    private final CategoryRepository categoryRepository;
+    private final ContributorRepository contributorRepository;
+    private final RoleRepository roleRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Value("${aladin.api.key}")
     private String aladinApiKey;
 
-    public BookService(RestTemplate restTemplate) {
+    public BookService(
+            RestTemplate restTemplate,
+            BookRepository bookRepository,
+            PublisherRepository publisherRepository,
+            CategoryRepository categoryRepository,
+            ContributorRepository contributorRepository,
+            RoleRepository roleRepository
+    ) {
         this.restTemplate = restTemplate;
+        this.bookRepository = bookRepository;
+        this.publisherRepository = publisherRepository;
+        this.categoryRepository = categoryRepository;
+        this.contributorRepository = contributorRepository;
+        this.roleRepository = roleRepository;
     }
 
     public List<BookSearchResponse> searchBook(BookSearchRequest bookSearchRequest) {
@@ -48,23 +91,18 @@ public class BookService {
                     .map(this::mapToBookSearchResponse)
                     .collect(Collectors.toList());
         } catch (RestClientException e) {
-            throw new BookSearchException("Aladin API 호출 중 오류가 발생했습니다.", e);
+            throw new BookSearchException("Error occurred while calling the Aladin API.", e);
         }
     }
 
-    // 쿼리 파라미터를 URL 인코딩하는 메서드
-    // private String encodeQuery(String query) {
-        // return URLEncoder.encode(query, StandardCharsets.UTF_8);
-    // }
-
-    // Item 객체를 BookSearchResponse로 변환하는 메서드
     private BookSearchResponse mapToBookSearchResponse(BookSearchApiResponse.Item item) {
-        LocalDate publicationDate = null;
+        LocalDate publicationDate;
         try {
-            publicationDate = LocalDate.parse(item.getPubDate(), DateTimeFormatter.ISO_DATE);
+            publicationDate = LocalDate.parse(item.getPubDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         } catch (Exception e) {
             publicationDate = LocalDate.now();
         }
+
         return new BookSearchResponse(
                 item.getTitle(),
                 item.getCover(),
@@ -76,6 +114,209 @@ public class BookService {
                 item.getIsbn(),
                 item.getStandardPrice(),
                 item.getSalesPrice()
+        );
+    }
+
+    @Transactional
+    public BookCreateResponse registerBook(BookCreateRequest request) {
+        if (bookRepository.findByIsbn(request.isbn()).isPresent()) {
+            throw new BookAlreadyExistsException(request.isbn());
+        }
+
+        Publisher publisher = publisherRepository.findByName(request.publisher())
+                .orElseGet(() -> {
+                    Publisher newPublisher = new Publisher();
+                    newPublisher.setName(request.publisher());
+                    return publisherRepository.save(newPublisher);
+                });
+
+        Book book = new Book();
+        book.setTitle(request.title());
+        book.setIndex(request.index());
+        book.setDescription(request.description());
+        book.setPublication(Date.valueOf(String.valueOf(request.pubDate())));
+        book.setIsbn(request.isbn());
+        book.setPrice(BigDecimal.valueOf(request.salesPrice()));
+        book.setPublisher(publisher);
+        book.setStatus(BookStatus.IN_STOCK);
+        book.setCategories(new HashSet<>());
+        book.setContributors(new HashSet<>());
+
+        bookRepository.save(book);
+
+        for (String categoryName : request.categories()) {
+            Category category = categoryRepository.findByName(categoryName.trim())
+                    .orElseGet(() -> {
+                        Category newCategory = new Category();
+                        newCategory.setName(categoryName.trim());
+                        return categoryRepository.save(newCategory);
+                    });
+
+            BookCategory bookCategory = new BookCategory(book, category);
+
+            book.addCategory(bookCategory);
+            category.addBookCategory(bookCategory);
+        }
+
+        for (String authorName : request.authors()) {
+            Contributor contributor = contributorRepository.findByName(authorName.trim())
+                    .orElseGet(() -> {
+                        Contributor newContributor = new Contributor();
+                        newContributor.setName(authorName.trim());
+                        newContributor.setDescription("");
+                        return contributorRepository.save(newContributor);
+                    });
+
+            Role role = roleRepository.findByRoleName(ContributorRole.AUTHOR)
+                    .orElseGet(() -> {
+                        Role newRole = new Role();
+                        newRole.setRoleName(ContributorRole.AUTHOR);
+                        return roleRepository.save(newRole);
+                    });
+
+            BookContributor bookContributor = new BookContributor();
+            bookContributor.setBook(book);
+            bookContributor.setContributor(contributor);
+            bookContributor.setRole(role);
+
+            book.getContributors().add(bookContributor);
+        }
+
+        bookRepository.save(book);
+        return new BookCreateResponse();
+    }
+
+    @Transactional
+    public BookResponse updateBook(Long bookId, BookUpdateRequest request) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new BookNotFoundException(bookId));
+
+        book.setTitle(request.title());
+        book.setIndex(request.index());
+        book.setDescription(request.description());
+        book.setPublication(Date.valueOf(request.pubDate()));
+        book.setIsbn(request.isbn());
+        book.setPrice(BigDecimal.valueOf(request.salesPrice()));
+
+        Publisher publisher = publisherRepository.findByName(request.publisher())
+                .orElseGet(() -> {
+                    Publisher newPublisher = new Publisher();
+                    newPublisher.setName(request.publisher());
+                    return publisherRepository.save(newPublisher);
+                });
+        book.setPublisher(publisher);
+
+        Set<Category> newCategories = new HashSet<>();
+        for (String categoryName : request.categories()) {
+            Category category = categoryRepository.findByName(categoryName.trim())
+                    .orElseGet(() -> {
+                        Category newCategory = new Category();
+                        newCategory.setName(categoryName.trim());
+                        return categoryRepository.save(newCategory);
+                    });
+            newCategories.add(category);
+        }
+
+        Set<BookCategory> categoriesToRemove = new HashSet<>(book.getCategories());
+        for (BookCategory bookCategory : categoriesToRemove) {
+
+            book.getCategories().remove(bookCategory);
+
+            bookCategory.getCategory().getBookCategories().remove(bookCategory);
+
+            bookCategory.setBook(null);
+            bookCategory.setCategory(null);
+
+            entityManager.remove(bookCategory);
+        }
+
+        entityManager.flush();
+
+        for (Category category : newCategories) {
+            if (book.getId() == null || category.getId() == null) {
+                throw new IllegalStateException("Book ID or Category ID is null.");
+            }
+            BookCategory bookCategory = new BookCategory(book, category);
+            book.addCategory(bookCategory);
+            category.addBookCategory(bookCategory);
+        }
+
+        Set<Contributor> newContributors = new HashSet<>();
+        for (String authorName : request.authors()) {
+            Contributor contributor = contributorRepository.findByName(authorName.trim())
+                    .orElseGet(() -> {
+                        Contributor newContributor = new Contributor();
+                        newContributor.setName(authorName.trim());
+                        newContributor.setDescription("");
+                        return contributorRepository.save(newContributor);
+                    });
+            newContributors.add(contributor);
+        }
+
+        Set<BookContributor> contributorsToRemove = new HashSet<>(book.getContributors());
+        for (BookContributor bookContributor : contributorsToRemove) {
+            book.getContributors().remove(bookContributor);
+
+            bookContributor.getContributor().getBookContributors().remove(bookContributor);
+
+            bookContributor.setBook(null);
+            bookContributor.setContributor(null);
+        }
+        Role authorRole = roleRepository.findByRoleName(ContributorRole.AUTHOR)
+                .orElseGet(() -> {
+                    Role newRole = new Role();
+                    newRole.setRoleName(ContributorRole.AUTHOR);
+                    return roleRepository.save(newRole);
+                });
+
+        for (Contributor contributor : newContributors) {
+            BookContributor bookContributor = new BookContributor();
+            bookContributor.setBook(book);
+            bookContributor.setContributor(contributor);
+            bookContributor.setRole(authorRole);
+            book.getContributors().add(bookContributor);
+        }
+
+        bookRepository.save(book);
+        return mapToBookResponse(book);
+    }
+
+    @Transactional
+    public void deleteBook(Long bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new BookNotFoundException(bookId));
+        bookRepository.delete(book);
+    }
+
+    @Transactional
+    public BookResponse getBook(Long bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new BookNotFoundException(bookId));
+        return mapToBookResponse(book);
+    }
+
+    private BookResponse mapToBookResponse(Book book) {
+        List<String> categories = book.getCategories().stream()
+                .map(bc -> bc.getCategory().getName())
+                .collect(Collectors.toList());
+
+        List<String> authors = book.getContributors().stream()
+                .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
+                .map(bc -> bc.getContributor().getName())
+                .collect(Collectors.toList());
+
+        return new BookResponse(
+                book.getId(),
+                book.getTitle(),
+                book.getIndex(),
+                book.getDescription(),
+                categories,
+                authors,
+                book.getPublisher().getName(),
+                new Date(book.getPublication().getTime()),
+                book.getIsbn(),
+                book.getPrice().intValue(),
+                book.getPrice().intValue()
         );
     }
 }

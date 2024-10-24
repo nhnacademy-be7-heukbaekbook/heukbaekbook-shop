@@ -19,11 +19,11 @@ public class Like {
 
     @Id
     @Column(name = "book_id")
-    private long bookId;
+    private Long bookId;
 
     @Id
     @Column(name = "customer_id")
-    private long customerId;
+    private Long customerId;
 
     @ManyToOne
     @MapsId("bookId")

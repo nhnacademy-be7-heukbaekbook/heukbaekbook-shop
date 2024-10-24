@@ -12,8 +12,8 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookTagPK {
-    private long bookId;
-    private long tagId;
+    private Long bookId;
+    private Long tagId;
 
     @Override
     public boolean equals(Object o) {

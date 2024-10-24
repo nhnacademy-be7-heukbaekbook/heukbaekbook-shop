@@ -1,9 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.contributor.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,8 +16,9 @@ import lombok.Setter;
 public class Role {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "role_id")
-    private long id;
+    private Long id;
 
     @NotNull
     @Column(name = "role_name")

@@ -18,7 +18,7 @@ public class MemberAddress {
 
     @Id
     @Column(name = "member_address_id")
-    private long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")

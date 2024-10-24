@@ -19,7 +19,7 @@ public class Grade {
 
     @Id
     @Column(name = "grade_id")
-    private long id;
+    private Long id;
 
     @NotNull
     @Enumerated(EnumType.STRING)

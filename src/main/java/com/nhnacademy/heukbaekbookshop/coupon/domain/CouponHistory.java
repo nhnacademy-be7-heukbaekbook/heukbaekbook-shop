@@ -22,7 +22,7 @@ public class CouponHistory {
 
     @Id
     @Column(name = "coupon_history_id")
-    private long id;
+    private Long id;
 
     @OneToOne
     @JoinColumn(name = "member_coupon_id")

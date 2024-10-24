@@ -21,7 +21,7 @@ public class Admin {
 
     @Id
     @Column(name = "admin_id")
-    private long id;
+    private Long id;
 
     @NotNull
     @Length(min = 1, max = 20)

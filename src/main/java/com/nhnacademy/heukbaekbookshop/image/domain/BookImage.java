@@ -17,7 +17,7 @@ public class BookImage {
 
     @Id
     @Column(name = "image_id")
-    private long id;
+    private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId

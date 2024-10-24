@@ -23,7 +23,7 @@ public class WrappingPaper {
 
     @Id
     @Column(name = "wrapping_paper_id")
-    private long id;
+    private Long id;
 
     @NotNull
     @Length(min = 1, max = 20)

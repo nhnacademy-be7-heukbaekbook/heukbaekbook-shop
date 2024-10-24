@@ -35,7 +35,9 @@
         <tr>
             <th>Cover</th>
             <th>Title</th>
+            <th>Description</th>
             <th>Author</th>
+            <th>Category</th>
             <th>Publisher</th>
             <th>Published Date</th>
             <th>ISBN</th>
@@ -45,14 +47,14 @@
         </thead>
         <tbody>
         <tr th:if="${responses.isEmpty()}">
-            <td colspan="8">No books found. Please try again.</td>
+            <td colspan="11">No books found. Please try again.</td>
         </tr>
         <tr th:each="result : ${responses}">
-            <td>
-                <img th:src="@{${result.cover}}" alt="No image" style="width:100px; height:auto;">
-            </td>
+            <td><img th:src="@{${result.cover}}" alt="No image" style="width:100px; height:auto;"></td>
             <td th:text="${result.title}">Title</td>
+            <td th:text="${result.description}">Description</td>
             <td th:text="${result.author}">Author</td>
+            <td th:text="${result.category}">Category</td>
             <td th:text="${result.publisher}">Publisher</td>
             <td th:text="${result.pubDate}">Published Date</td>
             <td th:text="${result.isbn}">ISBN</td>
@@ -62,5 +64,6 @@
         </tbody>
     </table>
 </div>
+
 </body>
 </html>
