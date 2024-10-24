@@ -38,9 +38,4 @@ public class Policy {
     @Column(name = "discount_value")
     private BigDecimal discountValue;
 
-    @NotNull
-    @Length(min = 1, max = 20)
-    @Column(name = "policy_name")
-    private String name;
-
 }
