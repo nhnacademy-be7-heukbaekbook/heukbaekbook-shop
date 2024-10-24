@@ -20,7 +20,7 @@ public class Payment {
 
     @Id
     @Column(name = "payment_id")
-    private long id;
+    private Long id;
 
     @OneToOne
     @JoinColumn(name = "order_id")

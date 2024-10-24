@@ -25,15 +25,15 @@ public class Review {
 
     @Id
     @Column(name = "customer_id")
-    private long customerId;
+    private Long customerId;
 
     @Id
     @Column(name = "book_id")
-    private long bookId;
+    private Long bookId;
 
     @Id
     @Column(name = "order_id")
-    private long orderId;
+    private Long orderId;
 
     @ManyToOne
     @MapsId("customerId")

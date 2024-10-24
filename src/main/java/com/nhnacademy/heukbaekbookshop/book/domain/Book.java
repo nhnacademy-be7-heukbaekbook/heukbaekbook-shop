@@ -25,7 +25,7 @@ public class Book {
 
     @Id
     @Column(name = "book_id")
-    private long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "publisher_id")

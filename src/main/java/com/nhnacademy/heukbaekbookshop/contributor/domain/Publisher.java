@@ -21,7 +21,7 @@ public class Publisher {
 
     @Id
     @Column(name = "publisher_id")
-    private long id;
+    private Long id;
 
     @NotNull
     @Length(min = 1, max = 100)

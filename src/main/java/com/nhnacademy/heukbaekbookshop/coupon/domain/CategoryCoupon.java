@@ -17,7 +17,7 @@ public class CategoryCoupon {
 
     @Id
     @Column(name = "coupon_id")
-    private long couponId;
+    private Long couponId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId

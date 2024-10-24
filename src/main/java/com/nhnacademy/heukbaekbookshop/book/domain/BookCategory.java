@@ -18,11 +18,11 @@ public class BookCategory {
 
     @Id
     @Column(name = "book_id")
-    private long bookId;
+    private Long bookId;
 
     @Id
     @Column(name = "category_id")
-    private long categoryId;
+    private Long categoryId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("bookId")

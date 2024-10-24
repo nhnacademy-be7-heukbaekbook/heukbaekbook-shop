@@ -21,7 +21,7 @@ public class Category {
 
     @Id
     @Column(name = "category_id")
-    private long id;
+    private Long id;
 
     @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Category> subCategories;

@@ -13,8 +13,8 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderBookPK implements Serializable {
-    private long bookId;
-    private long orderId;
+    private Long bookId;
+    private Long orderId;
 
     @Override
     public boolean equals(Object o) {

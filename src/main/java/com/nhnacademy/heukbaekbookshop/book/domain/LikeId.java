@@ -13,8 +13,8 @@ import java.util.Objects;
 @AllArgsConstructor
 public class LikeId {
 
-    private long bookId;
-    private long customerId;
+    private Long bookId;
+    private Long customerId;
 
     @Override
     public boolean equals(Object o) {

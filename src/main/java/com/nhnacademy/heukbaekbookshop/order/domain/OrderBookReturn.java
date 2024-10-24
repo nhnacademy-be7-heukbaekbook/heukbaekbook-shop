@@ -19,15 +19,15 @@ public class OrderBookReturn {
 
     @Id
     @Column(name = "book_id")
-    private long bookId;
+    private Long bookId;
 
     @Id
     @Column(name = "order_id")
-    private long orderId;
+    private Long orderId;
 
     @Id
     @Column(name = "return_id")
-    private long returnId;
+    private Long returnId;
 
     @ManyToOne
     @MapsId("bookId")

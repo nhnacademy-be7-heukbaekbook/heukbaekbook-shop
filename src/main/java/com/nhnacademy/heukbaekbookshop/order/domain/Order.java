@@ -26,7 +26,7 @@ public class Order {
 
     @Id
     @Column(name = "order_id")
-    private long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")

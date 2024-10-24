@@ -18,11 +18,11 @@ public class BookTag {
 
     @Id
     @Column(name = "tag_id")
-    private long tagId;
+    private Long tagId;
 
     @Id
     @Column(name = "book_id")
-    private long bookId;
+    private Long bookId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("tagId")

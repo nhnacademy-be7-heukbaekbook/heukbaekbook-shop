@@ -18,7 +18,7 @@ public class Contributor {
 
     @Id
     @Column(name = "contributor_id")
-    private long id;
+    private Long id;
 
     @NotNull
     @Column(name = "contributor_name")

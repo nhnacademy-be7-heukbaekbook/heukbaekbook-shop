@@ -20,7 +20,7 @@ public class Policy {
 
     @Id
     @Column(name = "policy_id")
-    private long id;
+    private Long id;
 
     @NotNull
     @Enumerated(EnumType.STRING)

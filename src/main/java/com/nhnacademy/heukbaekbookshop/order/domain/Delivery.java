@@ -21,7 +21,7 @@ public class Delivery {
 
     @Id
     @Column(name = "order_id")
-    private long id;
+    private Long id;
 
     @OneToOne
     @MapsId
