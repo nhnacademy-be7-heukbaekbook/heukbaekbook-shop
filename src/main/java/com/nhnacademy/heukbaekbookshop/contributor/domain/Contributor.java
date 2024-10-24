@@ -26,7 +26,6 @@ public class Contributor {
     private String name;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
     @Column(name = "contributor_description")
     private String description;
 
