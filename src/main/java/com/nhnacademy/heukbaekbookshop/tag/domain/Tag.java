@@ -21,10 +21,10 @@ public class Tag {
 
     @Id
     @Column(name = "tag_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
-    @Length(min = 1, max = 100)
     @Column(name = "tag_name")
     private String name;
 

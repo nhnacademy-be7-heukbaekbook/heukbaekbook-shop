@@ -18,10 +18,10 @@ public class Image {
 
     @Id
     @Column(name = "image_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
-    @Length(max = 255)
     @Column(name = "image_url")
     private String url;
 

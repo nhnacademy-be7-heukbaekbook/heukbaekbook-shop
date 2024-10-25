@@ -18,11 +18,11 @@ public class Contributor {
 
     @Id
     @Column(name = "contributor_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
     @Column(name = "contributor_name")
-    @Length(min = 1, max = 10)
     private String name;
 
     @NotNull

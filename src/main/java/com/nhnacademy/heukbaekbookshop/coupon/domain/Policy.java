@@ -20,6 +20,7 @@ public class Policy {
 
     @Id
     @Column(name = "policy_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull

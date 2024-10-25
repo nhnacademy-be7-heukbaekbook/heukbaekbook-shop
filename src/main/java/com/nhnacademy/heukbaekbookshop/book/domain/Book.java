@@ -25,6 +25,7 @@ public class Book {
 
     @Id
     @Column(name = "book_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -32,7 +33,6 @@ public class Book {
     private Publisher publisher;
 
     @NotNull
-    @Length(min = 1, max = 100)
     @Column(name = "book_title")
     private String title;
 

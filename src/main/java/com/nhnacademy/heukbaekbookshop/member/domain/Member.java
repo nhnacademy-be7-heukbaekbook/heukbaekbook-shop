@@ -5,10 +5,7 @@ import com.nhnacademy.heukbaekbookshop.book.domain.Like;
 import com.nhnacademy.heukbaekbookshop.cart.domain.Cart;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
 import java.sql.Date;
@@ -19,9 +16,9 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "members")
-public class Member {
+public class Member extends Customer{
 
     @Id
     @Column(name = "customer_id")
@@ -33,12 +30,10 @@ public class Member {
     private Customer customer;
 
     @NotNull
-    @Length(min = 1, max = 20)
     @Column(name = "member_login_id")
     private String loginId;
 
     @NotNull
-    @Length(min = 1, max = 255)
     @Column(name = "member_password")
     private String password;
 
@@ -68,4 +63,15 @@ public class Member {
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private Cart cart;
 
+    @Builder
+    private Member(Customer customer, String loginId, String password, Date birth, Grade grade){
+        this.id = customer.getId();;
+        this.customer = customer;
+        this.loginId = loginId;
+        this.password = password;
+        this.birth = birth;
+        this.createdAt = LocalDateTime.now();
+        this.status = MemberStatus.ACTIVE;
+        this.grade = grade;
+    }
 }

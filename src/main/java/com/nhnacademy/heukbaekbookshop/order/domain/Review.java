@@ -51,8 +51,6 @@ public class Review {
     private Order order;
 
     @NotNull
-    @Min(1)
-    @Max(5)
     @Column(name = "review_score")
     private int score;
 
@@ -64,7 +62,6 @@ public class Review {
     private LocalDateTime updatedAt;
 
     @NotNull
-    @Length(min = 1, max = 30)
     @Column(name = "review_title")
     private String title;
 
