@@ -4,7 +4,6 @@ import com.nhnacademy.heukbaekbookshop.member.domain.Customer;
 import com.nhnacademy.heukbaekbookshop.member.domain.Grade;
 import com.nhnacademy.heukbaekbookshop.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.member.domain.MemberStatus;
-import lombok.Builder;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
@@ -20,7 +19,8 @@ public record MemberResponse(
 ) {
 
     public static MemberResponse from(Member member) {
-        return new MemberResponse(member.getCustomer(),
+        return new MemberResponse(
+                Customer.createCustomer(member.getName(), member.getPhoneNumber(), member.getEmail()),
                 member.getLoginId(),
                 member.getBirth(),
                 member.getCreatedAt(),

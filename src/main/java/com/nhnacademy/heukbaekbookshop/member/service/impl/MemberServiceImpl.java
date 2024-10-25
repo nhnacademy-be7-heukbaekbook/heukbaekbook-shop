@@ -25,7 +25,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class MemberServiceImpl implements MemberService {
 
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+//    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final MemberRepository memberRepository;
     private final MemberAddressRepository memberAddressRepository;
     private final CustomerRepository customerRepository;
@@ -34,18 +34,22 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public MemberResponse createMember(MemberCreateRequest memberCreateRequest) {
-        if (memberRepository.existsMemberByMemberId(memberCreateRequest.loginId())) {
+        if (memberRepository.existsByLoginId(memberCreateRequest.loginId())) {
             throw new MemberAlreadyExistException();
         }
+
         if (customerRepository.existsCustomerByEmail(memberCreateRequest.email())) {
             throw new MemberAlreadyExistException();
         }
 
-        Customer customer = customerRepository.save(memberCreateRequest.toCustomerEntity());
+
         Grade grade = gradeRepository.findById(1L).orElseThrow(NoSuchElementException::new);
 
-        Member member = memberCreateRequest.toMemberEntity(customer, grade, bCryptPasswordEncoder.encode(memberCreateRequest.password()));
-        memberRepository.save(member);
+        // bCryptPasswordEncoder.encode(memberCreateRequest.password())
+
+        Member member = memberCreateRequest.toMemberEntity(grade, memberCreateRequest.password());
+        System.out.println(member.toString());
+        customerRepository.save(member);
 
         MemberAddress memberAddress = memberCreateRequest.toMemberAddressEntity(member);
         memberAddressRepository.save(memberAddress);

@@ -3,9 +3,7 @@ package com.nhnacademy.heukbaekbookshop.member.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
-import org.hibernate.validator.constraints.Length;
 
 @Entity
 @Getter
@@ -20,9 +18,6 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Member member;
-
     @NotNull
     @Column(name = "customer_name")
     private String name;
@@ -36,8 +31,15 @@ public class Customer {
     @Column(name = "customer_email")
     private String email;
 
-    @Builder
-    private Customer(String name, String phoneNumber, String email) {
+    public static Customer createCustomer(String name, String phoneNumber, String email) {
+        Customer customer = new Customer();
+        customer.name = name;
+        customer.phoneNumber = phoneNumber;
+        customer.email = email;
+        return customer;
+    }
+
+    protected Customer(String name, String phoneNumber, String email){
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.email = email;
