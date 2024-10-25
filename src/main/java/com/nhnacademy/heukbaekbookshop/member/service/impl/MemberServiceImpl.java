@@ -38,7 +38,7 @@ public class MemberServiceImpl implements MemberService {
             throw new MemberAlreadyExistException();
         }
 
-        if (customerRepository.existsCustomerByEmail(memberCreateRequest.email())) {
+        if (memberRepository.existsByEmail(memberCreateRequest.email())) {
             throw new MemberAlreadyExistException();
         }
 
