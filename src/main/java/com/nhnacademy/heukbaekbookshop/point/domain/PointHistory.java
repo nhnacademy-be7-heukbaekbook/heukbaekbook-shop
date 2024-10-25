@@ -22,7 +22,7 @@ public class PointHistory {
 
     @Id
     @Column(name = "point_history_id")
-    private long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")

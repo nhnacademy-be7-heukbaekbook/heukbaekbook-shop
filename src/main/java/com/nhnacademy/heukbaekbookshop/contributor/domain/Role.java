@@ -20,7 +20,7 @@ public class Role {
 
     @Id
     @Column(name = "role_id")
-    private long id;
+    private Long id;
 
     @NotNull
     @Column(name = "role_name")

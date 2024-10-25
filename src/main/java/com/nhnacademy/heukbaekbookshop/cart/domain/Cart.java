@@ -20,11 +20,11 @@ public class Cart {
 
     @Id
     @Column(name = "book_id")
-    private long bookId;
+    private Long bookId;
 
     @Id
     @Column(name = "customer_id")
-    private long customerId;
+    private Long customerId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("bookId")

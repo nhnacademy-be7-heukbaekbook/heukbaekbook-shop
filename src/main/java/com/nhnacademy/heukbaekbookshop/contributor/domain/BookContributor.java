@@ -17,7 +17,7 @@ public class BookContributor {
 
     @Id
     @Column(name = "book_contributor_id")
-    private long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "book_id")

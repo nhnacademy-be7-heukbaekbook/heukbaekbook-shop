@@ -19,7 +19,7 @@ public class Return {
 
     @Id
     @Column(name = "return_id")
-    private long id;
+    private Long id;
 
     @NotNull
     @Column(name = "reason")

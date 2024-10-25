@@ -20,7 +20,7 @@ public class MemberCoupon {
 
     @Id
     @Column(name = "member_coupon_id")
-    private long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")

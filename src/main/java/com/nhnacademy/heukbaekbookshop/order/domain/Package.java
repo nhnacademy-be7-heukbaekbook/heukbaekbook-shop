@@ -21,7 +21,7 @@ public class Package {
 
     @Id
     @Column(name = "book_id")
-    private long bookId;
+    private Long bookId;
 
     @Id
     @Column(name = "order_id")

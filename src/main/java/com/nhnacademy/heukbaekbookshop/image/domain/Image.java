@@ -18,7 +18,7 @@ public class Image {
 
     @Id
     @Column(name = "image_id")
-    private long id;
+    private Long id;
 
     @NotNull
     @Length(max = 255)

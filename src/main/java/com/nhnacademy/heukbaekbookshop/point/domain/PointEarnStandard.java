@@ -23,7 +23,7 @@ public class PointEarnStandard {
 
     @Id
     @Column(name = "point_earn_standard_id")
-    private long id;
+    private Long id;
 
     @NotNull
     @Length(min = 1, max = 20)

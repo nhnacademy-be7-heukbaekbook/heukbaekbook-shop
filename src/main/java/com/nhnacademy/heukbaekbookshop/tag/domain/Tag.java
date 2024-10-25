@@ -21,7 +21,7 @@ public class Tag {
 
     @Id
     @Column(name = "tag_id")
-    private long id;
+    private Long id;
 
     @NotNull
     @Length(min = 1, max = 100)

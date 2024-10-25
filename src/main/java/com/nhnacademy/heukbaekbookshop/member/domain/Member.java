@@ -25,7 +25,7 @@ public class Member {
 
     @Id
     @Column(name = "customer_id")
-    private long id;
+    private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId  // customer_id를 외래 키로 사용
