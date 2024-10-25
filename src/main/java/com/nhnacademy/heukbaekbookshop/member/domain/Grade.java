@@ -21,8 +21,8 @@ public class Grade {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "grade")
-    private GradeName grade;
+    @Column(name = "grade_name")
+    private GradeName gradeName;
 
     @NotNull
     @Column(name = "grade_point_percentage")
