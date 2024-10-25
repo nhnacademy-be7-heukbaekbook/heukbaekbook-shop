@@ -1,9 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.admin.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +8,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
+/**
+ *
+ * DB에서 추가하는 admin은 validation 값 필요
+ */
 @Entity
 @Getter
 @Setter
@@ -21,6 +22,7 @@ public class Admin {
 
     @Id
     @Column(name = "admin_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull

@@ -20,6 +20,7 @@ public class MemberCoupon {
 
     @Id
     @Column(name = "member_coupon_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne

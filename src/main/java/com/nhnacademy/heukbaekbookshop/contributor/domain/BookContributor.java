@@ -17,6 +17,7 @@ public class BookContributor {
 
     @Id
     @Column(name = "book_contributor_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne

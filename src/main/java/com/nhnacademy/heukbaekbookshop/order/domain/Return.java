@@ -19,6 +19,7 @@ public class Return {
 
     @Id
     @Column(name = "return_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull

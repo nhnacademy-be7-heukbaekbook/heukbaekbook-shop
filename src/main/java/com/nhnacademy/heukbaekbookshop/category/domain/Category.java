@@ -21,6 +21,7 @@ public class Category {
 
     @Id
     @Column(name = "category_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -31,7 +32,6 @@ public class Category {
     private Category parentCategory;
 
     @NotNull
-    @Length(min = 1, max = 100)
     @Column(name = "category_name")
     private String name;
 

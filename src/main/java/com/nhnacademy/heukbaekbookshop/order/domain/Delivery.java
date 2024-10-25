@@ -29,7 +29,6 @@ public class Delivery {
     private Order order;
 
     @NotNull
-    @Length(min = 1, max = 20)
     @Column(name = "delivery_recipient")
     private String recipient;
 
