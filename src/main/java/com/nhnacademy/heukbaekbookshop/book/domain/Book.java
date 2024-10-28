@@ -1,17 +1,18 @@
 package com.nhnacademy.heukbaekbookshop.book.domain;
 
 import com.nhnacademy.heukbaekbookshop.cart.domain.Cart;
-import com.nhnacademy.heukbaekbookshop.contributor.domain.BookContributor;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.Publisher;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
 import java.sql.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -23,8 +24,8 @@ import java.util.Set;
 public class Book {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "book_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -32,7 +33,6 @@ public class Book {
     private Publisher publisher;
 
     @NotNull
-    @Length(min = 1, max = 100)
     @Column(name = "book_title")
     private String title;
 
@@ -79,26 +79,17 @@ public class Book {
     private BookStatus status;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<BookTag> tags = new HashSet<>();
+    private Set<BookTag> tags;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Like> like = new HashSet<>();
+    private Set<Like> like;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Cart> carts = new HashSet<>();
+    private Set<Cart> carts;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<BookCategory> categories = new HashSet<>();
+    private Set<BookCategory> categories;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<OrderBook> orderBooks = new HashSet<>();
-
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<BookContributor> contributors = new HashSet<>();
-
-    public void addCategory(BookCategory bookCategory) {
-        categories.add(bookCategory);
-        bookCategory.setBook(this);
-    }
-
+    private Set<OrderBook> orderBooks;
 }

@@ -1,7 +1,5 @@
 package com.nhnacademy.heukbaekbookshop.book.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,28 +10,23 @@ import java.util.Objects;
 
 @Getter
 @Setter
-@Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookCategoryPK implements Serializable {
-    @Column(name = "book_id")
     private Long bookId;
-
-    @Column(name = "category_id")
     private Long categoryId;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         BookCategoryPK that = (BookCategoryPK) o;
-        return Objects.equals(bookId, that.bookId) &&
-                Objects.equals(categoryId, that.categoryId);
+        return Objects.equals(categoryId, that.categoryId) &&
+                Objects.equals(bookId, that.bookId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(bookId, categoryId);
+        return Objects.hash(categoryId, bookId);
     }
 }

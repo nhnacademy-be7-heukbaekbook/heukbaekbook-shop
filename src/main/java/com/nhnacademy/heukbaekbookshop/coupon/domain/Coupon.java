@@ -18,6 +18,7 @@ public class Coupon {
 
     @Id
     @Column(name = "coupon_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne

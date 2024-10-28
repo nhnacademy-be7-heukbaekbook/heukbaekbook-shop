@@ -22,6 +22,7 @@ public class CouponHistory {
 
     @Id
     @Column(name = "coupon_history_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne

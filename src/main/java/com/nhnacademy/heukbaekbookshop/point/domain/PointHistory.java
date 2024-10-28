@@ -22,6 +22,7 @@ public class PointHistory {
 
     @Id
     @Column(name = "point_history_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
