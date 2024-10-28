@@ -17,12 +17,11 @@ import org.hibernate.validator.constraints.Length;
 public class Publisher {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "publisher_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
-    @Length(min = 1, max = 100)
     @Column(name = "publisher_name")
     private String name;
 

@@ -1,15 +1,10 @@
 package com.nhnacademy.heukbaekbookshop.member.domain;
 
-import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import com.nhnacademy.heukbaekbookshop.book.domain.Like;
 import com.nhnacademy.heukbaekbookshop.cart.domain.Cart;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
+import lombok.*;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
@@ -18,27 +13,17 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "members")
-public class Member {
-
-    @Id
-    @Column(name = "customer_id")
-    private Long id;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId  // customer_id를 외래 키로 사용
-    @JoinColumn(name = "customer_id", insertable = false, updatable = false)
-    private Customer customer;
+public class Member extends Customer{
 
     @NotNull
-    @Length(min = 1, max = 20)
     @Column(name = "member_login_id")
     private String loginId;
 
     @NotNull
-    @Length(min = 1, max = 255)
     @Column(name = "member_password")
     private String password;
 
@@ -68,4 +53,14 @@ public class Member {
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private Cart cart;
 
+    @Builder
+    private Member(String name, String phoneNumber, String email, String loginId, String password, Date birth, Grade grade){
+        super(name, phoneNumber, email);
+        this.loginId = loginId;
+        this.password = password;
+        this.birth = birth;
+        this.createdAt = LocalDateTime.now();
+        this.status = MemberStatus.ACTIVE;
+        this.grade = grade;
+    }
 }
