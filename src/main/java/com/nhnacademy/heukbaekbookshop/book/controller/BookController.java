@@ -29,13 +29,13 @@ public class BookController {
         return ResponseEntity.ok(bookSearchResponses);
     }
 
-    @PostMapping
+    @PostMapping("/admins")
     public ResponseEntity<BookCreateResponse> createBook(@RequestBody BookCreateRequest request) {
         BookCreateResponse response = bookService.registerBook(request);
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{bookId}")
+    @PutMapping("/admins/{bookId}")
     public ResponseEntity<BookUpdateResponse> updateBook(
             @PathVariable Long bookId,
             @RequestBody BookUpdateRequest request
@@ -44,15 +44,15 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{bookId}")
+    @DeleteMapping("/admins/{bookId}")
     public ResponseEntity<BookDeleteResponse> deleteBook(@PathVariable Long bookId) {
         BookDeleteResponse response = bookService.deleteBook(bookId);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{bookId}")
-    public ResponseEntity<BookResponse> getBook(@PathVariable Long bookId) {
-        BookResponse response = bookService.getBook(bookId);
+    public ResponseEntity<BookDetailResponse> getBook(@PathVariable Long bookId) {
+        BookDetailResponse response = bookService.getBook(bookId);
         return ResponseEntity.ok(response);
     }
 

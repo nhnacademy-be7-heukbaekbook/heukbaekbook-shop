@@ -31,6 +31,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -332,10 +333,31 @@ public class BookService {
     }
 
     @Transactional
-    public BookResponse getBook(Long bookId) {
+    public BookDetailResponse getBook(Long bookId) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
-        return mapToBookResponse(book);
+        if (book.getStatus() == BookStatus.DELETED) {
+            throw new BookNotFoundException(bookId);
+        }
+        return new BookDetailResponse(
+                book.getTitle(),
+                book.getIndex(),
+                book.getDescription(),
+                book.getPublication().toString(),
+                book.getIsbn(),
+                book.isPackable(),
+                book.getStock(),
+                book.getPrice().intValue(),
+                book.getDiscountRate(),
+                book.getPublisher().getName(),
+                book.getCategories().stream()
+                        .map(bc -> bc.getCategory().getName())
+                        .collect(Collectors.toList()),
+                book.getContributors().stream()
+                        .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
+                        .map(bc -> bc.getContributor().getName())
+                        .collect(Collectors.toList())
+        );
     }
 
     private BookResponse mapToBookResponse(Book book) {
