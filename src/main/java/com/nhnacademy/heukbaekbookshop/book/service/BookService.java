@@ -6,10 +6,7 @@ import com.nhnacademy.heukbaekbookshop.book.domain.BookStatus;
 import com.nhnacademy.heukbaekbookshop.book.dto.request.BookCreateRequest;
 import com.nhnacademy.heukbaekbookshop.book.dto.request.BookSearchRequest;
 import com.nhnacademy.heukbaekbookshop.book.dto.request.BookUpdateRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.response.BookCreateResponse;
-import com.nhnacademy.heukbaekbookshop.book.dto.response.BookResponse;
-import com.nhnacademy.heukbaekbookshop.book.dto.response.BookSearchApiResponse;
-import com.nhnacademy.heukbaekbookshop.book.dto.response.BookSearchResponse;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.*;
 import com.nhnacademy.heukbaekbookshop.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.heukbaekbookshop.book.exception.BookNotFoundException;
 import com.nhnacademy.heukbaekbookshop.book.exception.BookSearchException;
@@ -134,11 +131,14 @@ public class BookService {
         book.setTitle(request.title());
         book.setIndex(request.index());
         book.setDescription(request.description());
-        book.setPublication(Date.valueOf(String.valueOf(request.pubDate())));
+        book.setPublication(Date.valueOf(String.valueOf(request.publication())));
         book.setIsbn(request.isbn());
-        book.setPrice(BigDecimal.valueOf(request.salesPrice()));
+        book.setPrice(BigDecimal.valueOf(request.standardPrice()));
+        book.setDiscountRate(request.discountRate());
+        book.setPackable(request.isPackable());
         book.setPublisher(publisher);
         book.setStatus(BookStatus.IN_STOCK);
+        book.setStock(request.stock());
         book.setCategories(new HashSet<>());
         book.setContributors(new HashSet<>());
 
@@ -183,20 +183,42 @@ public class BookService {
         }
 
         bookRepository.save(book);
-        return new BookCreateResponse();
+        return new BookCreateResponse(
+                book.getTitle(),
+                book.getIndex(),
+                book.getDescription(),
+                book.getPublication().toString(),
+                book.getIsbn(),
+                book.isPackable(),
+                book.getStock(),
+                book.getPrice().intValue(),
+                book.getDiscountRate(),
+                book.getPublisher().getName(),
+                book.getCategories().stream()
+                        .map(bc -> bc.getCategory().getName())
+                        .collect(Collectors.toList()),
+                book.getContributors().stream()
+                        .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
+                        .map(bc -> bc.getContributor().getName())
+                        .collect(Collectors.toList())
+        );
     }
 
     @Transactional
-    public BookResponse updateBook(Long bookId, BookUpdateRequest request) {
+    public BookUpdateResponse updateBook(Long bookId, BookUpdateRequest request) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
 
         book.setTitle(request.title());
         book.setIndex(request.index());
         book.setDescription(request.description());
-        book.setPublication(Date.valueOf(request.pubDate()));
+        book.setPublication(Date.valueOf(request.publication()));
         book.setIsbn(request.isbn());
-        book.setPrice(BigDecimal.valueOf(request.salesPrice()));
+        book.setPackable(request.isPackable());
+        book.setStock(request.stock());
+        book.setPrice(BigDecimal.valueOf(request.standardPrice()));
+        book.setDiscountRate(request.discountRate());
+        book.setStatus(BookStatus.valueOf(request.bookStatus()));
 
         Publisher publisher = publisherRepository.findByName(request.publisher())
                 .orElseGet(() -> {
@@ -278,14 +300,35 @@ public class BookService {
         }
 
         bookRepository.save(book);
-        return mapToBookResponse(book);
+        return new BookUpdateResponse(
+                book.getTitle(),
+                book.getIndex(),
+                book.getDescription(),
+                book.getPublication().toString(),
+                book.getIsbn(),
+                book.isPackable(),
+                book.getStock(),
+                book.getPrice().intValue(),
+                book.getDiscountRate(),
+                book.getStatus().name(),
+                book.getPublisher().getName(),
+                book.getCategories().stream()
+                        .map(bc -> bc.getCategory().getName())
+                        .collect(Collectors.toList()),
+                book.getContributors().stream()
+                        .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
+                        .map(bc -> bc.getContributor().getName())
+                        .collect(Collectors.toList())
+        );
     }
 
     @Transactional
-    public void deleteBook(Long bookId) {
+    public BookDeleteResponse deleteBook(Long bookId) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
-        bookRepository.delete(book);
+        book.setStatus(BookStatus.DELETED);
+        bookRepository.save(book);
+        return new BookDeleteResponse("Book deleted successfully.");
     }
 
     @Transactional

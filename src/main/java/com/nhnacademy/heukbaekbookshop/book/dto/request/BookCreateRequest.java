@@ -6,11 +6,13 @@ public record BookCreateRequest(
         String title,
         String index,
         String description,
-        List<String> categories,
-        List<String> authors,
-        String publisher,
-        String pubDate,
+        String publication,
         String isbn,
+        boolean isPackable,
+        int stock,
         int standardPrice,
-        int salesPrice
+        float discountRate,
+        String publisher,
+        List<String> categories,
+        List<String> authors
 ) {}

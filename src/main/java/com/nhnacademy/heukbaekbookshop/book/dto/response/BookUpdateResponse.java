@@ -1,8 +1,8 @@
-package com.nhnacademy.heukbaekbookshop.book.dto.request;
+package com.nhnacademy.heukbaekbookshop.book.dto.response;
 
 import java.util.List;
 
-public record BookUpdateRequest(
+public record BookUpdateResponse(
         String title,
         String index,
         String description,

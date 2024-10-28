@@ -3,9 +3,7 @@ package com.nhnacademy.heukbaekbookshop.book.controller;
 import com.nhnacademy.heukbaekbookshop.book.dto.request.BookCreateRequest;
 import com.nhnacademy.heukbaekbookshop.book.dto.request.BookSearchRequest;
 import com.nhnacademy.heukbaekbookshop.book.dto.request.BookUpdateRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.response.BookCreateResponse;
-import com.nhnacademy.heukbaekbookshop.book.dto.response.BookResponse;
-import com.nhnacademy.heukbaekbookshop.book.dto.response.BookSearchResponse;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.*;
 import com.nhnacademy.heukbaekbookshop.book.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -38,18 +36,18 @@ public class BookController {
     }
 
     @PutMapping("/{bookId}")
-    public ResponseEntity<BookResponse> updateBook(
+    public ResponseEntity<BookUpdateResponse> updateBook(
             @PathVariable Long bookId,
             @RequestBody BookUpdateRequest request
     ) {
-        BookResponse response = bookService.updateBook(bookId, request);
+        BookUpdateResponse response = bookService.updateBook(bookId, request);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{bookId}")
-    public ResponseEntity<Void> deleteBook(@PathVariable Long bookId) {
-        bookService.deleteBook(bookId);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<BookDeleteResponse> deleteBook(@PathVariable Long bookId) {
+        BookDeleteResponse response = bookService.deleteBook(bookId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{bookId}")
