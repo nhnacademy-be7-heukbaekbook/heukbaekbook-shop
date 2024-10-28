@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Getter
 @Setter
@@ -17,16 +20,20 @@ import org.hibernate.validator.constraints.Length;
 public class Contributor {
 
     @Id
-    @Column(name = "contributor_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "contributor_id")
     private Long id;
 
     @NotNull
     @Column(name = "contributor_name")
+    @Length(min = 1, max = 10)
     private String name;
 
     @NotNull
     @Column(name = "contributor_description")
     private String description;
+
+    @OneToMany(mappedBy = "contributor", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<BookContributor> bookContributors = new HashSet<>();
 
 }

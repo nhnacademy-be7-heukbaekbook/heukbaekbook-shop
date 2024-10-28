@@ -25,7 +25,7 @@ public class Package {
 
     @Id
     @Column(name = "order_id")
-    private long orderId;
+    private Long orderId;
 
     @ManyToOne
     @MapsId("bookId")
