@@ -1,8 +1,8 @@
-package com.nhnacademy.heukbaekbookshop.book.dto.response;
+package com.nhnacademy.heukbaekbookshop.book.dto.request.book;
 
 import java.util.List;
 
-public record BookUpdateResponse(
+public record BookCreateRequest(
         String title,
         String index,
         String description,
@@ -12,7 +12,6 @@ public record BookUpdateResponse(
         int stock,
         int standardPrice,
         float discountRate,
-        String bookStatus,
         String publisher,
         List<String> categories,
         List<String> authors

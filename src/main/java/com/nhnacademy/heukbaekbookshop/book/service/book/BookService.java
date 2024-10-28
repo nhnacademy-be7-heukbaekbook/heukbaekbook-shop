@@ -1,16 +1,16 @@
-package com.nhnacademy.heukbaekbookshop.book.service;
+package com.nhnacademy.heukbaekbookshop.book.service.book;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import com.nhnacademy.heukbaekbookshop.book.domain.BookCategory;
 import com.nhnacademy.heukbaekbookshop.book.domain.BookStatus;
-import com.nhnacademy.heukbaekbookshop.book.dto.request.BookCreateRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.request.BookSearchRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.request.BookUpdateRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.response.*;
-import com.nhnacademy.heukbaekbookshop.book.exception.BookAlreadyExistsException;
-import com.nhnacademy.heukbaekbookshop.book.exception.BookNotFoundException;
-import com.nhnacademy.heukbaekbookshop.book.exception.BookSearchException;
-import com.nhnacademy.heukbaekbookshop.book.repository.BookRepository;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookCreateRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookUpdateRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.book.*;
+import com.nhnacademy.heukbaekbookshop.book.exception.book.BookAlreadyExistsException;
+import com.nhnacademy.heukbaekbookshop.book.exception.book.BookNotFoundException;
+import com.nhnacademy.heukbaekbookshop.book.exception.book.BookSearchException;
+import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.*;
@@ -31,7 +31,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -357,31 +356,7 @@ public class BookService {
                         .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
                         .map(bc -> bc.getContributor().getName())
                         .collect(Collectors.toList())
-        );
-    }
 
-    private BookResponse mapToBookResponse(Book book) {
-        List<String> categories = book.getCategories().stream()
-                .map(bc -> bc.getCategory().getName())
-                .collect(Collectors.toList());
-
-        List<String> authors = book.getContributors().stream()
-                .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
-                .map(bc -> bc.getContributor().getName())
-                .collect(Collectors.toList());
-
-        return new BookResponse(
-                book.getId(),
-                book.getTitle(),
-                book.getIndex(),
-                book.getDescription(),
-                categories,
-                authors,
-                book.getPublisher().getName(),
-                new Date(book.getPublication().getTime()),
-                book.getIsbn(),
-                book.getPrice().intValue(),
-                book.getPrice().intValue()
         );
     }
 }
