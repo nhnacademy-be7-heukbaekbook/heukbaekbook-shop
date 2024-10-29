@@ -2,6 +2,8 @@ package com.nhnacademy.heukbaekbookshop.member.controller;
 
 
 import com.nhnacademy.heukbaekbookshop.member.domain.MemberStatus;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookDetailResponse;
+import com.nhnacademy.heukbaekbookshop.book.service.like.LikeService;
 import com.nhnacademy.heukbaekbookshop.member.dto.request.MemberCreateRequest;
 import com.nhnacademy.heukbaekbookshop.member.dto.request.MemberUpdateRequest;
 import com.nhnacademy.heukbaekbookshop.member.dto.response.MemberResponse;
@@ -12,6 +14,7 @@ import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 /**
  * Member(회원) RestController
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
+    private final LikeService likeService;
 
     /**
      * 회원 생성 요청 시 사용되는 메서드입니다.
@@ -75,5 +79,9 @@ public class MemberController {
                 .body(memberService.changeMemberStatus(customerId, MemberStatus.WITHDRAWN));
     }
 
-
+    @PostMapping("/{customerId}/likes")
+    public ResponseEntity<List<BookDetailResponse>> getLikedBooks(@PathVariable Long customerId) {
+        List<BookDetailResponse> likedBooks = likeService.getLikedBooks(customerId);
+        return ResponseEntity.ok(likedBooks);
+    }
 }
