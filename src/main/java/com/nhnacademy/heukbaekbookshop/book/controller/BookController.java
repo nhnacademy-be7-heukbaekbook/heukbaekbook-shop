@@ -22,9 +22,9 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    @PostMapping("/aladin")
-    public ResponseEntity<List<BookSearchResponse>> searchBooks(@RequestBody BookSearchRequest bookSearchRequest) {
-        List<BookSearchResponse> bookSearchResponses = bookService.searchBook(bookSearchRequest);
+    @GetMapping("/aladin")
+    public ResponseEntity<List<BookSearchResponse>> searchBooks(@RequestParam("title") String title) {
+        List<BookSearchResponse> bookSearchResponses = bookService.searchBook(title);
         return ResponseEntity.ok(bookSearchResponses);
     }
 
