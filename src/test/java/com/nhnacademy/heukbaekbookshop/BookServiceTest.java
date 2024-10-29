@@ -73,7 +73,7 @@ public class BookServiceTest {
     @Test
     public void testSearchBook_Success() {
         // Given
-        BookSearchRequest request = new BookSearchRequest("Test Title");
+        String title = "Test Title";
         String url = "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx" +
                 "?ttbkey=testApiKey" +
                 "&Query=Test Title" +
@@ -102,7 +102,7 @@ public class BookServiceTest {
         when(restTemplate.getForObject(eq(url), eq(BookSearchApiResponse.class))).thenReturn(apiResponse);
 
         // When
-        List<BookSearchResponse> responses = bookService.searchBook(request);
+        List<BookSearchResponse> responses = bookService.searchBook(title);
 
         // Then
         assertNotNull(responses);
@@ -123,7 +123,7 @@ public class BookServiceTest {
     @Test
     public void testSearchBook_NullApiResponse() {
         // Given
-        BookSearchRequest request = new BookSearchRequest("Test Title");
+        String title = "Test Title";
         String url = "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx" +
                 "?ttbkey=testApiKey" +
                 "&Query=Test Title" +
@@ -137,7 +137,7 @@ public class BookServiceTest {
         when(restTemplate.getForObject(eq(url), eq(BookSearchApiResponse.class))).thenReturn(null);
 
         // When
-        List<BookSearchResponse> responses = bookService.searchBook(request);
+        List<BookSearchResponse> responses = bookService.searchBook(title);
 
         // Then
         assertNotNull(responses);
@@ -147,7 +147,7 @@ public class BookServiceTest {
     @Test
     public void testSearchBook_RestClientException() {
         // Given
-        BookSearchRequest request = new BookSearchRequest("Test Title");
+        String title = "Test Title";
         String url = "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx" +
                 "?ttbkey=testApiKey" +
                 "&Query=Test Title" +
@@ -162,13 +162,13 @@ public class BookServiceTest {
                 .thenThrow(new RestClientException("Error"));
 
         // When & Then
-        assertThrows(BookSearchException.class, () -> bookService.searchBook(request));
+        assertThrows(BookSearchException.class, () -> bookService.searchBook(title));
     }
 
     @Test
     public void testSearchBook_InvalidPubDate() {
         // Given
-        BookSearchRequest request = new BookSearchRequest("Test Title");
+        String title = "Test Title";
         String url = "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx" +
                 "?ttbkey=testApiKey" +
                 "&Query=Test Title" +
@@ -197,7 +197,7 @@ public class BookServiceTest {
         when(restTemplate.getForObject(eq(url), eq(BookSearchApiResponse.class))).thenReturn(apiResponse);
 
         // When
-        List<BookSearchResponse> responses = bookService.searchBook(request);
+        List<BookSearchResponse> responses = bookService.searchBook(title);
 
         // Then
         assertNotNull(responses);
