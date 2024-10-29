@@ -1,4 +1,4 @@
-package com.nhnacademy.heukbaekbookshop.book.exception;
+package com.nhnacademy.heukbaekbookshop.book.exception.book;
 
 public class BookNotFoundException extends RuntimeException {
     public BookNotFoundException(Long bookId) {

@@ -7,7 +7,6 @@ import lombok.*;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "customers")
@@ -20,16 +19,16 @@ public class Customer {
 
     @NotNull
     @Column(name = "customer_name")
-    private String name;
+    protected String name;
 
     @NotNull
     @Column(name = "customer_phone_number")
-    private String phoneNumber;
+    protected String phoneNumber;
 
     @Email
     @NotNull
     @Column(name = "customer_email")
-    private String email;
+    protected String email;
 
     public static Customer createCustomer(String name, String phoneNumber, String email) {
         Customer customer = new Customer();

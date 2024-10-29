@@ -1,16 +1,16 @@
-package com.nhnacademy.heukbaekbookshop.book.service;
+package com.nhnacademy.heukbaekbookshop.book.service.book;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import com.nhnacademy.heukbaekbookshop.book.domain.BookCategory;
 import com.nhnacademy.heukbaekbookshop.book.domain.BookStatus;
-import com.nhnacademy.heukbaekbookshop.book.dto.request.BookCreateRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.request.BookSearchRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.request.BookUpdateRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.response.*;
-import com.nhnacademy.heukbaekbookshop.book.exception.BookAlreadyExistsException;
-import com.nhnacademy.heukbaekbookshop.book.exception.BookNotFoundException;
-import com.nhnacademy.heukbaekbookshop.book.exception.BookSearchException;
-import com.nhnacademy.heukbaekbookshop.book.repository.BookRepository;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookCreateRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookUpdateRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.book.*;
+import com.nhnacademy.heukbaekbookshop.book.exception.book.BookAlreadyExistsException;
+import com.nhnacademy.heukbaekbookshop.book.exception.book.BookNotFoundException;
+import com.nhnacademy.heukbaekbookshop.book.exception.book.BookSearchException;
+import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.*;
@@ -66,10 +66,10 @@ public class BookService {
         this.roleRepository = roleRepository;
     }
 
-    public List<BookSearchResponse> searchBook(String title) {
+    public List<BookSearchResponse> searchBook(BookSearchRequest bookSearchRequest) {
         String url = "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx" +
                 "?ttbkey=" + aladinApiKey +
-                "&Query=" + title +
+                "&Query=" + bookSearchRequest.title() +
                 "&QueryType=Title" +
                 "&MaxResults=10" +
                 "&start=1" +
@@ -356,6 +356,7 @@ public class BookService {
                         .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
                         .map(bc -> bc.getContributor().getName())
                         .collect(Collectors.toList())
+
         );
     }
 }
