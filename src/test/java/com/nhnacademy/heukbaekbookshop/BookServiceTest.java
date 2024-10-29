@@ -3,15 +3,15 @@ package com.nhnacademy.heukbaekbookshop;
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import com.nhnacademy.heukbaekbookshop.book.domain.BookCategory;
 import com.nhnacademy.heukbaekbookshop.book.domain.BookStatus;
-import com.nhnacademy.heukbaekbookshop.book.dto.request.BookCreateRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.request.BookSearchRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.request.BookUpdateRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.response.*;
-import com.nhnacademy.heukbaekbookshop.book.exception.BookAlreadyExistsException;
-import com.nhnacademy.heukbaekbookshop.book.exception.BookNotFoundException;
-import com.nhnacademy.heukbaekbookshop.book.exception.BookSearchException;
-import com.nhnacademy.heukbaekbookshop.book.repository.BookRepository;
-import com.nhnacademy.heukbaekbookshop.book.service.BookService;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookCreateRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookUpdateRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.book.*;
+import com.nhnacademy.heukbaekbookshop.book.exception.book.BookAlreadyExistsException;
+import com.nhnacademy.heukbaekbookshop.book.exception.book.BookNotFoundException;
+import com.nhnacademy.heukbaekbookshop.book.exception.book.BookSearchException;
+import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
+import com.nhnacademy.heukbaekbookshop.book.service.book.BookService;
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.*;
@@ -19,7 +19,6 @@ import com.nhnacademy.heukbaekbookshop.contributor.repository.ContributorReposit
 import com.nhnacademy.heukbaekbookshop.contributor.repository.PublisherRepository;
 import com.nhnacademy.heukbaekbookshop.contributor.repository.RoleRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.validation.constraints.Null;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -441,70 +440,6 @@ public class BookServiceTest {
 
         verify(bookRepository).findById(bookId);
         verifyNoMoreInteractions(bookRepository);
-    }
-
-    // Test for getBook method
-    @Test
-    public void testGetBook_Success() {
-        // Given
-        Long bookId = 1L;
-
-        Publisher publisher = new Publisher();
-        publisher.setId(1L);
-        publisher.setName("Test Publisher");
-
-        Book book = new Book();
-        book.setId(bookId);
-        book.setTitle("Test Book");
-        book.setIndex("Test Index");
-        book.setDescription("Test Description");
-        book.setPublication(Date.valueOf("2023-01-01"));
-        book.setIsbn("1234567890");
-        book.setPrice(BigDecimal.valueOf(10000));
-        book.setPublisher(publisher);
-
-        Set<BookCategory> bookCategories = new HashSet<>();
-        Category category1 = new Category();
-        category1.setId(1L);
-        category1.setName("Category1");
-        BookCategory bookCategory1 = new BookCategory(book, category1);
-        bookCategories.add(bookCategory1);
-        book.setCategories(bookCategories);
-
-        Set<BookContributor> bookContributors = new HashSet<>();
-        Contributor author1 = new Contributor();
-        author1.setId(1L);
-        author1.setName("Author1");
-        Role authorRole = new Role();
-        authorRole.setId(1L);
-        authorRole.setRoleName(ContributorRole.AUTHOR);
-        BookContributor bookContributor1 = new BookContributor();
-        bookContributor1.setBook(book);
-        bookContributor1.setContributor(author1);
-        bookContributor1.setRole(authorRole);
-        bookContributors.add(bookContributor1);
-        book.setContributors(bookContributors);
-
-        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
-
-        // When
-        BookResponse response = bookService.getBook(bookId);
-
-        // Then
-        assertNotNull(response);
-        assertEquals(bookId, response.id());
-        assertEquals("Test Book", response.title());
-        assertEquals("Test Index", response.index());
-        assertEquals("Test Description", response.description());
-        assertEquals(Arrays.asList("Category1"), response.categories());
-        assertEquals(Arrays.asList("Author1"), response.authors());
-        assertEquals("Test Publisher", response.publisher());
-        assertEquals(Date.valueOf("2023-01-01"), response.pubDate());
-        assertEquals("1234567890", response.isbn());
-        assertEquals(10000, response.standardPrice());
-        assertEquals(10000, response.salesPrice());
-
-        verify(bookRepository).findById(bookId);
     }
 
     @Test

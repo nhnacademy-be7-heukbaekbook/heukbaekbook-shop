@@ -1,4 +1,4 @@
-package com.nhnacademy.heukbaekbookshop.book.dto.response;
+package com.nhnacademy.heukbaekbookshop.book.dto.response.book;
 
 import java.time.LocalDate;
 
