@@ -359,29 +359,4 @@ public class BookService {
                         .collect(Collectors.toList())
         );
     }
-
-    private BookResponse mapToBookResponse(Book book) {
-        List<String> categories = book.getCategories().stream()
-                .map(bc -> bc.getCategory().getName())
-                .collect(Collectors.toList());
-
-        List<String> authors = book.getContributors().stream()
-                .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
-                .map(bc -> bc.getContributor().getName())
-                .collect(Collectors.toList());
-
-        return new BookResponse(
-                book.getId(),
-                book.getTitle(),
-                book.getIndex(),
-                book.getDescription(),
-                categories,
-                authors,
-                book.getPublisher().getName(),
-                new Date(book.getPublication().getTime()),
-                book.getIsbn(),
-                book.getPrice().intValue(),
-                book.getPrice().intValue()
-        );
-    }
 }

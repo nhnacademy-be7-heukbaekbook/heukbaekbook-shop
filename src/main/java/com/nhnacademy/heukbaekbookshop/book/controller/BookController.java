@@ -7,7 +7,6 @@ import com.nhnacademy.heukbaekbookshop.book.dto.response.*;
 import com.nhnacademy.heukbaekbookshop.book.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +23,7 @@ public class BookController {
     }
 
     @PostMapping("/aladin")
-    public ResponseEntity<List<BookSearchResponse>> searchBooks(@ModelAttribute BookSearchRequest bookSearchRequest, Model model) {
+    public ResponseEntity<List<BookSearchResponse>> searchBooks(@RequestBody BookSearchRequest bookSearchRequest) {
         List<BookSearchResponse> bookSearchResponses = bookService.searchBook(bookSearchRequest);
         return ResponseEntity.ok(bookSearchResponses);
     }
