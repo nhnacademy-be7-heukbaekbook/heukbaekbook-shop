@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Search</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<h2>Book Search</h2>
+
+<!-- 검색 폼 -->
+<form action="/api/books" method="POST" th:object="${bookSearchRequest}">
+    <label for="query">Search by title:</label>
+    <input type="text" id="query" name="title" placeholder="Enter book title" th:field="*{title}">
+    <button type="submit">Search</button>
+</form>
+
+<!-- 검색 결과 -->
+<div th:if="${responses != null}">
+    <h3>Search Results</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Cover</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Author</th>
+            <th>Category</th>
+            <th>Publisher</th>
+            <th>Published Date</th>
+            <th>ISBN</th>
+            <th>Standard Price</th>
+            <th>Sales Price</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${responses.isEmpty()}">
+            <td colspan="11">No books found. Please try again.</td>
+        </tr>
+        <tr th:each="result : ${responses}">
+            <td><img th:src="@{${result.cover}}" alt="No image" style="width:100px; height:auto;"></td>
+            <td th:text="${result.title}">Title</td>
+            <td th:text="${result.description}">Description</td>
+            <td th:text="${result.author}">Author</td>
+            <td th:text="${result.category}">Category</td>
+            <td th:text="${result.publisher}">Publisher</td>
+            <td th:text="${result.pubDate}">Published Date</td>
+            <td th:text="${result.isbn}">ISBN</td>
+            <td th:text="${result.standardPrice}">Standard Price</td>
+            <td th:text="${result.salesPrice}">Sales Price</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
