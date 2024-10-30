@@ -1,8 +1,8 @@
-package com.nhnacademy.heukbaekbookshop.book.dto.response;
+package com.nhnacademy.heukbaekbookshop.book.dto.response.book;
 
 import java.util.List;
 
-public record BookDetailResponse(
+public record BookCreateResponse(
         String title,
         String index,
         String description,

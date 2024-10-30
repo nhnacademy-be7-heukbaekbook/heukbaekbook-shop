@@ -3,15 +3,15 @@ package com.nhnacademy.heukbaekbookshop;
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import com.nhnacademy.heukbaekbookshop.book.domain.BookCategory;
 import com.nhnacademy.heukbaekbookshop.book.domain.BookStatus;
-import com.nhnacademy.heukbaekbookshop.book.dto.request.BookCreateRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.request.BookSearchRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.request.BookUpdateRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.response.*;
-import com.nhnacademy.heukbaekbookshop.book.exception.BookAlreadyExistsException;
-import com.nhnacademy.heukbaekbookshop.book.exception.BookNotFoundException;
-import com.nhnacademy.heukbaekbookshop.book.exception.BookSearchException;
-import com.nhnacademy.heukbaekbookshop.book.repository.BookRepository;
-import com.nhnacademy.heukbaekbookshop.book.service.BookService;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookCreateRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookUpdateRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.book.*;
+import com.nhnacademy.heukbaekbookshop.book.exception.book.BookAlreadyExistsException;
+import com.nhnacademy.heukbaekbookshop.book.exception.book.BookNotFoundException;
+import com.nhnacademy.heukbaekbookshop.book.exception.book.BookSearchException;
+import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
+import com.nhnacademy.heukbaekbookshop.book.service.book.BookService;
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.*;
@@ -19,7 +19,6 @@ import com.nhnacademy.heukbaekbookshop.contributor.repository.ContributorReposit
 import com.nhnacademy.heukbaekbookshop.contributor.repository.PublisherRepository;
 import com.nhnacademy.heukbaekbookshop.contributor.repository.RoleRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.validation.constraints.Null;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -74,7 +73,7 @@ public class BookServiceTest {
     @Test
     public void testSearchBook_Success() {
         // Given
-        BookSearchRequest request = new BookSearchRequest("Test Title");
+        String title = "Test Title";
         String url = "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx" +
                 "?ttbkey=testApiKey" +
                 "&Query=Test Title" +
@@ -103,7 +102,7 @@ public class BookServiceTest {
         when(restTemplate.getForObject(eq(url), eq(BookSearchApiResponse.class))).thenReturn(apiResponse);
 
         // When
-        List<BookSearchResponse> responses = bookService.searchBook(request);
+        List<BookSearchResponse> responses = bookService.searchBook(title);
 
         // Then
         assertNotNull(responses);
@@ -124,7 +123,7 @@ public class BookServiceTest {
     @Test
     public void testSearchBook_NullApiResponse() {
         // Given
-        BookSearchRequest request = new BookSearchRequest("Test Title");
+        String title = "Test Title";
         String url = "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx" +
                 "?ttbkey=testApiKey" +
                 "&Query=Test Title" +
@@ -138,7 +137,7 @@ public class BookServiceTest {
         when(restTemplate.getForObject(eq(url), eq(BookSearchApiResponse.class))).thenReturn(null);
 
         // When
-        List<BookSearchResponse> responses = bookService.searchBook(request);
+        List<BookSearchResponse> responses = bookService.searchBook(title);
 
         // Then
         assertNotNull(responses);
@@ -148,7 +147,7 @@ public class BookServiceTest {
     @Test
     public void testSearchBook_RestClientException() {
         // Given
-        BookSearchRequest request = new BookSearchRequest("Test Title");
+        String title = "Test Title";
         String url = "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx" +
                 "?ttbkey=testApiKey" +
                 "&Query=Test Title" +
@@ -163,13 +162,13 @@ public class BookServiceTest {
                 .thenThrow(new RestClientException("Error"));
 
         // When & Then
-        assertThrows(BookSearchException.class, () -> bookService.searchBook(request));
+        assertThrows(BookSearchException.class, () -> bookService.searchBook(title));
     }
 
     @Test
     public void testSearchBook_InvalidPubDate() {
         // Given
-        BookSearchRequest request = new BookSearchRequest("Test Title");
+        String title = "Test Title";
         String url = "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx" +
                 "?ttbkey=testApiKey" +
                 "&Query=Test Title" +
@@ -198,7 +197,7 @@ public class BookServiceTest {
         when(restTemplate.getForObject(eq(url), eq(BookSearchApiResponse.class))).thenReturn(apiResponse);
 
         // When
-        List<BookSearchResponse> responses = bookService.searchBook(request);
+        List<BookSearchResponse> responses = bookService.searchBook(title);
 
         // Then
         assertNotNull(responses);

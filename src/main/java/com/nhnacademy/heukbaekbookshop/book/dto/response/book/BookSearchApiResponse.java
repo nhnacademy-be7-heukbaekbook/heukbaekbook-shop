@@ -1,4 +1,4 @@
-package com.nhnacademy.heukbaekbookshop.book.dto.response;
+package com.nhnacademy.heukbaekbookshop.book.dto.response.book;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

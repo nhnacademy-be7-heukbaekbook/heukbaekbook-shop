@@ -1,4 +1,4 @@
-package com.nhnacademy.heukbaekbookshop.book.repository;
+package com.nhnacademy.heukbaekbookshop.book.repository.book;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.BookCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
