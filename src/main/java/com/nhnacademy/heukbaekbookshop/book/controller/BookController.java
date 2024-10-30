@@ -10,7 +10,6 @@ import com.nhnacademy.heukbaekbookshop.book.service.book.BookService;
 import com.nhnacademy.heukbaekbookshop.book.service.like.LikeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,9 +27,9 @@ public class BookController {
         this.likeService = likeService;
     }
 
-    @PostMapping("/aladin")
-    public ResponseEntity<List<BookSearchResponse>> searchBooks(@ModelAttribute BookSearchRequest bookSearchRequest, Model model) {
-        List<BookSearchResponse> bookSearchResponses = bookService.searchBook(bookSearchRequest);
+    @GetMapping("/aladin")
+    public ResponseEntity<List<BookSearchResponse>> searchBooks(@RequestParam("title") String title) {
+        List<BookSearchResponse> bookSearchResponses = bookService.searchBook(title);
         return ResponseEntity.ok(bookSearchResponses);
     }
 

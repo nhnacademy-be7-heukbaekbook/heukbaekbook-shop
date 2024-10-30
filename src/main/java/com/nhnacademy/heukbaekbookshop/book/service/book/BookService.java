@@ -66,10 +66,10 @@ public class BookService {
         this.roleRepository = roleRepository;
     }
 
-    public List<BookSearchResponse> searchBook(BookSearchRequest bookSearchRequest) {
+    public List<BookSearchResponse> searchBook(String title) {
         String url = "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx" +
                 "?ttbkey=" + aladinApiKey +
-                "&Query=" + bookSearchRequest.title() +
+                "&Query=" + title +
                 "&QueryType=Title" +
                 "&MaxResults=10" +
                 "&start=1" +
