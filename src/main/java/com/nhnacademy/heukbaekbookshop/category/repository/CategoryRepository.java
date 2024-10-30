@@ -13,4 +13,6 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
             "((:parentId IS NULL AND c.parentCategory IS NULL) OR " +
             "(:parentId IS NOT NULL AND c.parentCategory.id = :parentId))")
     Optional<Category> findByParentCategory_IdAndName(Long parentId, String name);
+
+    Optional<Category> findByNameAndParentCategory(String trimmedName, Category parentCategory);
 }
