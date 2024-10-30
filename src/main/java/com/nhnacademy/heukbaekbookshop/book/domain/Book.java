@@ -3,6 +3,7 @@ package com.nhnacademy.heukbaekbookshop.book.domain;
 import com.nhnacademy.heukbaekbookshop.cart.domain.Cart;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.BookContributor;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.Publisher;
+import com.nhnacademy.heukbaekbookshop.image.domain.BookImage;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -96,9 +97,21 @@ public class Book {
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookContributor> contributors = new HashSet<>();
 
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<BookImage> bookImages = new HashSet<>();
+
     public void addCategory(BookCategory bookCategory) {
         categories.add(bookCategory);
         bookCategory.setBook(this);
     }
 
+    public void addBookImage(BookImage bookImage) {
+        this.bookImages.add(bookImage);
+        bookImage.setBook(this);
+    }
+
+    public void removeBookImage(BookImage bookImage) {
+        this.bookImages.remove(bookImage);
+        bookImage.setBook(null);
+    }
 }

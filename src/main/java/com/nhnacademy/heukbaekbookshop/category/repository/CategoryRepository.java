@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     Optional<Category> findByName(String name);
-
+  
     @Query("SELECT c FROM Category c WHERE c.name = :name AND " +
             "((:parentId IS NULL AND c.parentCategory IS NULL) OR " +
             "(:parentId IS NOT NULL AND c.parentCategory.id = :parentId))")
