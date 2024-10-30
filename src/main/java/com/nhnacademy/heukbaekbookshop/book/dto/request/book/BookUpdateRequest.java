@@ -8,6 +8,7 @@ public record BookUpdateRequest(
         String description,
         String publication,
         String isbn,
+        List<String> imageUrls,
         boolean isPackable,
         int stock,
         int standardPrice,
@@ -15,5 +16,6 @@ public record BookUpdateRequest(
         String bookStatus,
         String publisher,
         List<String> categories,
-        List<String> authors
+        String authors,
+        List<String> tags
 ) {}

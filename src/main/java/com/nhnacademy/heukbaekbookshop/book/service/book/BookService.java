@@ -3,8 +3,8 @@ package com.nhnacademy.heukbaekbookshop.book.service.book;
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import com.nhnacademy.heukbaekbookshop.book.domain.BookCategory;
 import com.nhnacademy.heukbaekbookshop.book.domain.BookStatus;
+import com.nhnacademy.heukbaekbookshop.book.domain.BookTag;
 import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookCreateRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchRequest;
 import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookUpdateRequest;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.*;
 import com.nhnacademy.heukbaekbookshop.book.exception.book.BookAlreadyExistsException;
@@ -17,6 +17,12 @@ import com.nhnacademy.heukbaekbookshop.contributor.domain.*;
 import com.nhnacademy.heukbaekbookshop.contributor.repository.ContributorRepository;
 import com.nhnacademy.heukbaekbookshop.contributor.repository.PublisherRepository;
 import com.nhnacademy.heukbaekbookshop.contributor.repository.RoleRepository;
+import com.nhnacademy.heukbaekbookshop.image.domain.BookImage;
+import com.nhnacademy.heukbaekbookshop.image.domain.Image;
+import com.nhnacademy.heukbaekbookshop.image.repository.BookImageRepository;
+import com.nhnacademy.heukbaekbookshop.image.repository.ImageRepository;
+import com.nhnacademy.heukbaekbookshop.tag.domain.Tag;
+import com.nhnacademy.heukbaekbookshop.tag.repository.TagRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -29,9 +35,9 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +49,9 @@ public class BookService {
     private final CategoryRepository categoryRepository;
     private final ContributorRepository contributorRepository;
     private final RoleRepository roleRepository;
+    private final ImageRepository imageRepository;
+    private final BookImageRepository bookImageRepository;
+    private final TagRepository tagRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -50,13 +59,18 @@ public class BookService {
     @Value("${aladin.api.key}")
     private String aladinApiKey;
 
+    private static final int MAX_CATEGORY_COUNT = 10;
+
     public BookService(
             RestTemplate restTemplate,
             BookRepository bookRepository,
             PublisherRepository publisherRepository,
             CategoryRepository categoryRepository,
             ContributorRepository contributorRepository,
-            RoleRepository roleRepository
+            RoleRepository roleRepository,
+            ImageRepository imageRepository,
+            BookImageRepository bookImageRepository,
+            TagRepository tagRepository
     ) {
         this.restTemplate = restTemplate;
         this.bookRepository = bookRepository;
@@ -64,6 +78,9 @@ public class BookService {
         this.categoryRepository = categoryRepository;
         this.contributorRepository = contributorRepository;
         this.roleRepository = roleRepository;
+        this.imageRepository = imageRepository;
+        this.bookImageRepository = bookImageRepository;
+        this.tagRepository = tagRepository;
     }
 
     public List<BookSearchResponse> searchBook(String title) {
@@ -90,28 +107,6 @@ public class BookService {
         } catch (RestClientException e) {
             throw new BookSearchException("Error occurred while calling the Aladin API.", e);
         }
-    }
-
-    private BookSearchResponse mapToBookSearchResponse(BookSearchApiResponse.Item item) {
-        LocalDate publicationDate;
-        try {
-            publicationDate = LocalDate.parse(item.getPubDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        } catch (Exception e) {
-            publicationDate = LocalDate.now();
-        }
-
-        return new BookSearchResponse(
-                item.getTitle(),
-                item.getCover(),
-                item.getDescription(),
-                item.getCategory(),
-                item.getAuthor(),
-                item.getPublisher(),
-                publicationDate,
-                item.getIsbn(),
-                item.getStandardPrice(),
-                item.getSalesPrice()
-        );
     }
 
     @Transactional
@@ -144,33 +139,33 @@ public class BookService {
 
         bookRepository.save(book);
 
-        for (String categoryName : request.categories()) {
-            Category category = categoryRepository.findByName(categoryName.trim())
-                    .orElseGet(() -> {
-                        Category newCategory = new Category();
-                        newCategory.setName(categoryName.trim());
-                        return categoryRepository.save(newCategory);
-                    });
-
-            BookCategory bookCategory = new BookCategory(book, category);
-
+        Category leafCategory = processCategoryHierarchy(request.categories());
+        if (leafCategory != null) {
+            BookCategory bookCategory = new BookCategory(book, leafCategory);
             book.addCategory(bookCategory);
-            category.addBookCategory(bookCategory);
+            leafCategory.addBookCategory(bookCategory);
         }
 
-        for (String authorName : request.authors()) {
-            Contributor contributor = contributorRepository.findByName(authorName.trim())
+        List<ParsedPerson> parsedPersons = parseAuthors(request.authors());
+        for (ParsedPerson person : parsedPersons) {
+            Contributor contributor = contributorRepository.findByName(person.name)
                     .orElseGet(() -> {
                         Contributor newContributor = new Contributor();
-                        newContributor.setName(authorName.trim());
+                        newContributor.setName(person.name);
                         newContributor.setDescription("");
                         return contributorRepository.save(newContributor);
                     });
 
-            Role role = roleRepository.findByRoleName(ContributorRole.AUTHOR)
+            ContributorRole contributorRole = switch (person.role) {
+                case "지은이" -> ContributorRole.AUTHOR;
+                case "옮긴이" -> ContributorRole.TRANSLATOR;
+                default -> ContributorRole.EDITOR;
+            };
+
+            Role role = roleRepository.findByRoleName(contributorRole)
                     .orElseGet(() -> {
                         Role newRole = new Role();
-                        newRole.setRoleName(ContributorRole.AUTHOR);
+                        newRole.setRoleName(contributorRole);
                         return roleRepository.save(newRole);
                     });
 
@@ -178,11 +173,27 @@ public class BookService {
             bookContributor.setBook(book);
             bookContributor.setContributor(contributor);
             bookContributor.setRole(role);
-
             book.getContributors().add(bookContributor);
         }
 
+        if (request.imageUrl() != null && !request.imageUrl().trim().isEmpty()) {
+            Image image = new Image();
+            image.setUrl(request.imageUrl().trim());
+            image = imageRepository.save(image);
+            entityManager.flush();
+
+            BookImage bookImage = new BookImage();
+            bookImage.setImage(image);
+            bookImage.setBook(book);
+
+            image.setBookImage(bookImage);
+            book.addBookImage(bookImage);
+
+            bookImageRepository.save(bookImage);
+        }
+
         bookRepository.save(book);
+
         return new BookCreateResponse(
                 book.getTitle(),
                 book.getIndex(),
@@ -198,7 +209,6 @@ public class BookService {
                         .map(bc -> bc.getCategory().getName())
                         .collect(Collectors.toList()),
                 book.getContributors().stream()
-                        .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
                         .map(bc -> bc.getContributor().getName())
                         .collect(Collectors.toList())
         );
@@ -228,78 +238,126 @@ public class BookService {
                 });
         book.setPublisher(publisher);
 
-        Set<Category> newCategories = new HashSet<>();
-        for (String categoryName : request.categories()) {
-            Category category = categoryRepository.findByName(categoryName.trim())
-                    .orElseGet(() -> {
-                        Category newCategory = new Category();
-                        newCategory.setName(categoryName.trim());
-                        return categoryRepository.save(newCategory);
-                    });
-            newCategories.add(category);
-        }
-
         Set<BookCategory> categoriesToRemove = new HashSet<>(book.getCategories());
         for (BookCategory bookCategory : categoriesToRemove) {
-
             book.getCategories().remove(bookCategory);
-
             bookCategory.getCategory().getBookCategories().remove(bookCategory);
-
             bookCategory.setBook(null);
             bookCategory.setCategory(null);
-
             entityManager.remove(bookCategory);
         }
-
         entityManager.flush();
 
-        for (Category category : newCategories) {
-            if (book.getId() == null || category.getId() == null) {
-                throw new IllegalStateException("Book ID or Category ID is null.");
+        int count = 0;
+        for (String categoryStr : request.categories()) {
+            if (count >= MAX_CATEGORY_COUNT) {
+                break;
             }
-            BookCategory bookCategory = new BookCategory(book, category);
-            book.addCategory(bookCategory);
-            category.addBookCategory(bookCategory);
+            Category leafCategory = processCategoryHierarchy(categoryStr);
+            if (leafCategory != null) {
+                BookCategory bookCategory = new BookCategory(book, leafCategory);
+                book.addCategory(bookCategory);
+                leafCategory.addBookCategory(bookCategory);
+                count++;
+            }
         }
 
-        Set<Contributor> newContributors = new HashSet<>();
-        for (String authorName : request.authors()) {
-            Contributor contributor = contributorRepository.findByName(authorName.trim())
-                    .orElseGet(() -> {
-                        Contributor newContributor = new Contributor();
-                        newContributor.setName(authorName.trim());
-                        newContributor.setDescription("");
-                        return contributorRepository.save(newContributor);
-                    });
-            newContributors.add(contributor);
-        }
+        List<ParsedPerson> parsedPersons = parseAuthors(request.authors());
 
         Set<BookContributor> contributorsToRemove = new HashSet<>(book.getContributors());
         for (BookContributor bookContributor : contributorsToRemove) {
             book.getContributors().remove(bookContributor);
-
             bookContributor.getContributor().getBookContributors().remove(bookContributor);
-
             bookContributor.setBook(null);
             bookContributor.setContributor(null);
+            entityManager.remove(bookContributor);
         }
-        Role authorRole = roleRepository.findByRoleName(ContributorRole.AUTHOR)
-                .orElseGet(() -> {
-                    Role newRole = new Role();
-                    newRole.setRoleName(ContributorRole.AUTHOR);
-                    return roleRepository.save(newRole);
-                });
+        entityManager.flush();
 
-        for (Contributor contributor : newContributors) {
+        for (ParsedPerson person : parsedPersons) {
+            Contributor contributor = contributorRepository.findByName(person.name)
+                    .orElseGet(() -> {
+                        Contributor newContributor = new Contributor();
+                        newContributor.setName(person.name);
+                        newContributor.setDescription("");
+                        return contributorRepository.save(newContributor);
+                    });
+
+            ContributorRole contributorRole = switch (person.role) {
+                case "지은이" -> ContributorRole.AUTHOR;
+                case "옮긴이" -> ContributorRole.TRANSLATOR;
+                default -> ContributorRole.EDITOR;
+            };
+
+            Role role = roleRepository.findByRoleName(contributorRole)
+                    .orElseGet(() -> {
+                        Role newRole = new Role();
+                        newRole.setRoleName(contributorRole);
+                        return roleRepository.save(newRole);
+                    });
+
             BookContributor bookContributor = new BookContributor();
             bookContributor.setBook(book);
             bookContributor.setContributor(contributor);
-            bookContributor.setRole(authorRole);
+            bookContributor.setRole(role);
             book.getContributors().add(bookContributor);
         }
 
-        bookRepository.save(book);
+        Set<BookImage> imagesToRemove = new HashSet<>(book.getBookImages());
+        for (BookImage bookImage : imagesToRemove) {
+            book.removeBookImage(bookImage);
+            imageRepository.delete(bookImage.getImage());
+        }
+
+        if (request.imageUrls() != null) {
+            for (String imageUrl : request.imageUrls()) {
+                if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+                    Image image = new Image();
+                    image.setUrl(imageUrl.trim());
+                    image = imageRepository.save(image);
+                    entityManager.flush();
+
+                    BookImage bookImage = new BookImage();
+                    bookImage.setImage(image);
+                    bookImage.setBook(book);
+
+                    image.setBookImage(bookImage);
+                    book.addBookImage(bookImage);
+
+                    bookImageRepository.save(bookImage);
+                }
+            }
+        }
+
+        // 기존 태그 삭제
+        Set<BookTag> tagsToRemove = new HashSet<>(book.getTags());
+        for (BookTag bookTag : tagsToRemove) {
+            book.getTags().remove(bookTag);
+            bookTag.getTag().getBookTags().remove(bookTag);
+            bookTag.setBook(null);
+            bookTag.setTag(null);
+            entityManager.remove(bookTag);
+        }
+
+        entityManager.flush();
+        if (request.tags() != null) {
+            for (String tagName : request.tags()) {
+                if (tagName != null && !tagName.trim().isEmpty()) {
+                    Tag tag = tagRepository.findByName(tagName.trim())
+                            .orElseGet(() -> {
+                                Tag newTag = new Tag();
+                                newTag.setName(tagName.trim());
+                                return tagRepository.save(newTag);
+                            });
+                    BookTag bookTag = new BookTag();
+                    bookTag.setBook(book);
+                    bookTag.setTag(tag);
+                    book.getTags().add(bookTag);
+                    tag.getBookTags().add(bookTag);
+                }
+            }
+        }
+
         return new BookUpdateResponse(
                 book.getTitle(),
                 book.getIndex(),
@@ -316,7 +374,6 @@ public class BookService {
                         .map(bc -> bc.getCategory().getName())
                         .collect(Collectors.toList()),
                 book.getContributors().stream()
-                        .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
                         .map(bc -> bc.getContributor().getName())
                         .collect(Collectors.toList())
         );
@@ -358,5 +415,123 @@ public class BookService {
                         .collect(Collectors.toList())
 
         );
+    }
+
+    private static class ParsedPerson {
+        String name;
+        String role;
+
+        ParsedPerson(String name, String role) {
+            this.name = name.trim();
+            this.role = role.trim();
+        }
+    }
+
+    private static class RolePosition {
+        String role;
+        int start;
+        int end;
+
+        RolePosition(String role, int start, int end) {
+            this.role = role;
+            this.start = start;
+            this.end = end;
+        }
+    }
+
+    private BookSearchResponse mapToBookSearchResponse(BookSearchApiResponse.Item item) {
+        LocalDate publicationDate;
+        try {
+            publicationDate = LocalDate.parse(item.getPubDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        } catch (Exception e) {
+            publicationDate = LocalDate.now();
+        }
+
+        return new BookSearchResponse(
+                item.getTitle(),
+                item.getCover(),
+                item.getDescription(),
+                item.getCategory(),
+                item.getAuthor(),
+                item.getPublisher(),
+                publicationDate,
+                item.getIsbn(),
+                item.getStandardPrice(),
+                item.getSalesPrice()
+        );
+    }
+
+    private Category processCategoryHierarchy(String categoriesStr) {
+        if (categoriesStr == null || categoriesStr.trim().isEmpty()) {
+            return null;
+        }
+
+        String[] categoryNames = categoriesStr.split(">");
+        Category parentCategory = null;
+        Category currentCategory = null;
+
+        for (String categoryName : categoryNames) {
+            String trimmedName = categoryName.trim();
+            if (trimmedName.isEmpty()) {
+                continue;
+            }
+
+            Optional<Category> categoryOpt = categoryRepository.findByNameAndParentCategory(trimmedName, parentCategory);
+
+            Category finalParentCategory = parentCategory;
+            currentCategory = categoryOpt.orElseGet(() -> {
+                Category newCategory = new Category();
+                newCategory.setName(trimmedName);
+                newCategory.setParentCategory(finalParentCategory);
+                return categoryRepository.save(newCategory);
+            });
+
+            parentCategory = currentCategory;
+        }
+
+        return currentCategory;
+    }
+
+    private List<ParsedPerson> parseAuthors(String authorsStr) {
+        List<ParsedPerson> persons = new ArrayList<>();
+
+        Pattern rolePattern = Pattern.compile("\\([^\\)]*\\)");
+        Matcher roleMatcher = rolePattern.matcher(authorsStr);
+
+        List<RolePosition> roles = new ArrayList<>();
+
+        while (roleMatcher.find()) {
+            String roleText = roleMatcher.group();
+            int start = roleMatcher.start();
+            int end = roleMatcher.end();
+            roles.add(new RolePosition(roleText.substring(1, roleText.length() - 1), start, end));
+        }
+
+        int lastEnd = 0;
+        for (RolePosition role : roles) {
+            int start = role.start;
+            String segment = authorsStr.substring(lastEnd, start);
+            String[] names = segment.split(",");
+            for (String name : names) {
+                name = name.trim();
+                if (!name.isEmpty()) {
+                    persons.add(new ParsedPerson(name, role.role));
+                }
+            }
+            lastEnd = role.end;
+        }
+
+        if (lastEnd < authorsStr.length()) {
+            String segment = authorsStr.substring(lastEnd);
+            String[] names = segment.split(",");
+            for (String name : names) {
+                name = name.trim();
+                if (!name.isEmpty()) {
+                    persons.add(new ParsedPerson(name, "기타"));
+                }
+            }
+        }
+
+        return persons;
     }
 }
