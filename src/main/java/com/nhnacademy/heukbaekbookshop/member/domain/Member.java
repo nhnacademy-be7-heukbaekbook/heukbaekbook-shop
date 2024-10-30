@@ -2,17 +2,18 @@ package com.nhnacademy.heukbaekbookshop.member.domain;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Like;
 import com.nhnacademy.heukbaekbookshop.cart.domain.Cart;
+import com.nhnacademy.heukbaekbookshop.member.dto.request.MemberUpdateRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Getter
-@Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -39,6 +40,7 @@ public class Member extends Customer{
     private LocalDateTime lastLoginAt;
 
     @NotNull
+    @Setter
     @Enumerated(EnumType.STRING)
     @Column(name = "member_status")
     private MemberStatus status;
@@ -62,5 +64,17 @@ public class Member extends Customer{
         this.createdAt = LocalDateTime.now();
         this.status = MemberStatus.ACTIVE;
         this.grade = grade;
+    }
+
+    public Member modifyMember(MemberUpdateRequest memberUpdateRequest) {
+        super.name = memberUpdateRequest.name();
+        super.phoneNumber = memberUpdateRequest.phoneNumber();
+        super.email = memberUpdateRequest.email();
+        if (Objects.nonNull(memberUpdateRequest.newPassword())) {
+            this.password = memberUpdateRequest.newPassword();
+        }
+        this.birth = memberUpdateRequest.birth();
+
+        return this;
     }
 }

@@ -1,13 +1,15 @@
 package com.nhnacademy.heukbaekbookshop.book.controller;
 
-import com.nhnacademy.heukbaekbookshop.book.dto.request.BookCreateRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.request.BookSearchRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.request.BookUpdateRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.response.*;
-import com.nhnacademy.heukbaekbookshop.book.service.BookService;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookCreateRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookUpdateRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.book.*;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.like.LikeCreateResponse;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.like.LikeDeleteResponse;
+import com.nhnacademy.heukbaekbookshop.book.service.book.BookService;
+import com.nhnacademy.heukbaekbookshop.book.service.like.LikeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,15 +19,17 @@ import java.util.List;
 public class BookController {
 
     private final BookService bookService;
+    private final LikeService likeService;
 
     @Autowired
-    public BookController(BookService bookService) {
+    public BookController(BookService bookService, LikeService likeService) {
         this.bookService = bookService;
+        this.likeService = likeService;
     }
 
-    @PostMapping("/aladin")
-    public ResponseEntity<List<BookSearchResponse>> searchBooks(@ModelAttribute BookSearchRequest bookSearchRequest, Model model) {
-        List<BookSearchResponse> bookSearchResponses = bookService.searchBook(bookSearchRequest);
+    @GetMapping("/aladin")
+    public ResponseEntity<List<BookSearchResponse>> searchBooks(@RequestParam("title") String title) {
+        List<BookSearchResponse> bookSearchResponses = bookService.searchBook(title);
         return ResponseEntity.ok(bookSearchResponses);
     }
 
@@ -53,6 +57,22 @@ public class BookController {
     @GetMapping("/{bookId}")
     public ResponseEntity<BookDetailResponse> getBook(@PathVariable Long bookId) {
         BookDetailResponse response = bookService.getBook(bookId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{bookId}/likes")
+    public ResponseEntity<LikeCreateResponse> createLike(
+            @PathVariable Long bookId,
+            @RequestParam Long customerId) {
+        LikeCreateResponse response = likeService.createLike(bookId, customerId);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{bookId}/likes")
+    public ResponseEntity<LikeDeleteResponse> deleteLike(
+            @PathVariable Long bookId,
+            @RequestParam Long customerId) {
+        LikeDeleteResponse response = likeService.deleteLike(bookId, customerId);
         return ResponseEntity.ok(response);
     }
 

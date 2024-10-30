@@ -1,4 +1,4 @@
-package com.nhnacademy.heukbaekbookshop.book.exception;
+package com.nhnacademy.heukbaekbookshop.book.exception.book;
 
 import org.springframework.web.client.RestClientException;
 

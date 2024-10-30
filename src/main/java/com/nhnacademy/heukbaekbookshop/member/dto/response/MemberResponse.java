@@ -9,18 +9,22 @@ import java.sql.Date;
 import java.time.LocalDateTime;
 
 public record MemberResponse(
-        Customer customer,
+        String name,
+        String phoneNumber,
+        String email,
         String loginId,
         Date birth,
         LocalDateTime createdAt,
-        LocalDateTime lastLoninedAt,
+        LocalDateTime lastLoginAt,
         MemberStatus memberStatus,
         Grade grade
 ) {
 
     public static MemberResponse from(Member member) {
         return new MemberResponse(
-                Customer.createCustomer(member.getName(), member.getPhoneNumber(), member.getEmail()),
+                member.getName(),
+                member.getPhoneNumber(),
+                member.getEmail(),
                 member.getLoginId(),
                 member.getBirth(),
                 member.getCreatedAt(),
