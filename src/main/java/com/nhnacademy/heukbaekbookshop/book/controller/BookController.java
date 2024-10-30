@@ -1,7 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.book.controller;
 
 import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookCreateRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchRequest;
 import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookUpdateRequest;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.*;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.like.LikeCreateResponse;

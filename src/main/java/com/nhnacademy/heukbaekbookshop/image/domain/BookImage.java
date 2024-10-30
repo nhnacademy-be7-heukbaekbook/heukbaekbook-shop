@@ -21,11 +21,12 @@ public class BookImage {
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @JoinColumn(name = "image_id", insertable = false, updatable = false)
+    @JoinColumn(name = "image_id")
     private Image image;
 
     @ManyToOne
-    @JoinColumn(name = "book_id")
+    @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
 }
+
