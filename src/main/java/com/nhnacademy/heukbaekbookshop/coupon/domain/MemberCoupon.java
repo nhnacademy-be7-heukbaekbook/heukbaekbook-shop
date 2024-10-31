@@ -1,6 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.coupon.domain;
 
-import com.nhnacademy.heukbaekbookshop.member.domain.Member;
+import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

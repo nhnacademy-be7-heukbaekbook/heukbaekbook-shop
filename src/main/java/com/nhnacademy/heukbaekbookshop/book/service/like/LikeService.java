@@ -10,8 +10,8 @@ import com.nhnacademy.heukbaekbookshop.book.exception.like.LikeNotFoundException
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.book.repository.like.LikeRepository;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.ContributorRole;
-import com.nhnacademy.heukbaekbookshop.member.domain.Member;
-import com.nhnacademy.heukbaekbookshop.member.repository.MemberRepository;
+import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
+import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
