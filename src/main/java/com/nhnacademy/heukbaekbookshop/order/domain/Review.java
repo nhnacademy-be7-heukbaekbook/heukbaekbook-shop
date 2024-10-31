@@ -1,16 +1,13 @@
 package com.nhnacademy.heukbaekbookshop.order.domain;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
-import com.nhnacademy.heukbaekbookshop.member.domain.Customer;
+import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 

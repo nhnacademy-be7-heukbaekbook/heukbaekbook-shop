@@ -1,7 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.cart.domain;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
-import com.nhnacademy.heukbaekbookshop.member.domain.Member;
+import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -30,11 +30,6 @@ public class Cart {
     @MapsId("bookId")
     @JoinColumn(name = "book_id", insertable = false, updatable = false)
     private Book book;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId("customerId")
-    @JoinColumn(name = "customer_id", insertable = false, updatable = false)
-    private Member member;
 
     @NotNull
     @Column(name = "book_amount")
