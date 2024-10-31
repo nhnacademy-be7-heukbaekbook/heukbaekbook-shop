@@ -534,4 +534,8 @@ public class BookService {
 
         return persons;
     }
+
+    public List<BookSummaryResponse> getBooksSummary(List<Long> bookIds) {
+        return bookRepository.findAllByIdIn(bookIds);
+    }
 }

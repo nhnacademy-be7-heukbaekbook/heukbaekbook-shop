@@ -12,9 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
-@RequestMapping("/books")
+@RequestMapping("/api/books")
 public class BookController {
 
     private final BookService bookService;
@@ -73,6 +74,12 @@ public class BookController {
             @RequestParam Long customerId) {
         LikeDeleteResponse response = likeService.deleteLike(bookId, customerId);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<List<BookSummaryResponse>> getBooksSummary(@RequestParam List<Long> bookIds) {
+        List<BookSummaryResponse> booksSummary = bookService.getBooksSummary(bookIds);
+        return ResponseEntity.ok(booksSummary);
     }
 
 }
