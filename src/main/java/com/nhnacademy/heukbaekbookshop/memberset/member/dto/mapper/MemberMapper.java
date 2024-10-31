@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.memberset.member.dto.mapper;
 
 import com.nhnacademy.heukbaekbookshop.memberset.grade.domain.Grade;
+import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.mapper.GradeMapper;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.memberset.address.domain.MemberAddress;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberCreateRequest;
@@ -40,7 +41,7 @@ public class MemberMapper {
                 member.getCreatedAt(),
                 member.getLastLoginAt(),
                 member.getStatus(),
-                member.getGrade()
+                GradeMapper.createGradeResponse(member.getGrade())
         );
     }
 }

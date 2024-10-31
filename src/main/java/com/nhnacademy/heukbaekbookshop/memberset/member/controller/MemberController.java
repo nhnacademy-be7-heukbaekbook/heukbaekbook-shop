@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @RequestMapping("/api/members")
 public class MemberController {
 
@@ -36,6 +38,7 @@ public class MemberController {
      * @return 성공 시, 응답코드 201 반환합니다.
      */
     @PostMapping
+    @Transactional
     public ResponseEntity<MemberResponse> createMember(@Valid @RequestBody MemberCreateRequest memberCreateRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(memberService.createMember(memberCreateRequest));
@@ -58,11 +61,12 @@ public class MemberController {
      *
      * @param customerId 회원 존재 확인을 위한 회원의 id 입니다.
      * @param memberUpdateRequest 회원 수정 dto 입니다.
-     * @return 성공 시, 응답코드 204 반환합니다.
+     * @return 성공 시, 응답코드 200 반환합니다.
      */
     @PutMapping("/{customerId}")
+    @Transactional
     public ResponseEntity<MemberResponse> updateMember(@PathVariable Long customerId, @Valid @RequestBody MemberUpdateRequest memberUpdateRequest) {
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(memberService.updateMember(customerId, memberUpdateRequest));
     }
 
@@ -73,12 +77,19 @@ public class MemberController {
      * @return 성공 시, 응답코드 204 반환합니다.
      */
     @DeleteMapping("/{customerId}")
+    @Transactional
     public ResponseEntity<MemberResponse> deleteMember(@PathVariable Long customerId){
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(memberService.changeMemberStatus(customerId, MemberStatus.WITHDRAWN));
     }
 
-    @PostMapping("/{customerId}/likes")
+    /**
+     * 회원 좋아요 조회 요청 시 사용되는 메서드입니다.
+     *
+     * @param customerId 회원 조회를 위한 회원의 id 입니다.
+     * @return 성공 시, 응답코드 200 반환합니다.
+     */
+    @GetMapping("/{customerId}/likes")
     public ResponseEntity<List<BookDetailResponse>> getLikedBooks(@PathVariable Long customerId) {
         List<BookDetailResponse> likedBooks = likeService.getLikedBooks(customerId);
         return ResponseEntity.ok(likedBooks);

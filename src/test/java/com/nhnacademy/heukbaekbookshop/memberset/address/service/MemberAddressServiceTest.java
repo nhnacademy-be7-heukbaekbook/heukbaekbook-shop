@@ -110,7 +110,7 @@ class MemberAddressServiceTest {
     }
 
     @Test
-    @DisplayName("회원 주소 생성 시 중복 주소")
+    @DisplayName("회원 주소 생성 성공")
     void createMemberAddress_CreateNewMemberAddress_Success() {
         // given
         MemberAddressDto testMemberAddressDto = new MemberAddressDto(testPostalCode, testRoadNameAddress, testDetailAddress, testAlias);

@@ -1,6 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.memberset.member.dto.response;
 
-import com.nhnacademy.heukbaekbookshop.memberset.grade.domain.Grade;
+import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.MemberStatus;
 
 import java.sql.Date;
@@ -15,6 +15,6 @@ public record MemberResponse(
         LocalDateTime createdAt,
         LocalDateTime lastLoginAt,
         MemberStatus memberStatus,
-        Grade grade
+        GradeDto grade
 ) {
 }
