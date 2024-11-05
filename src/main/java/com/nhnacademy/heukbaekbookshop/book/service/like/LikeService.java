@@ -70,15 +70,20 @@ public class LikeService {
 
     private BookDetailResponse mapToBookDetailResponse(Book book) {
         return new BookDetailResponse(
+                book.getId(),
                 book.getTitle(),
                 book.getIndex(),
                 book.getDescription(),
                 book.getPublication().toString(),
                 book.getIsbn(),
+                book.getBookImages().stream()
+                        .map(bookImage -> bookImage.getImage().getUrl())
+                                .toList().getFirst(),
                 book.isPackable(),
                 book.getStock(),
                 book.getPrice().intValue(),
                 book.getDiscountRate(),
+                book.getStatus().toString(),
                 book.getPublisher().getName(),
                 book.getCategories().stream()
                         .map(bc -> bc.getCategory().getName())
@@ -86,6 +91,9 @@ public class LikeService {
                 book.getContributors().stream()
                         .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
                         .map(bc -> bc.getContributor().getName())
+                        .collect(Collectors.toList()),
+                book.getTags().stream()
+                        .map(bt -> bt.getTag().getName())
                         .collect(Collectors.toList())
         );
     }

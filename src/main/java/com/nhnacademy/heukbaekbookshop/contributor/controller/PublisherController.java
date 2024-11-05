@@ -32,7 +32,7 @@ public class PublisherController {
     @GetMapping("/{publisherId}")
     public ResponseEntity<PublisherDetailResponse> getPublisher(@PathVariable Long publisherId) {
         PublisherDetailResponse response = publisherService.getPublisher(publisherId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{publisherId}")
@@ -40,13 +40,13 @@ public class PublisherController {
             @PathVariable Long publisherId,
             @RequestBody PublisherUpdateRequest request) {
         PublisherUpdateResponse response = publisherService.updatePublisher(publisherId, request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{publisherId}")
     public ResponseEntity<PublisherDeleteResponse> deletePublisher(@PathVariable Long publisherId) {
         PublisherDeleteResponse response = publisherService.deletePublisher(publisherId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.ok(response);
     }
 
 }

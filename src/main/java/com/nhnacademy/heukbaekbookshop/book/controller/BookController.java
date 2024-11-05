@@ -8,14 +8,16 @@ import com.nhnacademy.heukbaekbookshop.book.dto.response.like.LikeDeleteResponse
 import com.nhnacademy.heukbaekbookshop.book.service.book.BookService;
 import com.nhnacademy.heukbaekbookshop.book.service.like.LikeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 
 @RestController
-@RequestMapping("/api/books")
+@RequestMapping("/api")
 public class BookController {
 
     private final BookService bookService;
@@ -27,19 +29,19 @@ public class BookController {
         this.likeService = likeService;
     }
 
-    @GetMapping("/aladin")
+    @PostMapping("/admins/aladin")
     public ResponseEntity<List<BookSearchResponse>> searchBooks(@RequestParam("title") String title) {
         List<BookSearchResponse> bookSearchResponses = bookService.searchBook(title);
         return ResponseEntity.ok(bookSearchResponses);
     }
 
-    @PostMapping("/admins")
-    public ResponseEntity<BookCreateResponse> createBook(@RequestBody BookCreateRequest request) {
+    @PostMapping("/admins/books")
+    public ResponseEntity<BookCreateResponse> registerBook(@RequestBody BookCreateRequest request) {
         BookCreateResponse response = bookService.registerBook(request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping("/admins/{bookId}")
+    @PutMapping("/admins/books/{bookId}")
     public ResponseEntity<BookUpdateResponse> updateBook(
             @PathVariable Long bookId,
             @RequestBody BookUpdateRequest request
@@ -48,27 +50,33 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/admins/{bookId}")
+    @DeleteMapping("/admins/books/{bookId}")
     public ResponseEntity<BookDeleteResponse> deleteBook(@PathVariable Long bookId) {
         BookDeleteResponse response = bookService.deleteBook(bookId);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{bookId}")
+    @GetMapping("/books/{bookId}")
     public ResponseEntity<BookDetailResponse> getBook(@PathVariable Long bookId) {
         BookDetailResponse response = bookService.getBook(bookId);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{bookId}/likes")
+    @GetMapping("/admins/books")
+    public ResponseEntity<Page<BookDetailResponse>> getBooks(Pageable pageable) {
+        Page<BookDetailResponse> response = bookService.getBooks(pageable);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/books/{bookId}/likes")
     public ResponseEntity<LikeCreateResponse> createLike(
             @PathVariable Long bookId,
             @RequestParam Long customerId) {
         LikeCreateResponse response = likeService.createLike(bookId, customerId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @DeleteMapping("/{bookId}/likes")
+    @DeleteMapping("/books/{bookId}/likes")
     public ResponseEntity<LikeDeleteResponse> deleteLike(
             @PathVariable Long bookId,
             @RequestParam Long customerId) {
@@ -83,4 +91,3 @@ public class BookController {
     }
 
 }
-
