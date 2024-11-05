@@ -11,6 +11,7 @@ import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.book.repository.like.LikeRepository;
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.ContributorRole;
+import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,9 +80,14 @@ public class LikeService {
                 book.getPublication().toString(),
                 book.getIsbn(),
                 book.getBookImages().stream()
+                        .filter(bookImage -> bookImage.getImage().getType() == ImageType.THUMBNAIL)
                         .map(bookImage -> bookImage.getImage().getUrl())
                         .findFirst()
                         .orElse(null),
+                book.getBookImages().stream()
+                        .filter(bookImage -> bookImage.getImage().getType() == ImageType.DETAIL)
+                        .map(bookImage -> bookImage.getImage().getUrl())
+                        .collect(Collectors.toList()),
                 book.isPackable(),
                 book.getStock(),
                 book.getPrice().intValue(),
