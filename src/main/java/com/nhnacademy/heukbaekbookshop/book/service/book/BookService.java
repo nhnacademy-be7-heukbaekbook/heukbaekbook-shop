@@ -27,6 +27,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -93,7 +95,6 @@ public class BookService {
                 "&SearchTarget=Book" +
                 "&output=js" +
                 "&Version=20131101";
-
         try {
             BookSearchApiResponse apiResponse = restTemplate.getForObject(url, BookSearchApiResponse.class);
 
@@ -364,11 +365,14 @@ public class BookService {
                 book.getDescription(),
                 book.getPublication().toString(),
                 book.getIsbn(),
+                book.getBookImages().stream()
+                        .map(bookImage -> bookImage.getImage().getUrl())
+                        .toList().getFirst(),
                 book.isPackable(),
                 book.getStock(),
                 book.getPrice().intValue(),
                 book.getDiscountRate(),
-                book.getStatus().name(),
+                book.getStatus().toString(),
                 book.getPublisher().getName(),
                 book.getCategories().stream()
                         .map(bc -> bc.getCategory().getName())
@@ -396,25 +400,66 @@ public class BookService {
             throw new BookNotFoundException(bookId);
         }
         return new BookDetailResponse(
+                book.getId(),
                 book.getTitle(),
                 book.getIndex(),
                 book.getDescription(),
                 book.getPublication().toString(),
                 book.getIsbn(),
+                book.getBookImages().stream()
+                        .map(bookImage -> bookImage.getImage().getUrl())
+                        .findFirst()
+                        .orElse(null),
                 book.isPackable(),
                 book.getStock(),
                 book.getPrice().intValue(),
                 book.getDiscountRate(),
+                book.getStatus().toString(),
                 book.getPublisher().getName(),
                 book.getCategories().stream()
-                        .map(bc -> bc.getCategory().getName())
+                        .map(bc -> buildCategoryPath(bc.getCategory()))
                         .collect(Collectors.toList()),
                 book.getContributors().stream()
                         .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
                         .map(bc -> bc.getContributor().getName())
+                        .collect(Collectors.toList()),
+                book.getTags().stream()
+                        .map(bt -> bt.getTag().getName())
                         .collect(Collectors.toList())
-
         );
+    }
+
+    public Page<BookDetailResponse> getBooks(Pageable pageable) {
+        Page<Book> booksPage = bookRepository.findAllByStatusNot(BookStatus.DELETED, pageable);
+
+        return booksPage.map(book -> new BookDetailResponse(
+                book.getId(),
+                book.getTitle(),
+                book.getIndex(),
+                book.getDescription(),
+                book.getPublication().toString(),
+                book.getIsbn(),
+                book.getBookImages().stream()
+                        .map(bookImage -> bookImage.getImage().getUrl())
+                        .findFirst()
+                        .orElse(null),
+                book.isPackable(),
+                book.getStock(),
+                book.getPrice().intValue(),
+                book.getDiscountRate(),
+                book.getStatus().toString(),
+                book.getPublisher().getName(),
+                book.getCategories().stream()
+                        .map(bc -> buildCategoryPath(bc.getCategory()))
+                        .collect(Collectors.toList()),
+                book.getContributors().stream()
+                        .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
+                        .map(bc -> bc.getContributor().getName())
+                        .collect(Collectors.toList()),
+                book.getTags().stream()
+                        .map(bt -> bt.getTag().getName())
+                        .collect(Collectors.toList())
+        ));
     }
 
     private static class ParsedPerson {
@@ -538,4 +583,14 @@ public class BookService {
     public List<BookSummaryResponse> getBooksSummary(List<Long> bookIds) {
         return bookRepository.findAllByIdIn(bookIds);
     }
+
+    private String buildCategoryPath(Category category) {
+        List<String> categoryNames = new LinkedList<>();
+        while (category != null) {
+            categoryNames.add(0, category.getName());
+            category = category.getParentCategory();
+        }
+        return String.join(">", categoryNames);
+    }
+
 }

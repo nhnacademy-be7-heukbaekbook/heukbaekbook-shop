@@ -7,6 +7,7 @@ import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryDeleteRespo
 import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryUpdateResponse;
 import com.nhnacademy.heukbaekbookshop.category.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class CategoryController {
     @PostMapping("/admins")
     public ResponseEntity<CategoryCreateResponse> createCategory(@RequestBody CategoryCreateRequest request) {
         CategoryCreateResponse response = categoryService.registerCategory(request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/admins/{id}")
