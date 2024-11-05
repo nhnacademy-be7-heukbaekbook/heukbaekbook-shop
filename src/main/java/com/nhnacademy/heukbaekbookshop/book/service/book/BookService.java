@@ -458,6 +458,7 @@ public class BookService {
                 item.getIsbn(),
                 item.getStandardPrice(),
                 item.getSalesPrice()
+
         );
     }
 
