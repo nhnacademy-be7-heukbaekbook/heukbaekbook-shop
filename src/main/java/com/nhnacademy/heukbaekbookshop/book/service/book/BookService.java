@@ -19,6 +19,7 @@ import com.nhnacademy.heukbaekbookshop.contributor.repository.PublisherRepositor
 import com.nhnacademy.heukbaekbookshop.contributor.repository.RoleRepository;
 import com.nhnacademy.heukbaekbookshop.image.domain.BookImage;
 import com.nhnacademy.heukbaekbookshop.image.domain.Image;
+import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import com.nhnacademy.heukbaekbookshop.image.repository.BookImageRepository;
 import com.nhnacademy.heukbaekbookshop.image.repository.ImageRepository;
 import com.nhnacademy.heukbaekbookshop.tag.domain.Tag;
@@ -180,6 +181,7 @@ public class BookService {
         if (request.imageUrl() != null && !request.imageUrl().trim().isEmpty()) {
             Image image = new Image();
             image.setUrl(request.imageUrl().trim());
+            image.setType(ImageType.THUMBNAIL);
             image = imageRepository.save(image);
             entityManager.flush();
 
@@ -310,11 +312,29 @@ public class BookService {
             imageRepository.delete(bookImage.getImage());
         }
 
-        if (request.imageUrls() != null) {
-            for (String imageUrl : request.imageUrls()) {
+        if (request.thumbnailImageUrl() != null && !request.thumbnailImageUrl().trim().isEmpty()) {
+            Image image = new Image();
+            image.setUrl(request.thumbnailImageUrl().trim());
+            image.setType(ImageType.THUMBNAIL);
+            image = imageRepository.save(image);
+            entityManager.flush();
+
+            BookImage bookImage = new BookImage();
+            bookImage.setImage(image);
+            bookImage.setBook(book);
+
+            image.setBookImage(bookImage);
+            book.addBookImage(bookImage);
+
+            bookImageRepository.save(bookImage);
+        }
+
+        if (request.detailImageUrls() != null) {
+            for (String imageUrl : request.detailImageUrls()) {
                 if (imageUrl != null && !imageUrl.trim().isEmpty()) {
                     Image image = new Image();
                     image.setUrl(imageUrl.trim());
+                    image.setType(ImageType.DETAIL);
                     image = imageRepository.save(image);
                     entityManager.flush();
 
@@ -366,8 +386,10 @@ public class BookService {
                 book.getPublication().toString(),
                 book.getIsbn(),
                 book.getBookImages().stream()
+                        .filter(bookImage -> bookImage.getImage().getType() == ImageType.THUMBNAIL)
                         .map(bookImage -> bookImage.getImage().getUrl())
-                        .toList().getFirst(),
+                        .findFirst()
+                        .orElse(null),
                 book.isPackable(),
                 book.getStock(),
                 book.getPrice().intValue(),
@@ -407,9 +429,13 @@ public class BookService {
                 book.getPublication().toString(),
                 book.getIsbn(),
                 book.getBookImages().stream()
+                        .filter(bookImage -> bookImage.getImage().getType() == ImageType.THUMBNAIL)
                         .map(bookImage -> bookImage.getImage().getUrl())
                         .findFirst()
                         .orElse(null),
+                book.getBookImages().stream()
+                                .map(bookImage -> bookImage.getImage().getType().equals(ImageType.DETAIL)
+                                        ? bookImage.getImage().getUrl() : null).toList(),
                 book.isPackable(),
                 book.getStock(),
                 book.getPrice().intValue(),
@@ -440,9 +466,14 @@ public class BookService {
                 book.getPublication().toString(),
                 book.getIsbn(),
                 book.getBookImages().stream()
+                        .filter(bookImage -> bookImage.getImage().getType() == ImageType.THUMBNAIL)
                         .map(bookImage -> bookImage.getImage().getUrl())
                         .findFirst()
                         .orElse(null),
+                book.getBookImages().stream()
+                        .filter(bookImage -> bookImage.getImage().getType() == ImageType.DETAIL)
+                        .map(bookImage -> bookImage.getImage().getUrl())
+                        .collect(Collectors.toList()),
                 book.isPackable(),
                 book.getStock(),
                 book.getPrice().intValue(),
