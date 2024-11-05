@@ -408,7 +408,8 @@ public class BookService {
                 book.getIsbn(),
                 book.getBookImages().stream()
                         .map(bookImage -> bookImage.getImage().getUrl())
-                        .toList().getFirst(),
+                        .findFirst()
+                        .orElse(null),
                 book.isPackable(),
                 book.getStock(),
                 book.getPrice().intValue(),
@@ -416,7 +417,7 @@ public class BookService {
                 book.getStatus().toString(),
                 book.getPublisher().getName(),
                 book.getCategories().stream()
-                        .map(bc -> bc.getCategory().getName())
+                        .map(bc -> buildCategoryPath(bc.getCategory()))
                         .collect(Collectors.toList()),
                 book.getContributors().stream()
                         .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
@@ -440,7 +441,8 @@ public class BookService {
                 book.getIsbn(),
                 book.getBookImages().stream()
                         .map(bookImage -> bookImage.getImage().getUrl())
-                        .toList().getFirst(),
+                        .findFirst()
+                        .orElse(null),
                 book.isPackable(),
                 book.getStock(),
                 book.getPrice().intValue(),
@@ -448,7 +450,7 @@ public class BookService {
                 book.getStatus().toString(),
                 book.getPublisher().getName(),
                 book.getCategories().stream()
-                        .map(bc -> bc.getCategory().getName())
+                        .map(bc -> buildCategoryPath(bc.getCategory()))
                         .collect(Collectors.toList()),
                 book.getContributors().stream()
                         .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
@@ -581,4 +583,14 @@ public class BookService {
     public List<BookSummaryResponse> getBooksSummary(List<Long> bookIds) {
         return bookRepository.findAllByIdIn(bookIds);
     }
+
+    private String buildCategoryPath(Category category) {
+        List<String> categoryNames = new LinkedList<>();
+        while (category != null) {
+            categoryNames.add(0, category.getName());
+            category = category.getParentCategory();
+        }
+        return String.join(">", categoryNames);
+    }
+
 }

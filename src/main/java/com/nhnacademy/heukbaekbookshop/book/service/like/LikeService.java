@@ -9,12 +9,14 @@ import com.nhnacademy.heukbaekbookshop.book.exception.like.LikeAlreadyExistExcep
 import com.nhnacademy.heukbaekbookshop.book.exception.like.LikeNotFoundException;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.book.repository.like.LikeRepository;
+import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.ContributorRole;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -78,7 +80,8 @@ public class LikeService {
                 book.getIsbn(),
                 book.getBookImages().stream()
                         .map(bookImage -> bookImage.getImage().getUrl())
-                                .toList().getFirst(),
+                        .findFirst()
+                        .orElse(null),
                 book.isPackable(),
                 book.getStock(),
                 book.getPrice().intValue(),
@@ -86,7 +89,7 @@ public class LikeService {
                 book.getStatus().toString(),
                 book.getPublisher().getName(),
                 book.getCategories().stream()
-                        .map(bc -> bc.getCategory().getName())
+                        .map(bc -> buildCategoryPath(bc.getCategory()))
                         .collect(Collectors.toList()),
                 book.getContributors().stream()
                         .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
@@ -96,5 +99,14 @@ public class LikeService {
                         .map(bt -> bt.getTag().getName())
                         .collect(Collectors.toList())
         );
+    }
+
+    private String buildCategoryPath(Category category) {
+        List<String> categoryNames = new LinkedList<>();
+        while (category != null) {
+            categoryNames.add(0, category.getName());
+            category = category.getParentCategory();
+        }
+        return String.join(">", categoryNames);
     }
 }
