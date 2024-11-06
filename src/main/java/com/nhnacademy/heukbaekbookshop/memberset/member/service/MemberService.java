@@ -14,4 +14,8 @@ public interface  MemberService {
     MemberResponse changeMemberStatus(Long customerId, MemberStatus memberStatus);
 
     MemberResponse updateMember(Long customerId, MemberUpdateRequest memberUpdateRequest);
+
+    boolean existsLoginId(String loginId);
+
+    boolean existsEmail(String email);
 }
