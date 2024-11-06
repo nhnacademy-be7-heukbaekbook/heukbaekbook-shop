@@ -31,6 +31,7 @@ public class MemberController {
     private final MemberService memberService;
     private final LikeService likeService;
 
+    private static final String X_USER_ID = "X-USER-ID";
     /**
      * 회원 생성 요청 시 사용되는 메서드입니다.
      *
@@ -50,8 +51,8 @@ public class MemberController {
      * @param customerId 회원 조회를 위한 회원의 id 입니다.
      * @return 성공 시, 응답코드 200 반환합니다.
      */
-    @GetMapping("/{customerId}")
-    public ResponseEntity<MemberResponse> getMember(@PathVariable Long customerId) {
+    @GetMapping
+    public ResponseEntity<MemberResponse> getMember(@RequestHeader(X_USER_ID) Long customerId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(memberService.getMember(customerId));
     }
@@ -63,9 +64,9 @@ public class MemberController {
      * @param memberUpdateRequest 회원 수정 dto 입니다.
      * @return 성공 시, 응답코드 200 반환합니다.
      */
-    @PutMapping("/{customerId}")
+    @PutMapping
     @Transactional
-    public ResponseEntity<MemberResponse> updateMember(@PathVariable Long customerId, @Valid @RequestBody MemberUpdateRequest memberUpdateRequest) {
+    public ResponseEntity<MemberResponse> updateMember(@RequestHeader(X_USER_ID) Long customerId, @Valid @RequestBody MemberUpdateRequest memberUpdateRequest) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(memberService.updateMember(customerId, memberUpdateRequest));
     }
@@ -76,9 +77,9 @@ public class MemberController {
      * @param customerId 회원 존재 확인을 위한 회원의 id 입니다.
      * @return 성공 시, 응답코드 204 반환합니다.
      */
-    @DeleteMapping("/{customerId}")
+    @DeleteMapping
     @Transactional
-    public ResponseEntity<MemberResponse> deleteMember(@PathVariable Long customerId){
+    public ResponseEntity<MemberResponse> deleteMember(@RequestHeader(X_USER_ID) Long customerId){
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(memberService.changeMemberStatus(customerId, MemberStatus.WITHDRAWN));
     }
@@ -89,9 +90,33 @@ public class MemberController {
      * @param customerId 회원 조회를 위한 회원의 id 입니다.
      * @return 성공 시, 응답코드 200 반환합니다.
      */
-    @GetMapping("/{customerId}/likes")
-    public ResponseEntity<List<BookDetailResponse>> getLikedBooks(@PathVariable Long customerId) {
+    @GetMapping("/likes")
+    public ResponseEntity<List<BookDetailResponse>> getLikedBooks(@RequestHeader(X_USER_ID) Long customerId) {
         List<BookDetailResponse> likedBooks = likeService.getLikedBooks(customerId);
         return ResponseEntity.ok(likedBooks);
+    }
+
+    /**
+     * 회원가입의 아이디 중복 확인 요청 시 사용되는 메서드입니다.
+     *
+     * @param loginId 중복 확인을 위한 회원의 입력 loginId 입니다.
+     * @return 성공 시, 응답코드 200 반환합니다.
+     */
+    @PostMapping("/existsLoginId")
+    public ResponseEntity<Boolean> existsLoginId(@RequestBody String loginId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(memberService.existsLoginId(loginId));
+    }
+
+    /**
+     * 회원가입의 이메일 중복 확인 요청 시 사용되는 메서드입니다.
+     *
+     * @param email 중복 확인을 위한 회원의 입력 email 입니다.
+     * @return 성공 시, 응답코드 200 반환합니다.
+     */
+    @PostMapping("/existsEmail")
+    public ResponseEntity<Boolean> existsEmail(@RequestBody String email) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(memberService.existsEmail(email));
     }
 }

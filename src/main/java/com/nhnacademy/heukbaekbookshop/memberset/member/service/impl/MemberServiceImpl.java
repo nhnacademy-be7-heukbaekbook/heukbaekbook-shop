@@ -75,8 +75,18 @@ public class MemberServiceImpl implements MemberService {
                 memberUpdateRequest.oldPassword().equals(memberUpdateRequest.newPassword())) {
             throw new InvalidPasswordException();
         }
-
+//        bCryptPasswordEncoder.encode(memberUpdateRequest.newPassword());
         return MemberMapper.createMemberResponse(member.modifyMember(memberUpdateRequest));
+    }
+
+    @Override
+    public boolean existsLoginId(String loginId) {
+        return memberRepository.existsByLoginId(loginId);
+    }
+
+    @Override
+    public boolean existsEmail(String email) {
+        return memberRepository.existsByEmail(email);
     }
 
     @Override
