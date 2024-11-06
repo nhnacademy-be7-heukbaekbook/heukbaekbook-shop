@@ -6,4 +6,6 @@ import java.util.Optional;
 
 public interface ContributorRepository extends JpaRepository<Contributor, Long> {
     Optional<Contributor> findByName(String name);
+
+    Optional<Contributor> findByNameAndDescription(String name, String description);
 }
