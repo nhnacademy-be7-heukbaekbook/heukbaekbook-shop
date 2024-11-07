@@ -6,10 +6,4 @@ import com.nhnacademy.heukbaekbookshop.memberset.customer.dto.request.CustomerCr
 import java.util.Optional;
 
 public interface CustomerService {
-
-    void createCustomer(CustomerCreateRequest customerCreateRequest);
-
-    boolean existCustomerByMemberId(String memberId);
-
-    Optional<Member> getMember(Long memberId);
 }

@@ -50,17 +50,10 @@ public class MemberAddressServiceImpl implements MemberAddressService {
             throw new MemberAddressAlreadyExistsException();
         }
 
-        MemberAddress memberAddress = memberAddressRepository.save(MemberAddressMapper.createMemberAddressEntity(memberAddressDto, member));
+        MemberAddress memberAddress = memberAddressRepository.save(
+                MemberAddressMapper.createMemberAddressEntity(memberAddressDto, member));
 
         return MemberAddressMapper.createMemberAddressResponse(memberAddress);
-    }
-
-    @Override
-    public void deleteMemberAddress(Long addressId) {
-        if (!memberAddressRepository.existsById(addressId)) {
-            throw new MemberAddressNotFoundException();
-        }
-        memberAddressRepository.deleteById(addressId);
     }
 
     @Override
@@ -70,6 +63,14 @@ public class MemberAddressServiceImpl implements MemberAddressService {
 
         return MemberAddressMapper.createMemberAddressResponse(
                 memberAddress.modifyMemberAddress(memberAddressDto));
+    }
+
+    @Override
+    public void deleteMemberAddress(Long addressId) {
+        if (!memberAddressRepository.existsById(addressId)) {
+            throw new MemberAddressNotFoundException();
+        }
+        memberAddressRepository.deleteById(addressId);
     }
 
 }

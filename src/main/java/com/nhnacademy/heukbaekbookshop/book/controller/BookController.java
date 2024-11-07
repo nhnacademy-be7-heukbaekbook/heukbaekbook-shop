@@ -46,7 +46,7 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/summary")
+    @GetMapping("/books/summary")
     public ResponseEntity<List<BookSummaryResponse>> getBooksSummary(@RequestParam List<Long> bookIds) {
         List<BookSummaryResponse> booksSummary = bookService.getBooksSummary(bookIds);
         return ResponseEntity.ok(booksSummary);

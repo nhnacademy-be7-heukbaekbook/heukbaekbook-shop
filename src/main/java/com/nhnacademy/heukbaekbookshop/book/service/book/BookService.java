@@ -221,7 +221,7 @@ public class BookService {
     public BookUpdateResponse updateBook(Long bookId, BookUpdateRequest request) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
-
+        // 1 수정
         book.setTitle(request.title());
         book.setIndex(request.index());
         book.setDescription(request.description());
@@ -233,6 +233,7 @@ public class BookService {
         book.setDiscountRate(request.discountRate());
         book.setStatus(BookStatus.valueOf(request.bookStatus()));
 
+        // 2 출판사 수정
         Publisher publisher = publisherRepository.findByName(request.publisher())
                 .orElseGet(() -> {
                     Publisher newPublisher = new Publisher();
@@ -241,6 +242,7 @@ public class BookService {
                 });
         book.setPublisher(publisher);
 
+        // 3 카테고리 수정
         Set<BookCategory> categoriesToRemove = new HashSet<>(book.getCategories());
         for (BookCategory bookCategory : categoriesToRemove) {
             book.getCategories().remove(bookCategory);
@@ -266,7 +268,7 @@ public class BookService {
         }
 
         List<ParsedPerson> parsedPersons = parseAuthors(request.authors());
-
+        // 4 기여자(저자, 옮긴이, 엮은이) 수정
         Set<BookContributor> contributorsToRemove = new HashSet<>(book.getContributors());
         for (BookContributor bookContributor : contributorsToRemove) {
             book.getContributors().remove(bookContributor);
@@ -277,6 +279,7 @@ public class BookService {
         }
         entityManager.flush();
 
+        // 5 기여자 처리
         for (ParsedPerson person : parsedPersons) {
             Contributor contributor = contributorRepository.findByName(person.name)
                     .orElseGet(() -> {
@@ -362,6 +365,7 @@ public class BookService {
 
         entityManager.flush();
         if (request.tags() != null) {
+            book.getTags().clear();
             for (String tagName : request.tags()) {
                 if (tagName != null && !tagName.trim().isEmpty()) {
                     Tag tag = tagRepository.findByName(tagName.trim())
@@ -371,10 +375,12 @@ public class BookService {
                                 return tagRepository.save(newTag);
                             });
                     BookTag bookTag = new BookTag();
+                    book.addTag(bookTag);
                     bookTag.setBook(book);
                     bookTag.setTag(tag);
                     book.getTags().add(bookTag);
                     tag.getBookTags().add(bookTag);
+
                 }
             }
         }
