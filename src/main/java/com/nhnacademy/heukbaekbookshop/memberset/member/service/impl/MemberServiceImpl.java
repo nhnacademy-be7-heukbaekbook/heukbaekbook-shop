@@ -17,6 +17,7 @@ import com.nhnacademy.heukbaekbookshop.memberset.address.repository.MemberAddres
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import com.nhnacademy.heukbaekbookshop.memberset.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,8 +28,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class MemberServiceImpl implements MemberService {
-
-    //    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final MemberRepository memberRepository;
     private final MemberAddressRepository memberAddressRepository;
     private final CustomerRepository customerRepository;
@@ -46,9 +46,7 @@ public class MemberServiceImpl implements MemberService {
 
         Grade grade = gradeRepository.findById(1L).orElseThrow(NoSuchElementException::new);
 
-        // bCryptPasswordEncoder.encode(memberCreateRequest.password())
-
-        Member member = MemberMapper.createMemberEntity(memberCreateRequest, grade, memberCreateRequest.password());
+        Member member = MemberMapper.createMemberEntity(memberCreateRequest, grade, bCryptPasswordEncoder.encode(memberCreateRequest.password()));
         customerRepository.save(member);
 
         MemberAddress memberAddress = MemberMapper.createMemberAddressEntity(memberCreateRequest, member);
@@ -68,14 +66,15 @@ public class MemberServiceImpl implements MemberService {
     public MemberResponse updateMember(Long customerId, MemberUpdateRequest memberUpdateRequest) {
         Member member = memberRepository.findById(customerId).orElseThrow(MemberNotFoundException::new);
 
-//        if (Objects.nonNull(memberUpdateRequest.oldPassword()) && !bCryptPasswordEncoder.matches(member.getPassword(), memberUpdateRequest.oldPassword())) {
-//            throw new InvalidPasswordException();
-//        }
+        if (Objects.nonNull(memberUpdateRequest.oldPassword())
+                && !bCryptPasswordEncoder.matches(member.getPassword(), memberUpdateRequest.oldPassword())) {
+            throw new InvalidPasswordException();
+        }
         if (Objects.nonNull(memberUpdateRequest.newPassword()) &&
                 memberUpdateRequest.oldPassword().equals(memberUpdateRequest.newPassword())) {
             throw new InvalidPasswordException();
         }
-//        bCryptPasswordEncoder.encode(memberUpdateRequest.newPassword());
+        bCryptPasswordEncoder.encode(memberUpdateRequest.newPassword());
         return MemberMapper.createMemberResponse(member.modifyMember(memberUpdateRequest));
     }
 
