@@ -11,6 +11,8 @@ import com.nhnacademy.heukbaekbookshop.tag.exception.TagAlreadyExistsException;
 import com.nhnacademy.heukbaekbookshop.tag.exception.TagNotFoundException;
 import com.nhnacademy.heukbaekbookshop.tag.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -58,6 +60,11 @@ public class TagService {
             throw new TagNotFoundException("존재하지 않는 태그입니다.");
         }
         Tag tag = tagRepository.findById(tagId).get();
-        return new TagDetailResponse(tag.getName());
+        return new TagDetailResponse(tag.getId(), tag.getName());
+    }
+
+    public Page<TagDetailResponse> getTags(Pageable pageable) {
+        Page<Tag> tags = tagRepository.findAll(pageable);
+        return tags.map(tag -> new TagDetailResponse(tag.getId(), tag.getName()));
     }
 }
