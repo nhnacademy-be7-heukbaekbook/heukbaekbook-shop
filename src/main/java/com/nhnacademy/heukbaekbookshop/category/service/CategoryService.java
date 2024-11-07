@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.category.service;
 
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
+import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryDetailResponse;
 import com.nhnacademy.heukbaekbookshop.category.dto.request.CategoryCreateRequest;
 import com.nhnacademy.heukbaekbookshop.category.dto.request.CategoryUpdateRequest;
 import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryCreateResponse;
@@ -10,9 +11,12 @@ import com.nhnacademy.heukbaekbookshop.category.exception.CategoryAlreadyExistsE
 import com.nhnacademy.heukbaekbookshop.category.exception.CategoryNotFoundException;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
 
 @Service
 public class CategoryService {
@@ -67,5 +71,23 @@ public class CategoryService {
         }
         categoryRepository.deleteById(id);
         return new CategoryDeleteResponse("카테고리가 정상적으로 삭제되었습니다.");
+    }
+
+    public CategoryDetailResponse getCategory(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new CategoryNotFoundException("존재하지 않는 카테고리입니다."));
+
+        Long parentId = (category.getParentCategory() != null) ? category.getParentCategory().getId() : null;
+        return new CategoryDetailResponse(category.getId(), parentId, category.getName());
+    }
+
+    public Page<CategoryDetailResponse> getCategories(Pageable pageable) {
+        Page<Category> categories = categoryRepository.findAllBy(pageable);
+        return categories.map(category -> new CategoryDetailResponse(
+                category.getId(),
+                (category.getParentCategory() != null) ? category.getParentCategory().getId() : null,
+                category.getName()
+
+        ));
     }
 }
