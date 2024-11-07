@@ -15,6 +15,7 @@ import com.nhnacademy.heukbaekbookshop.memberset.customer.repository.CustomerRep
 import com.nhnacademy.heukbaekbookshop.memberset.grade.repository.GradeRepository;
 import com.nhnacademy.heukbaekbookshop.memberset.address.repository.MemberAddressRepository;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -137,23 +138,23 @@ public class MemberServiceTest {
     }
 
 
-//    @Test
-//    @DisplayName("회원정보 수정 시 비밀번호 불일치")
-//    void updateMember_InvalidPassword_ExceptionThrown() {
-//        // given
-//        Member mockedMember = mock(Member.class);
-//        when(memberRepository.findById(any())).thenReturn(Optional.of(mockedMember));
-//        MemberUpdateRequest testMemberUpdateRequest = new MemberUpdateRequest(testLoginId,
-//                "wrongPassword1!",
-//                "otherPassword1!",
-//                testBirth, testCustomerName, testPhoneNumber, testEmail, testPostalCode, testRoadNameAddress, testDetailAddress, testAlias
-//        );
-//        when(mockedMember.getPassword()).thenReturn(testPassword);
-//
-//        // when & then
-//        assertThrows(InvalidPasswordException.class, () -> memberService.updateMember(testCustomerId, testMemberUpdateRequest));
-//        verify(memberRepository, times(1)).findById(testCustomerId);
-//    }
+    @Test
+    @DisplayName("회원정보 수정 시 비밀번호 불일치")
+    void updateMember_InvalidPassword_ExceptionThrown() {
+        // given
+        Member mockedMember = mock(Member.class);
+        when(memberRepository.findById(any())).thenReturn(Optional.of(mockedMember));
+        MemberUpdateRequest testMemberUpdateRequest = new MemberUpdateRequest(testLoginId,
+                "wrongPassword1!",
+                "otherPassword1!",
+                testBirth, testCustomerName, testPhoneNumber, testEmail, testPostalCode, testRoadNameAddress, testDetailAddress, testAlias
+        );
+        when(mockedMember.getPassword()).thenReturn(testPassword);
+
+        // when & then
+        assertThrows(InvalidPasswordException.class, () -> memberService.updateMember(testCustomerId, testMemberUpdateRequest));
+        verify(memberRepository, times(1)).findById(testCustomerId);
+    }
 
     @Test
     @DisplayName("회원정보 수정 시 기존 비밀번호와 동일")
@@ -171,6 +172,7 @@ public class MemberServiceTest {
         verify(memberRepository, times(1)).findById(testCustomerId);
     }
 
+
     @Test
     @DisplayName("회원정보 수정 성공")
     void updateMember_UpdateMember_Success() {
@@ -180,7 +182,7 @@ public class MemberServiceTest {
                 .phoneNumber(testPhoneNumber)
                 .email(testEmail)
                 .loginId(testLoginId)
-                .password("oldPassword1!")
+                .password(bCryptPasswordEncoder.encode("oldPassword1!"))
                 .birth(testBirth)
                 .grade(testGrade)
                 .build();
@@ -191,11 +193,15 @@ public class MemberServiceTest {
                 testBirth, "changedName", testPhoneNumber, testEmail, testPostalCode, testRoadNameAddress, testDetailAddress, testAlias
         );
         when(memberRepository.findById(any())).thenReturn(Optional.of(testMember));
+        when(bCryptPasswordEncoder.matches(testMember.getPassword(), testMemberUpdateRequest.oldPassword())).thenReturn(true);
 
         // when
         MemberResponse testMemberResponse = memberService.updateMember(testCustomerId, testMemberUpdateRequest);
 
         // then
+        assertNotNull(testMemberUpdateRequest.oldPassword());
+        assertNotNull(testMemberUpdateRequest.newPassword());
+        assertNotEquals(testMemberUpdateRequest.oldPassword(), testMemberUpdateRequest.newPassword());
         assertEquals("changedName", testMemberResponse.name());
         verify(memberRepository, times(1)).findById(testCustomerId);
     }
@@ -233,6 +239,20 @@ public class MemberServiceTest {
         // then
         assertEquals(MemberStatus.WITHDRAWN, testMemberResponse.memberStatus());
         verify(memberRepository, times(1)).findById(testCustomerId);
+    }
+
+    @Test
+    @DisplayName("회원가입 시 LoginId 중복 확인 조회 성공")
+    void existsLoginId_existsLoginIdCheck_Success() {
+        when(memberRepository.existsByLoginId(testLoginId)).thenReturn(false);
+        assertFalse(memberService.existsLoginId(testLoginId));
+    }
+
+    @Test
+    @DisplayName("회원가입 시 Email 중복 확인 조회 성공")
+    void existsEmail_existsEmailCheck_Success() {
+        when(memberRepository.existsByEmail(testEmail)).thenReturn(false);
+        assertFalse(memberService.existsEmail(testEmail));
     }
 
 }
