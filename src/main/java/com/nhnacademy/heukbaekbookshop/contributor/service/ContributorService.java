@@ -11,6 +11,8 @@ import com.nhnacademy.heukbaekbookshop.contributor.exception.ContributorAlreadyE
 import com.nhnacademy.heukbaekbookshop.contributor.exception.ContributorNotFoundException;
 import com.nhnacademy.heukbaekbookshop.contributor.repository.ContributorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,10 +43,21 @@ public class ContributorService {
     }
 
     @Transactional(readOnly = true)
+    public Page<ContributorDetailResponse> getContributors(Pageable pageable) {
+        return contributorRepository.findAll(pageable)
+                .map(contributor -> new ContributorDetailResponse(
+                        contributor.getId(),
+                        contributor.getName(),
+                        contributor.getDescription()
+                ));
+    }
+
+    @Transactional(readOnly = true)
     public ContributorDetailResponse getContributor(Long contributorId) {
         Contributor contributor = contributorRepository.findById(contributorId)
                 .orElseThrow(() -> new ContributorNotFoundException("Contributor not found"));
         return new ContributorDetailResponse(
+                contributor.getId(),
                 contributor.getName(),
                 contributor.getDescription()
         );
