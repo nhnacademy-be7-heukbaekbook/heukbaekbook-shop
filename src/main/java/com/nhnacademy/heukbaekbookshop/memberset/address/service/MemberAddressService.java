@@ -11,7 +11,7 @@ public interface MemberAddressService {
 
     List<MemberAddressDto> getMemberAddressesList(Long customerId);
 
-    void deleteMemberAddress(Long addressId);
-
     MemberAddressDto updateMemberAddress(Long addressId, MemberAddressDto memberAddressDto);
+
+    void deleteMemberAddress(Long addressId);
 }

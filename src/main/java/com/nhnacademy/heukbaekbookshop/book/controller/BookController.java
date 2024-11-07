@@ -82,8 +82,6 @@ public class BookController {
     @GetMapping("/summary")
     public ResponseEntity<List<BookCartResponse>> getBooksSummary(@RequestParam List<Long> bookIds) {
         List<BookCartResponse> booksSummary = bookService.getBooksSummary(bookIds);
-        return ResponseEntity.ok(booksSummary);
-    }
 
     @GetMapping
     public ResponseEntity<Page<BookResponse>> getBooks(Pageable pageable) {
