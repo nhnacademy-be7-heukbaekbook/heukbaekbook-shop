@@ -13,17 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "reviews_images")
-public class ReviewImage {
-
-    @Id
-    @Column(name = "image_id")
-    private Long id;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "image_id", insertable = false, updatable = false)
-    private Image image;
-
+public class ReviewImage extends Image {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "customer_id", referencedColumnName = "customer_id"),

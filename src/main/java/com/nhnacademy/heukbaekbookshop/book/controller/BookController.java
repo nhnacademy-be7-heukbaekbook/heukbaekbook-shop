@@ -7,17 +7,18 @@ import com.nhnacademy.heukbaekbookshop.book.dto.response.like.LikeCreateResponse
 import com.nhnacademy.heukbaekbookshop.book.dto.response.like.LikeDeleteResponse;
 import com.nhnacademy.heukbaekbookshop.book.service.book.BookService;
 import com.nhnacademy.heukbaekbookshop.book.service.like.LikeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/books")
+@Slf4j
 public class BookController {
 
     private final BookService bookService;
@@ -29,19 +30,19 @@ public class BookController {
         this.likeService = likeService;
     }
 
-    @PostMapping("/admins/aladin")
+    @GetMapping("/aladin")
     public ResponseEntity<List<BookSearchResponse>> searchBooks(@RequestParam("title") String title) {
         List<BookSearchResponse> bookSearchResponses = bookService.searchBook(title);
         return ResponseEntity.ok(bookSearchResponses);
     }
 
-    @PostMapping("/admins/books")
-    public ResponseEntity<BookCreateResponse> registerBook(@RequestBody BookCreateRequest request) {
+    @PostMapping("/admins")
+    public ResponseEntity<BookCreateResponse> createBook(@RequestBody BookCreateRequest request) {
         BookCreateResponse response = bookService.registerBook(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/admins/books/{bookId}")
+    @PutMapping("/admins/{bookId}")
     public ResponseEntity<BookUpdateResponse> updateBook(
             @PathVariable Long bookId,
             @RequestBody BookUpdateRequest request
@@ -50,33 +51,27 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/admins/books/{bookId}")
+    @DeleteMapping("/admins/{bookId}")
     public ResponseEntity<BookDeleteResponse> deleteBook(@PathVariable Long bookId) {
         BookDeleteResponse response = bookService.deleteBook(bookId);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/books/{bookId}")
+    @GetMapping("/{bookId}")
     public ResponseEntity<BookDetailResponse> getBook(@PathVariable Long bookId) {
         BookDetailResponse response = bookService.getBook(bookId);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/admins/books")
-    public ResponseEntity<Page<BookDetailResponse>> getBooks(Pageable pageable) {
-        Page<BookDetailResponse> response = bookService.getBooks(pageable);
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/books/{bookId}/likes")
+    @PostMapping("/{bookId}/likes")
     public ResponseEntity<LikeCreateResponse> createLike(
             @PathVariable Long bookId,
             @RequestParam Long customerId) {
         LikeCreateResponse response = likeService.createLike(bookId, customerId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/books/{bookId}/likes")
+    @DeleteMapping("/{bookId}/likes")
     public ResponseEntity<LikeDeleteResponse> deleteLike(
             @PathVariable Long bookId,
             @RequestParam Long customerId) {
@@ -85,9 +80,15 @@ public class BookController {
     }
 
     @GetMapping("/summary")
-    public ResponseEntity<List<BookSummaryResponse>> getBooksSummary(@RequestParam List<Long> bookIds) {
-        List<BookSummaryResponse> booksSummary = bookService.getBooksSummary(bookIds);
+    public ResponseEntity<List<BookCartResponse>> getBooksSummary(@RequestParam List<Long> bookIds) {
+        List<BookCartResponse> booksSummary = bookService.getBooksSummary(bookIds);
         return ResponseEntity.ok(booksSummary);
     }
 
+    @GetMapping
+    public ResponseEntity<Page<BookResponse>> getBooks(Pageable pageable) {
+        log.info("pageable: {}", pageable);
+        Page<BookResponse> books = bookService.getBooks(pageable);
+        return ResponseEntity.ok(books);
+    }
 }
