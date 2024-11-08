@@ -60,7 +60,6 @@ public class BookService {
     private final CategoryRepository categoryRepository;
     private final ContributorRepository contributorRepository;
     private final RoleRepository roleRepository;
-    private final ImageRepository imageRepository;
     private final BookImageRepository bookImageRepository;
     private final TagRepository tagRepository;
     private final BookFormatter bookFormatter;
@@ -167,13 +166,11 @@ public class BookService {
         }
 
         if (request.imageUrl() != null && !request.imageUrl().trim().isEmpty()) {
-            Image image = new Image();
-            image.setUrl(request.imageUrl().trim());
-            imageRepository.save(image);
-            entityManager.flush();
 
             BookImage bookImage = new BookImage();
             bookImage.setBook(book);
+            bookImage.setUrl(request.imageUrl().trim());
+            bookImage.setType(ImageType.THUMBNAIL);
 
             book.addBookImage(bookImage);
 
@@ -300,14 +297,10 @@ public class BookService {
         }
 
         if (request.thumbnailImageUrl() != null && !request.thumbnailImageUrl().trim().isEmpty()) {
-            Image image = new Image();
-            image.setUrl(request.thumbnailImageUrl().trim());
-            image.setType(ImageType.THUMBNAIL);
-            image = imageRepository.save(image);
-            entityManager.flush();
-
             BookImage bookImage = new BookImage();
             bookImage.setBook(book);
+            bookImage.setUrl(request.thumbnailImageUrl().trim());
+            bookImage.setType(ImageType.THUMBNAIL);
 
             book.addBookImage(bookImage);
 
@@ -317,17 +310,11 @@ public class BookService {
         if (request.detailImageUrls() != null) {
             for (String imageUrl : request.detailImageUrls()) {
                 if (imageUrl != null && !imageUrl.trim().isEmpty()) {
-                    Image image = new Image();
-                    image.setUrl(imageUrl.trim());
-                    image.setType(ImageType.DETAIL);
-                    image = imageRepository.save(image);
-                    entityManager.flush();
-
                     BookImage bookImage = new BookImage();
                     bookImage.setBook(book);
-
+                    bookImage.setUrl(imageUrl.trim());
+                    bookImage.setType(ImageType.DETAIL);
                     book.addBookImage(bookImage);
-
                     bookImageRepository.save(bookImage);
                 }
             }
