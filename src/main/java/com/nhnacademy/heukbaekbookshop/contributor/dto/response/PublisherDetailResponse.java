@@ -1,3 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.contributor.dto.response;
 
-public record PublisherDetailResponse(String name) {}
+public record PublisherDetailResponse(
+        Long id,
+        String name
+) {}

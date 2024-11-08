@@ -8,12 +8,14 @@ import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorCreat
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorDetailResponse;
 import com.nhnacademy.heukbaekbookshop.contributor.service.ContributorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/contributors")
+@RequestMapping("/api/admins/contributors")
 public class ContributorController {
 
     private final ContributorService contributorService;
@@ -29,22 +31,29 @@ public class ContributorController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/{contributorId}")
-    public ResponseEntity<ContributorDetailResponse> getContributor(@PathVariable Long contributorId) {
+    @GetMapping
+    public ResponseEntity<Page<ContributorDetailResponse>> getContributors(Pageable pageable) {
+        Page<ContributorDetailResponse> responses = contributorService.getContributors(pageable);
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/{contributor-id}")
+    public ResponseEntity<ContributorDetailResponse> getContributor(@PathVariable(name = "contributor-id") Long contributorId) {
         ContributorDetailResponse response = contributorService.getContributor(contributorId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PutMapping("/{contributorId}")
+
+    @PutMapping("/{contributor-id}")
     public ResponseEntity<ContributorUpdateResponse> updateContributor(
-            @PathVariable Long contributorId,
+            @PathVariable(name = "contributor-id") Long contributorId,
             @RequestBody ContributorUpdateRequest request) {
         ContributorUpdateResponse response = contributorService.updateContributor(contributorId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @DeleteMapping("/{contributorId}")
-    public ResponseEntity<ContributorDeleteResponse> deleteContributor(@PathVariable Long contributorId) {
+    @DeleteMapping("/{contributor-id}")
+    public ResponseEntity<ContributorDeleteResponse> deleteContributor(@PathVariable(name = "contributor-id") Long contributorId) {
         ContributorDeleteResponse response = contributorService.deleteContributor(contributorId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
     }

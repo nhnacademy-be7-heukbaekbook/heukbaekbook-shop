@@ -333,7 +333,6 @@ public class BookService {
             }
         }
 
-        // 기존 태그 삭제
         Set<BookTag> tagsToRemove = new HashSet<>(book.getTags());
         for (BookTag bookTag : tagsToRemove) {
             book.getTags().remove(bookTag);
