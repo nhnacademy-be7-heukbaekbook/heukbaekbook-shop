@@ -83,7 +83,7 @@ public class ContributorControllerTest {
         mockMvc.perform(post("/api/contributors")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createRequest)))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().is4xxClientError());
 
         verify(contributorService, times(1)).registerContributor(any(ContributorCreateRequest.class));
     }
@@ -113,7 +113,7 @@ public class ContributorControllerTest {
 
         // When & Then
         mockMvc.perform(get("/api/contributors/{id}", contributorId))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().is4xxClientError());
 
         verify(contributorService, times(1)).getContributor(contributorId);
     }
@@ -148,7 +148,7 @@ public class ContributorControllerTest {
         mockMvc.perform(put("/api/contributors/{id}", contributorId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateRequest)))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().is4xxClientError());
 
         verify(contributorService, times(1)).updateContributor(eq(contributorId), any(ContributorUpdateRequest.class));
     }
@@ -175,7 +175,7 @@ public class ContributorControllerTest {
 
         // When & Then
         mockMvc.perform(delete("/api/contributors/{id}", contributorId))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().is4xxClientError());
 
         verify(contributorService, times(1)).deleteContributor(contributorId);
     }

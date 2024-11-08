@@ -54,7 +54,7 @@ public class CategoryControllerTest {
         mockMvc.perform(post("/categories/admins")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.parentId").doesNotExist())
                 .andExpect(jsonPath("$.name").value("New Category"));
     }
