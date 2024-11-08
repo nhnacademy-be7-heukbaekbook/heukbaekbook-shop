@@ -25,13 +25,13 @@ public class BookController {
     private final BookService bookService;
     private final LikeService likeService;
 
-    @GetMapping("/books/{bookId}")
+    @GetMapping("/{bookId}")
     public ResponseEntity<BookDetailResponse> getBook(@PathVariable Long bookId) {
         BookDetailResponse response = bookService.getBook(bookId);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/books/{bookId}/likes")
+    @PostMapping("/{bookId}/likes")
     public ResponseEntity<LikeCreateResponse> createLike(
             @PathVariable Long bookId,
             @RequestParam Long customerId) {
