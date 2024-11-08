@@ -333,7 +333,6 @@ public class BookService {
             }
         }
 
-        // 기존 태그 삭제
         Set<BookTag> tagsToRemove = new HashSet<>(book.getTags());
         for (BookTag bookTag : tagsToRemove) {
             book.getTags().remove(bookTag);
@@ -612,6 +611,44 @@ public class BookService {
                     )
             );
         });
+    }
+
+    public Page<BookDetailResponse> getBooksDetail(Pageable pageable) {
+        Page<Book> booksPage = bookRepository.findAllByStatusNot(BookStatus.DELETED, pageable);
+
+        return booksPage.map(book -> new BookDetailResponse(
+                book.getId(),
+                book.getTitle(),
+                book.getIndex(),
+                book.getDescription(),
+                book.getPublication().toString(),
+                book.getIsbn(),
+                book.getBookImages().stream()
+                        .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
+                        .map(Image::getUrl)
+                        .findFirst()
+                        .orElse(null),
+                book.getBookImages().stream()
+                        .filter(bookImage -> bookImage.getType() == ImageType.DETAIL)
+                        .map(Image::getUrl)
+                        .collect(Collectors.toList()),
+                book.isPackable(),
+                book.getStock(),
+                book.getPrice().intValue(),
+                book.getDiscountRate(),
+                book.getStatus().toString(),
+                book.getPublisher().getName(),
+                book.getCategories().stream()
+                        .map(bc -> buildCategoryPath(bc.getCategory()))
+                        .collect(Collectors.toList()),
+                book.getContributors().stream()
+                        .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
+                        .map(bc -> bc.getContributor().getName())
+                        .collect(Collectors.toList()),
+                book.getTags().stream()
+                        .map(bt -> bt.getTag().getName())
+                        .collect(Collectors.toList())
+        ));
     }
 
     private BigDecimal getSalePrice(BigDecimal price, double disCountRate) {
