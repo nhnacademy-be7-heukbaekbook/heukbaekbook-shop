@@ -39,7 +39,7 @@ public class Delivery {
 
     @NotNull
     @Column(name = "delivery_postal_code")
-    private long postalCode;
+    private Long postalCode;
 
     @NotNull
     @Length(min = 1, max = 255)

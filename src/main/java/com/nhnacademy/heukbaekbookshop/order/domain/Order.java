@@ -1,6 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.order.domain;
 
-import com.nhnacademy.heukbaekbookshop.member.domain.Customer;
+import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;

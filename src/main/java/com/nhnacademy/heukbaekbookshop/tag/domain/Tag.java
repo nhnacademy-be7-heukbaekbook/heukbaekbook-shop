@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -29,6 +30,6 @@ public class Tag {
     private String name;
 
     @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<BookTag> bookTags;
+    private Set<BookTag> bookTags = new HashSet<>();
 
 }

@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Objects;
+
 @Entity
 @Getter
 @Setter
@@ -17,20 +19,27 @@ import lombok.Setter;
 public class BookTag {
 
     @Id
-    @Column(name = "tag_id")
-    private Long tagId;
-
-    @Id
-    @Column(name = "book_id")
-    private Long bookId;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("tagId")
-    @JoinColumn(name = "tag_id", insertable = false, updatable = false)
+    @JoinColumn(name = "tag_id")
     private Tag tag;
 
+    @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("bookId")
-    @JoinColumn(name = "book_id", insertable = false, updatable = false)
+    @JoinColumn(name = "book_id")
     private Book book;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BookTag)) return false;
+        BookTag that = (BookTag) o;
+        return Objects.equals(book.getId(), that.book.getId()) &&
+                Objects.equals(tag.getId(), that.tag.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(book.getId(), tag.getId());
+    }
 }
+

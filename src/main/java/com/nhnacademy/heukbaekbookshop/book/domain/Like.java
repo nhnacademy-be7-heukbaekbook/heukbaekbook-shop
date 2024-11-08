@@ -1,9 +1,8 @@
 package com.nhnacademy.heukbaekbookshop.book.domain;
 
-import com.nhnacademy.heukbaekbookshop.member.domain.Customer;
-import com.nhnacademy.heukbaekbookshop.member.domain.Member;
+import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +11,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @IdClass(LikeId.class)
 @Table(name = "likes")
 public class Like {
@@ -34,5 +32,13 @@ public class Like {
     @MapsId("customerId")
     @JoinColumn(name = "customer_id", insertable = false, updatable = false)
     private Member member;
+
+    @Builder
+    public Like(Long bookId, Long customerId, Book book, Member member) {
+        this.bookId = bookId;
+        this.customerId = customerId;
+        this.book = book;
+        this.member = member;
+    }
 
 }

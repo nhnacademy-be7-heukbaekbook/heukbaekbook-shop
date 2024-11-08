@@ -22,6 +22,7 @@ public class Role {
 
     @NotNull
     @Column(name = "role_name")
+    @Enumerated(EnumType.STRING)
     private ContributorRole roleName;
 
 }

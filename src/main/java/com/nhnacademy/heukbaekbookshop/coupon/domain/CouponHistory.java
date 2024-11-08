@@ -1,7 +1,5 @@
 package com.nhnacademy.heukbaekbookshop.coupon.domain;
 
-import com.nhnacademy.heukbaekbookshop.book.domain.Book;
-import com.nhnacademy.heukbaekbookshop.order.domain.Order;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
