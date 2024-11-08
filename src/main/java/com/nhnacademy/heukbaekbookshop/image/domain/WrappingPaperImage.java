@@ -13,19 +13,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "wrapping_papers_images")
-public class WrappingPaperImage {
-
-    @Id
-    @Column(name = "image_id")
-    private Long id;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "image_id", insertable = false, updatable = false)
-    private Image image;
+public class WrappingPaperImage extends Image {
 
     @OneToOne
     @JoinColumn(name = "wrapping_paper_id")
     private WrappingPaper wrappingPaper;
-
 }

@@ -14,6 +14,7 @@ import org.hibernate.validator.constraints.Length;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "images")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Image {
 
     @Id
@@ -25,18 +26,7 @@ public class Image {
     @Column(name = "image_url")
     private String url;
 
-    @NotNull
     @Column(name = "image_type")
     @Enumerated(EnumType.STRING)
     private ImageType type;
-
-    @OneToOne(mappedBy = "image", cascade = CascadeType.ALL, orphanRemoval = true)
-    private BookImage bookImage;
-
-    @OneToOne(mappedBy = "image", cascade = CascadeType.ALL, orphanRemoval = true)
-    private WrappingPaperImage wrappingPaperImage;
-
-    @OneToOne(mappedBy = "image", cascade = CascadeType.ALL, orphanRemoval = true)
-    private ReviewImage reviewImage;
-
 }

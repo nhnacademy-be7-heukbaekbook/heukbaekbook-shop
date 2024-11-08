@@ -11,6 +11,7 @@ import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.book.repository.like.LikeRepository;
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.ContributorRole;
+import com.nhnacademy.heukbaekbookshop.image.domain.Image;
 import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
@@ -80,13 +81,13 @@ public class LikeService {
                 book.getPublication().toString(),
                 book.getIsbn(),
                 book.getBookImages().stream()
-                        .filter(bookImage -> bookImage.getImage().getType() == ImageType.THUMBNAIL)
-                        .map(bookImage -> bookImage.getImage().getUrl())
+                        .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
+                        .map(Image::getUrl)
                         .findFirst()
                         .orElse(null),
                 book.getBookImages().stream()
-                        .filter(bookImage -> bookImage.getImage().getType() == ImageType.DETAIL)
-                        .map(bookImage -> bookImage.getImage().getUrl())
+                        .filter(bookImage -> bookImage.getType() == ImageType.DETAIL)
+                        .map(Image::getUrl)
                         .collect(Collectors.toList()),
                 book.isPackable(),
                 book.getStock(),

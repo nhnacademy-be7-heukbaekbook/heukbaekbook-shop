@@ -6,23 +6,24 @@ import com.nhnacademy.heukbaekbookshop.book.dto.response.like.LikeCreateResponse
 import com.nhnacademy.heukbaekbookshop.book.dto.response.like.LikeDeleteResponse;
 import com.nhnacademy.heukbaekbookshop.book.service.book.BookService;
 import com.nhnacademy.heukbaekbookshop.book.service.like.LikeService;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/books")
+@Slf4j
+@RequiredArgsConstructor
 public class BookController {
 
     private final BookService bookService;
     private final LikeService likeService;
-
-    public BookController(BookService bookService, LikeService likeService) {
-        this.bookService = bookService;
-        this.likeService = likeService;
-    }
 
     @GetMapping("/books/{bookId}")
     public ResponseEntity<BookDetailResponse> getBook(@PathVariable Long bookId) {
@@ -35,10 +36,10 @@ public class BookController {
             @PathVariable Long bookId,
             @RequestParam Long customerId) {
         LikeCreateResponse response = likeService.createLike(bookId, customerId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/books/{bookId}/likes")
+    @DeleteMapping("/{bookId}/likes")
     public ResponseEntity<LikeDeleteResponse> deleteLike(
             @PathVariable Long bookId,
             @RequestParam Long customerId) {
@@ -46,10 +47,14 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/books/summary")
-    public ResponseEntity<List<BookSummaryResponse>> getBooksSummary(@RequestParam List<Long> bookIds) {
-        List<BookSummaryResponse> booksSummary = bookService.getBooksSummary(bookIds);
-        return ResponseEntity.ok(booksSummary);
-    }
+    @GetMapping("/summary")
+    public ResponseEntity<List<BookCartResponse>> getBooksSummary(@RequestParam List<Long> bookIds) {
+        List<BookCartResponse> booksSummary = bookService.getBooksSummary(bookIds);
 
+    @GetMapping
+    public ResponseEntity<Page<BookResponse>> getBooks(Pageable pageable) {
+        log.info("pageable: {}", pageable);
+        Page<BookResponse> books = bookService.getBooks(pageable);
+        return ResponseEntity.ok(books);
+    }
 }
