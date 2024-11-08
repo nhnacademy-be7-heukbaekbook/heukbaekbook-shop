@@ -13,7 +13,10 @@ import com.nhnacademy.heukbaekbookshop.book.exception.book.BookSearchException;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
+import com.nhnacademy.heukbaekbookshop.common.formatter.BookFormatter;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.*;
+import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSummaryResponse;
+import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.contributor.repository.ContributorRepository;
 import com.nhnacademy.heukbaekbookshop.contributor.repository.PublisherRepository;
 import com.nhnacademy.heukbaekbookshop.contributor.repository.RoleRepository;
@@ -27,6 +30,7 @@ import com.nhnacademy.heukbaekbookshop.tag.repository.TagRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +39,9 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -43,7 +49,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+
 @Service
+@RequiredArgsConstructor
 public class BookService {
 
     private final RestTemplate restTemplate;
@@ -55,6 +63,7 @@ public class BookService {
     private final ImageRepository imageRepository;
     private final BookImageRepository bookImageRepository;
     private final TagRepository tagRepository;
+    private final BookFormatter bookFormatter;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -63,28 +72,6 @@ public class BookService {
     private String aladinApiKey;
 
     private static final int MAX_CATEGORY_COUNT = 10;
-
-    public BookService(
-            RestTemplate restTemplate,
-            BookRepository bookRepository,
-            PublisherRepository publisherRepository,
-            CategoryRepository categoryRepository,
-            ContributorRepository contributorRepository,
-            RoleRepository roleRepository,
-            ImageRepository imageRepository,
-            BookImageRepository bookImageRepository,
-            TagRepository tagRepository
-    ) {
-        this.restTemplate = restTemplate;
-        this.bookRepository = bookRepository;
-        this.publisherRepository = publisherRepository;
-        this.categoryRepository = categoryRepository;
-        this.contributorRepository = contributorRepository;
-        this.roleRepository = roleRepository;
-        this.imageRepository = imageRepository;
-        this.bookImageRepository = bookImageRepository;
-        this.tagRepository = tagRepository;
-    }
 
     public List<BookSearchResponse> searchBook(String title) {
         String url = "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx" +
@@ -96,6 +83,7 @@ public class BookService {
                 "&SearchTarget=Book" +
                 "&output=js" +
                 "&Version=20131101";
+
         try {
             BookSearchApiResponse apiResponse = restTemplate.getForObject(url, BookSearchApiResponse.class);
 
@@ -181,15 +169,12 @@ public class BookService {
         if (request.imageUrl() != null && !request.imageUrl().trim().isEmpty()) {
             Image image = new Image();
             image.setUrl(request.imageUrl().trim());
-            image.setType(ImageType.THUMBNAIL);
-            image = imageRepository.save(image);
+            imageRepository.save(image);
             entityManager.flush();
 
             BookImage bookImage = new BookImage();
-            bookImage.setImage(image);
             bookImage.setBook(book);
 
-            image.setBookImage(bookImage);
             book.addBookImage(bookImage);
 
             bookImageRepository.save(bookImage);
@@ -312,7 +297,6 @@ public class BookService {
         Set<BookImage> imagesToRemove = new HashSet<>(book.getBookImages());
         for (BookImage bookImage : imagesToRemove) {
             book.removeBookImage(bookImage);
-            imageRepository.delete(bookImage.getImage());
         }
 
         if (request.thumbnailImageUrl() != null && !request.thumbnailImageUrl().trim().isEmpty()) {
@@ -323,10 +307,8 @@ public class BookService {
             entityManager.flush();
 
             BookImage bookImage = new BookImage();
-            bookImage.setImage(image);
             bookImage.setBook(book);
 
-            image.setBookImage(bookImage);
             book.addBookImage(bookImage);
 
             bookImageRepository.save(bookImage);
@@ -342,10 +324,8 @@ public class BookService {
                     entityManager.flush();
 
                     BookImage bookImage = new BookImage();
-                    bookImage.setImage(image);
                     bookImage.setBook(book);
 
-                    image.setBookImage(bookImage);
                     book.addBookImage(bookImage);
 
                     bookImageRepository.save(bookImage);
@@ -392,8 +372,8 @@ public class BookService {
                 book.getPublication().toString(),
                 book.getIsbn(),
                 book.getBookImages().stream()
-                        .filter(bookImage -> bookImage.getImage().getType() == ImageType.THUMBNAIL)
-                        .map(bookImage -> bookImage.getImage().getUrl())
+                        .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
+                        .map(Image::getUrl)
                         .findFirst()
                         .orElse(null),
                 book.isPackable(),
@@ -435,13 +415,13 @@ public class BookService {
                 book.getPublication().toString(),
                 book.getIsbn(),
                 book.getBookImages().stream()
-                        .filter(bookImage -> bookImage.getImage().getType() == ImageType.THUMBNAIL)
-                        .map(bookImage -> bookImage.getImage().getUrl())
+                        .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
+                        .map(Image::getUrl)
                         .findFirst()
                         .orElse(null),
                 book.getBookImages().stream()
-                                .map(bookImage -> bookImage.getImage().getType().equals(ImageType.DETAIL)
-                                        ? bookImage.getImage().getUrl() : null).toList(),
+                        .map(bookImage -> bookImage.getType().equals(ImageType.DETAIL)
+                                ? bookImage.getUrl() : null).toList(),
                 book.isPackable(),
                 book.getStock(),
                 book.getPrice().intValue(),
@@ -459,44 +439,6 @@ public class BookService {
                         .map(bt -> bt.getTag().getName())
                         .collect(Collectors.toList())
         );
-    }
-
-    public Page<BookDetailResponse> getBooks(Pageable pageable) {
-        Page<Book> booksPage = bookRepository.findAllByStatusNot(BookStatus.DELETED, pageable);
-
-        return booksPage.map(book -> new BookDetailResponse(
-                book.getId(),
-                book.getTitle(),
-                book.getIndex(),
-                book.getDescription(),
-                book.getPublication().toString(),
-                book.getIsbn(),
-                book.getBookImages().stream()
-                        .filter(bookImage -> bookImage.getImage().getType() == ImageType.THUMBNAIL)
-                        .map(bookImage -> bookImage.getImage().getUrl())
-                        .findFirst()
-                        .orElse(null),
-                book.getBookImages().stream()
-                        .filter(bookImage -> bookImage.getImage().getType() == ImageType.DETAIL)
-                        .map(bookImage -> bookImage.getImage().getUrl())
-                        .collect(Collectors.toList()),
-                book.isPackable(),
-                book.getStock(),
-                book.getPrice().intValue(),
-                book.getDiscountRate(),
-                book.getStatus().toString(),
-                book.getPublisher().getName(),
-                book.getCategories().stream()
-                        .map(bc -> buildCategoryPath(bc.getCategory()))
-                        .collect(Collectors.toList()),
-                book.getContributors().stream()
-                        .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
-                        .map(bc -> bc.getContributor().getName())
-                        .collect(Collectors.toList()),
-                book.getTags().stream()
-                        .map(bt -> bt.getTag().getName())
-                        .collect(Collectors.toList())
-        ));
     }
 
     private static class ParsedPerson {
@@ -617,17 +559,63 @@ public class BookService {
         return persons;
     }
 
-    public List<BookSummaryResponse> getBooksSummary(List<Long> bookIds) {
-        return bookRepository.findAllByIdIn(bookIds);
-    }
-
     private String buildCategoryPath(Category category) {
         List<String> categoryNames = new LinkedList<>();
         while (category != null) {
-            categoryNames.add(0, category.getName());
+            categoryNames.addFirst(category.getName());
             category = category.getParentCategory();
         }
         return String.join(">", categoryNames);
     }
 
+    public List<BookCartResponse> getBooksSummary(List<Long> bookIds) {
+        List<Book> books = bookRepository.findAllByIdInAndType(bookIds, ImageType.THUMBNAIL);
+        return books.stream()
+                .map(book -> new BookCartResponse(
+                                book.getId(),
+                                book.getTitle(),
+                                bookFormatter.formatPrice(book.getPrice()),
+                                bookFormatter.formatPrice(getSalePrice(book.getPrice(), book.getDiscountRate())),
+                                book.getDiscountRate(),
+                                book.getBookImages().stream()
+                                        .map(Image::getUrl)
+                                        .findFirst()
+                                        .orElse("no-image")
+                        )
+                )
+                .collect(Collectors.toList());
+    }
+
+    public Page<BookResponse> getBooks(Pageable pageable) {
+        Page<Book> allByPageable = bookRepository.findAllByPageable(pageable);
+        return allByPageable.map(book -> {
+            return new BookResponse(
+                    book.getId(),
+                    book.getTitle(),
+                    bookFormatter.formatDate(book.getPublication()),
+                    bookFormatter.formatPrice(getSalePrice(book.getPrice(), book.getDiscountRate())),
+                    book.getDiscountRate(),
+                    book.getBookImages().stream()
+                            .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
+                            .map(Image::getUrl)
+                            .findFirst()
+                            .orElse("no-image"),
+                    book.getContributors().stream()
+                            .map(bookContributor -> new ContributorSummaryResponse(
+                                    bookContributor.getContributor().getId(),
+                                    bookContributor.getContributor().getName()
+                            ))
+                            .collect(Collectors.toList()),
+                    new PublisherSummaryResponse(
+                            book.getPublisher().getId(),
+                            book.getPublisher().getName()
+                    )
+            );
+        });
+    }
+
+    private BigDecimal getSalePrice(BigDecimal price, double disCountRate) {
+        BigDecimal discountRate = BigDecimal.valueOf(disCountRate).divide(BigDecimal.valueOf(100));
+        return price.multiply(BigDecimal.ONE.subtract(discountRate)).setScale(2, RoundingMode.HALF_UP);
+    }
 }
