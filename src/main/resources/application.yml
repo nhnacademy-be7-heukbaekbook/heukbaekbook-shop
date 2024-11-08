@@ -3,5 +3,3 @@ spring:
     name: shop
   config:
     import: optional:configserver:http://localhost:9000
-  profiles:
-    active: dev

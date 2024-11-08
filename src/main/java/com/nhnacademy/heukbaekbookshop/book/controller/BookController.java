@@ -1,14 +1,14 @@
 package com.nhnacademy.heukbaekbookshop.book.controller;
 
+import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookCartResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookDetailResponse;
-import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookSummaryResponse;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.like.LikeCreateResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.like.LikeDeleteResponse;
 import com.nhnacademy.heukbaekbookshop.book.service.book.BookService;
 import com.nhnacademy.heukbaekbookshop.book.service.like.LikeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +49,9 @@ public class BookController {
 
     @GetMapping("/summary")
     public ResponseEntity<List<BookCartResponse>> getBooksSummary(@RequestParam List<Long> bookIds) {
-        List<BookCartResponse> booksSummary = bookService.getBooksSummary(bookIds);
+        List<BookCartResponse> bookCartResponses = bookService.getBooksSummary(bookIds);
+        return ResponseEntity.ok(bookCartResponses);
+    }
 
     @GetMapping
     public ResponseEntity<Page<BookResponse>> getBooks(Pageable pageable) {

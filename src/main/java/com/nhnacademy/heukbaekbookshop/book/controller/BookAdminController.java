@@ -51,8 +51,7 @@ public class BookAdminController {
 
     @GetMapping("/books")
     public ResponseEntity<Page<BookDetailResponse>> getBooks(Pageable pageable) {
-        Page<BookDetailResponse> response = bookService.getBooks(pageable);
+        Page<BookDetailResponse> response = bookService.getBooksDetail(pageable);
         return ResponseEntity.ok(response);
     }
-
 }

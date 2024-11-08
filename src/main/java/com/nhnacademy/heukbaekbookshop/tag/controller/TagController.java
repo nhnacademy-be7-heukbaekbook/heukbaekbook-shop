@@ -40,7 +40,7 @@ public class TagController {
     @DeleteMapping("/{tagId}")
     public ResponseEntity<TagDeleteResponse> deleteTag(@PathVariable Long tagId) {
         TagDeleteResponse response = tagService.deleteTag(tagId);
-        return ResponseEntity.ok(response);
+        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/{tagId}")

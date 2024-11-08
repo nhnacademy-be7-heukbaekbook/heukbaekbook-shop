@@ -29,19 +29,18 @@ import com.nhnacademy.heukbaekbookshop.tag.domain.Tag;
 import com.nhnacademy.heukbaekbookshop.tag.repository.TagRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -52,6 +51,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BookService {
 
     private final RestTemplate restTemplate;
@@ -611,6 +611,44 @@ public class BookService {
                     )
             );
         });
+    }
+
+    public Page<BookDetailResponse> getBooksDetail(Pageable pageable) {
+        Page<Book> booksPage = bookRepository.findAllByStatusNot(BookStatus.DELETED, pageable);
+
+        return booksPage.map(book -> new BookDetailResponse(
+                book.getId(),
+                book.getTitle(),
+                book.getIndex(),
+                book.getDescription(),
+                book.getPublication().toString(),
+                book.getIsbn(),
+                book.getBookImages().stream()
+                        .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
+                        .map(Image::getUrl)
+                        .findFirst()
+                        .orElse(null),
+                book.getBookImages().stream()
+                        .filter(bookImage -> bookImage.getType() == ImageType.DETAIL)
+                        .map(Image::getUrl)
+                        .collect(Collectors.toList()),
+                book.isPackable(),
+                book.getStock(),
+                book.getPrice().intValue(),
+                book.getDiscountRate(),
+                book.getStatus().toString(),
+                book.getPublisher().getName(),
+                book.getCategories().stream()
+                        .map(bc -> buildCategoryPath(bc.getCategory()))
+                        .collect(Collectors.toList()),
+                book.getContributors().stream()
+                        .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
+                        .map(bc -> bc.getContributor().getName())
+                        .collect(Collectors.toList()),
+                book.getTags().stream()
+                        .map(bt -> bt.getTag().getName())
+                        .collect(Collectors.toList())
+        ));
     }
 
     private BigDecimal getSalePrice(BigDecimal price, double disCountRate) {
