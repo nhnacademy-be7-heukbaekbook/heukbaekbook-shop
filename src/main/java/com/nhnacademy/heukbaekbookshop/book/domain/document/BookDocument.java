@@ -1,23 +1,15 @@
 package com.nhnacademy.heukbaekbookshop.book.domain.document;
 
-import com.nhnacademy.heukbaekbookshop.contributor.domain.BookContributor;
-import com.nhnacademy.heukbaekbookshop.contributor.domain.Contributor;
-import com.nhnacademy.heukbaekbookshop.contributor.domain.Publisher;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
-@Data
-@Builder
+@Getter
 @Document(indexName = "books")
 public class BookDocument {
 
@@ -31,7 +23,7 @@ public class BookDocument {
     private String description;
 
     @Field(type = FieldType.Text)
-    private Set<BookContributor> contributors;
+    private String authorName;
 
     @Field(type = FieldType.Keyword)
     private String isbn;
@@ -40,10 +32,10 @@ public class BookDocument {
     private Date pubDate;
 
     @Field(type = FieldType.Keyword)
-    private Publisher publisher;
+    private String publisher;
 
-    @Field(type = FieldType.Integer)
-    private BigDecimal price;
+    @Field(type = FieldType.Text)
+    private String price;
 
     @Field(type = FieldType.Float)
     private float discountRate;
@@ -54,9 +46,31 @@ public class BookDocument {
     @Field(type = FieldType.Text)
     private List<String> tags;
 
-    @Field(type = FieldType.Integer)
-    private int reviewCount;
 
-    @Field(type = FieldType.Integer)
-    private int reviewScore;
+    // 나중에 추가
+//    @Field(type = FieldType.Integer)
+//    private int reviewCount;
+//
+//    @Field(type = FieldType.Integer)
+//    private int reviewScore;
+
+
+    public BookDocument(Long id, String title, String description, String authorName, String isbn, Date pubDate,
+                        String publisher, String price, float discountRate, Long popularity, List<String> tags
+                        //int reviewCount, int reviewScore
+                        ) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.authorName = authorName;
+        this.isbn = isbn;
+        this.pubDate = pubDate;
+        this.publisher = publisher;
+        this.price = price;
+        this.discountRate = discountRate;
+        this.popularity = popularity;
+        this.tags = tags;
+//        this.reviewCount = reviewCount; 나중에 추가
+//        this.reviewScore = reviewScore;
+    }
 }
