@@ -5,6 +5,7 @@ import com.nhnacademy.heukbaekbookshop.contributor.domain.BookContributor;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.Publisher;
 import com.nhnacademy.heukbaekbookshop.image.domain.BookImage;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
+import com.nhnacademy.heukbaekbookshop.tag.domain.Tag;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -28,7 +29,7 @@ public class Book {
     @Column(name = "book_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "publisher_id")
     private Publisher publisher;
 
@@ -101,17 +102,22 @@ public class Book {
     private Set<BookImage> bookImages = new HashSet<>();
 
     public void addCategory(BookCategory bookCategory) {
-        categories.add(bookCategory);
         bookCategory.setBook(this);
+        categories.add(bookCategory);
     }
 
     public void addBookImage(BookImage bookImage) {
-        this.bookImages.add(bookImage);
         bookImage.setBook(this);
+        this.bookImages.add(bookImage);
     }
 
     public void removeBookImage(BookImage bookImage) {
-        this.bookImages.remove(bookImage);
         bookImage.setBook(null);
+        this.bookImages.remove(bookImage);
+    }
+
+    public void addTag(BookTag bookTag) {
+        bookTag.setBook(this);
+        this.tags.add(bookTag);
     }
 }

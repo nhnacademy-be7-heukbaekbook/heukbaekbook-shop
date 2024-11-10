@@ -7,13 +7,16 @@ import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherDeleteR
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherDetailResponse;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherUpdateResponse;
 import com.nhnacademy.heukbaekbookshop.contributor.service.PublisherService;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/publishers")
+@RequestMapping("/api/admins/publishers")
 public class PublisherController {
 
     private final PublisherService publisherService;
@@ -29,24 +32,30 @@ public class PublisherController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/{publisherId}")
-    public ResponseEntity<PublisherDetailResponse> getPublisher(@PathVariable Long publisherId) {
-        PublisherDetailResponse response = publisherService.getPublisher(publisherId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    @GetMapping
+    public ResponseEntity<Page<PublisherDetailResponse>> getPublishers(Pageable pageable) {
+        Page<PublisherDetailResponse> response = publisherService.getPublishers(pageable);
+        return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{publisherId}")
+    @GetMapping("/{publisher-id}")
+    public ResponseEntity<PublisherDetailResponse> getPublisherById(@PathVariable(name = "publisher-id") Long publisherId) {
+        PublisherDetailResponse response = publisherService.getPublisherById(publisherId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{publisher-id}")
     public ResponseEntity<PublisherUpdateResponse> updatePublisher(
-            @PathVariable Long publisherId,
+            @PathVariable(name = "publisher-id") Long publisherId,
             @RequestBody PublisherUpdateRequest request) {
         PublisherUpdateResponse response = publisherService.updatePublisher(publisherId, request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{publisherId}")
-    public ResponseEntity<PublisherDeleteResponse> deletePublisher(@PathVariable Long publisherId) {
+    @DeleteMapping("/{publisher-id}")
+    public ResponseEntity<PublisherDeleteResponse> deletePublisher(@PathVariable(name = "publisher-id") Long publisherId) {
         PublisherDeleteResponse response = publisherService.deletePublisher(publisherId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
 
 }

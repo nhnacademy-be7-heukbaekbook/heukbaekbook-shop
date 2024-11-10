@@ -8,6 +8,7 @@ public record BookUpdateResponse(
         String description,
         String publication,
         String isbn,
+        String imageUrl,
         boolean isPackable,
         int stock,
         int standardPrice,

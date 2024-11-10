@@ -13,18 +13,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "books_images")
-public class BookImage {
+public class BookImage extends Image {
 
-    @Id
-    @Column(name = "image_id")
-    private Long id;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "image_id")
-    private Image image;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 

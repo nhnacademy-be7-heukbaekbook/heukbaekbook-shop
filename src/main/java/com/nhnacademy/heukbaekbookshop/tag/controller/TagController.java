@@ -8,12 +8,14 @@ import com.nhnacademy.heukbaekbookshop.tag.dto.response.TagDetailResponse;
 import com.nhnacademy.heukbaekbookshop.tag.dto.response.TagUpdateResponse;
 import com.nhnacademy.heukbaekbookshop.tag.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/tags")
+@RequestMapping("/api/admins/tags")
 public class TagController {
 
     private final TagService tagService;
@@ -32,18 +34,24 @@ public class TagController {
     @PutMapping("/{tagId}")
     public ResponseEntity<TagUpdateResponse> updateTag(@PathVariable Long tagId, @RequestBody TagUpdateRequest request) {
         TagUpdateResponse response = tagService.updateTag(tagId, request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{tagId}")
     public ResponseEntity<TagDeleteResponse> deleteTag(@PathVariable Long tagId) {
         TagDeleteResponse response = tagService.deleteTag(tagId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/{tagId}")
     public ResponseEntity<TagDetailResponse> getTag(@PathVariable Long tagId) {
         TagDetailResponse response = tagService.getTag(tagId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<TagDetailResponse>> getTags(Pageable pageable) {
+        Page<TagDetailResponse> response = tagService.getTags(pageable);
+        return ResponseEntity.ok(response);
     }
 }

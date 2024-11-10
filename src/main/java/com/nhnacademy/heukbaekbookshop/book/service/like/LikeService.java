@@ -9,12 +9,16 @@ import com.nhnacademy.heukbaekbookshop.book.exception.like.LikeAlreadyExistExcep
 import com.nhnacademy.heukbaekbookshop.book.exception.like.LikeNotFoundException;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.book.repository.like.LikeRepository;
+import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.ContributorRole;
+import com.nhnacademy.heukbaekbookshop.image.domain.Image;
+import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,23 +74,46 @@ public class LikeService {
 
     private BookDetailResponse mapToBookDetailResponse(Book book) {
         return new BookDetailResponse(
+                book.getId(),
                 book.getTitle(),
                 book.getIndex(),
                 book.getDescription(),
                 book.getPublication().toString(),
                 book.getIsbn(),
+                book.getBookImages().stream()
+                        .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
+                        .map(Image::getUrl)
+                        .findFirst()
+                        .orElse(null),
+                book.getBookImages().stream()
+                        .filter(bookImage -> bookImage.getType() == ImageType.DETAIL)
+                        .map(Image::getUrl)
+                        .collect(Collectors.toList()),
                 book.isPackable(),
                 book.getStock(),
                 book.getPrice().intValue(),
                 book.getDiscountRate(),
+                book.getStatus().toString(),
                 book.getPublisher().getName(),
                 book.getCategories().stream()
-                        .map(bc -> bc.getCategory().getName())
+                        .map(bc -> buildCategoryPath(bc.getCategory()))
                         .collect(Collectors.toList()),
                 book.getContributors().stream()
                         .filter(bc -> bc.getRole().getRoleName() == ContributorRole.AUTHOR)
                         .map(bc -> bc.getContributor().getName())
+                        .collect(Collectors.toList()),
+                book.getTags().stream()
+                        .map(bt -> bt.getTag().getName())
                         .collect(Collectors.toList())
         );
+    }
+
+    private String buildCategoryPath(Category category) {
+        List<String> categoryNames = new LinkedList<>();
+        while (category != null) {
+            categoryNames.add(0, category.getName());
+            category = category.getParentCategory();
+        }
+        return String.join(">", categoryNames);
     }
 }

@@ -11,6 +11,8 @@ import com.nhnacademy.heukbaekbookshop.contributor.exception.PublisherAlreadyExi
 import com.nhnacademy.heukbaekbookshop.contributor.exception.PublisherNotFoundException;
 import com.nhnacademy.heukbaekbookshop.contributor.repository.PublisherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,12 +35,10 @@ public class PublisherService {
         return new PublisherCreateResponse(publisher.getName());
     }
 
-    public PublisherDetailResponse getPublisher(Long publisherId) {
-        if (publisherRepository.findById(publisherId).isEmpty()) {
-            throw new PublisherNotFoundException("출판사를 찾을 수 없습니다.");
-        }
-        Publisher publisher = publisherRepository.findById(publisherId).get();
-        return new PublisherDetailResponse(publisher.getName());
+    public Page<PublisherDetailResponse> getPublishers(Pageable pageable) {
+        Page<Publisher> publishers = publisherRepository.findAll(pageable);
+        return publishers.map(publisher ->
+                new PublisherDetailResponse(publisher.getId(), publisher.getName()));
     }
 
     public PublisherUpdateResponse updatePublisher(Long publisherId, PublisherUpdateRequest request) {
@@ -58,5 +58,13 @@ public class PublisherService {
         Publisher publisher = publisherRepository.findById(publisherId).get();
         publisherRepository.delete(publisher);
         return new PublisherDeleteResponse(publisher.getName());
+    }
+
+    public PublisherDetailResponse getPublisherById(Long publisherId) {
+        if (publisherRepository.findById(publisherId).isEmpty()) {
+            throw new PublisherNotFoundException("출판사를 찾을 수 없습니다.");
+        }
+        Publisher publisher = publisherRepository.findById(publisherId).get();
+        return new PublisherDetailResponse(publisher.getId(), publisher.getName());
     }
 }
