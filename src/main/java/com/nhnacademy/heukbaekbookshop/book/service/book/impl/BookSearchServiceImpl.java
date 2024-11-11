@@ -6,15 +6,12 @@ import com.nhnacademy.heukbaekbookshop.book.domain.SearchCondition;
 import com.nhnacademy.heukbaekbookshop.book.domain.SortCondition;
 import com.nhnacademy.heukbaekbookshop.book.domain.document.BookDocument;
 import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookElasticSearchResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookResponse;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookDocumentRepository;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookSearchRepository;
 import com.nhnacademy.heukbaekbookshop.book.service.book.BookSearchService;
 import com.nhnacademy.heukbaekbookshop.common.formatter.BookFormatter;
-import com.nhnacademy.heukbaekbookshop.contributor.domain.BookContributor;
-import com.nhnacademy.heukbaekbookshop.contributor.domain.ContributorRole;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.image.domain.Image;
@@ -29,7 +26,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -107,13 +103,6 @@ public class BookSearchServiceImpl implements BookSearchService {
                 )
         );
     }
-
-    private List<String> convertBookTagsToList(Set<BookTag> bookTags) {
-        return bookTags.stream()
-                .map(bookTag -> bookTag.getTag().getName()) // BookTag 객체의 태그 이름 필드를 반환하는 메서드 사용
-                .collect(Collectors.toList());
-    }
-
     public static SearchCondition toSearchCondition(String condition) {
         try {
             return SearchCondition.valueOf(condition.toUpperCase());

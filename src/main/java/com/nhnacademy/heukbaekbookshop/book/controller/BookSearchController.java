@@ -1,9 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.book.controller;
 
 import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchRequest;
-import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookElasticSearchResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookResponse;
-import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookSearchResponse;
 import com.nhnacademy.heukbaekbookshop.book.service.book.BookSearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
