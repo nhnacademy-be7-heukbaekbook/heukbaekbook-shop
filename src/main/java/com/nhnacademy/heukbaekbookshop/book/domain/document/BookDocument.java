@@ -1,7 +1,11 @@
 package com.nhnacademy.heukbaekbookshop.book.domain.document;
 
+import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSummaryResponse;
+import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
+import lombok.Data;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -19,33 +23,24 @@ public class BookDocument {
     @Field(type = FieldType.Text)
     private String title;
 
-    @Field(type = FieldType.Text)
-    private String description;
-
-    @Field(type = FieldType.Text)
-    private String authorName;
-
-    @Field(type = FieldType.Keyword)
-    private String isbn;
 
     @Field(type = FieldType.Date)
-    private Date pubDate;
-
-    @Field(type = FieldType.Keyword)
-    private String publisher;
+    private Date publishedAt;
 
     @Field(type = FieldType.Text)
-    private String price;
+    private String salePrice;
 
     @Field(type = FieldType.Float)
-    private float discountRate;
-
-    @Field(type = FieldType.Long)
-    private Long popularity;
+    private double discountRate;
 
     @Field(type = FieldType.Text)
-    private List<String> tags;
+    private String thumbnailUrl;
 
+    @Field(type = FieldType.Nested)
+    private List<ContributorSummaryResponse> contributors;
+
+    @Field(type = FieldType.Object)
+    private PublisherSummaryResponse publisher;
 
     // 나중에 추가
 //    @Field(type = FieldType.Integer)
@@ -55,22 +50,19 @@ public class BookDocument {
 //    private int reviewScore;
 
 
-    public BookDocument(Long id, String title, String description, String authorName, String isbn, Date pubDate,
-                        String publisher, String price, float discountRate, Long popularity, List<String> tags
-                        //int reviewCount, int reviewScore
-                        ) {
+    public BookDocument(Long id, String title, Date publishedAt, String salePrice, double discountRate,
+                        String thumbnailUrl, List<ContributorSummaryResponse> contributors,
+                        PublisherSummaryResponse publisher) {
         this.id = id;
         this.title = title;
-        this.description = description;
-        this.authorName = authorName;
-        this.isbn = isbn;
-        this.pubDate = pubDate;
-        this.publisher = publisher;
-        this.price = price;
+        this.publishedAt = publishedAt;
+        this.salePrice = salePrice;
         this.discountRate = discountRate;
-        this.popularity = popularity;
-        this.tags = tags;
+        this.thumbnailUrl = thumbnailUrl;
+        this.contributors = contributors;
+        this.publisher = publisher;
+    }
 //        this.reviewCount = reviewCount; 나중에 추가
 //        this.reviewScore = reviewScore;
-    }
+
 }

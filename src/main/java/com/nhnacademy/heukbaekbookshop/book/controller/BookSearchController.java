@@ -2,6 +2,7 @@ package com.nhnacademy.heukbaekbookshop.book.controller;
 
 import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchRequest;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookElasticSearchResponse;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookSearchResponse;
 import com.nhnacademy.heukbaekbookshop.book.service.book.BookSearchService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ public class BookSearchController {
     private final BookSearchService bookSearchService;
 
     @PostMapping("/search")
-    public Page<BookElasticSearchResponse> searchBooks(@RequestBody BookSearchRequest searchRequest) {
+    public Page<BookResponse> searchBooks(@RequestBody BookSearchRequest searchRequest) {
         PageRequest pageRequest = PageRequest.of(searchRequest.page(), searchRequest.size());
         return bookSearchService.searchBooks(pageRequest, searchRequest);
     }

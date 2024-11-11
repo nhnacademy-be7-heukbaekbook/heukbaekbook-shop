@@ -48,12 +48,12 @@ public class BookSearchRepositoryImpl implements BookSearchRepository {
 
     private Sort resolveSort(SortCondition sortCondition) {
         return switch (sortCondition) {
-            case NEWEST -> Sort.by(Sort.Order.desc("pubDate"));
-            case LOWEST_PRICE -> Sort.by(Sort.Order.asc("price"));
-            case HIGHEST_PRICE -> Sort.by(Sort.Order.desc("price"));
-            case RATING -> Sort.by(Sort.Order.desc("reviewScore"));
-            case REVIEW_COUNT -> Sort.by(Sort.Order.desc("reviewCount"));
-            default -> Sort.by(Sort.Order.desc("popularity"));
+            case NEWEST -> Sort.by(Sort.Order.desc("publishedAt"));
+            case LOWEST_PRICE -> Sort.by(Sort.Order.asc("salePrice"));
+            case HIGHEST_PRICE -> Sort.by(Sort.Order.desc("salePrice"));
+//            case RATING -> Sort.by(Sort.Order.desc("reviewScore"));
+//            case REVIEW_COUNT -> Sort.by(Sort.Order.desc("reviewCount"));
+            default -> Sort.by(Sort.Order.desc("publishedAt"));
         };
     }
 

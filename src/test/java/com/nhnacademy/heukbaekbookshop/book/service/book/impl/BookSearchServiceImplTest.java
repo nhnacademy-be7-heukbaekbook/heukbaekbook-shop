@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import com.nhnacademy.heukbaekbookshop.book.domain.document.BookDocument;
 import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchRequest;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookElasticSearchResponse;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookResponse;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookDocumentRepository;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookSearchRepository;
@@ -48,7 +49,7 @@ class BookSearchServiceImplTest {
 
         when(bookSearchRepository.search(any(), any(), any(), any())).thenReturn(searchResponse);
 
-        Page<BookElasticSearchResponse> result = bookSearchService.searchBooks(pageable, searchRequest);
+        Page<BookResponse> result = bookSearchService.searchBooks(pageable, searchRequest);
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).id()).isEqualTo(1L);
     }
@@ -65,7 +66,7 @@ class BookSearchServiceImplTest {
 
         when(bookSearchRepository.search(any(), any(), any(), any())).thenReturn(searchResponse);
 
-        Page<BookElasticSearchResponse> result = bookSearchService.searchBooks(pageable, searchRequest);
+        Page<BookResponse> result = bookSearchService.searchBooks(pageable, searchRequest);
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).id()).isEqualTo(2L);
     }
@@ -82,7 +83,7 @@ class BookSearchServiceImplTest {
 
         when(bookSearchRepository.search(any(), any(), any(), any())).thenReturn(searchResponse);
 
-        Page<BookElasticSearchResponse> result = bookSearchService.searchBooks(pageable, searchRequest);
+        Page<BookResponse> result = bookSearchService.searchBooks(pageable, searchRequest);
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).id()).isEqualTo(3L);
     }
@@ -102,7 +103,7 @@ class BookSearchServiceImplTest {
 
         when(bookSearchRepository.search(any(), any(), any(), any())).thenReturn(searchResponse);
 
-        Page<BookElasticSearchResponse> result = bookSearchService.searchBooks(pageable, searchRequest);
+        Page<BookResponse> result = bookSearchService.searchBooks(pageable, searchRequest);
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getContent().get(0).id()).isEqualTo(5L); // 최저가가 먼저 와야 함
     }
