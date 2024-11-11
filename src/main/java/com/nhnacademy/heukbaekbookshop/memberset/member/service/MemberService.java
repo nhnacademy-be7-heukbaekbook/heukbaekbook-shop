@@ -11,11 +11,13 @@ public interface  MemberService {
 
     MemberResponse getMember(Long customerId);
 
-    MemberResponse changeMemberStatus(Long customerId, MemberStatus memberStatus);
+    void changeMemberStatus(Long customerId, MemberStatus memberStatus);
 
     MemberResponse updateMember(Long customerId, MemberUpdateRequest memberUpdateRequest);
 
     boolean existsLoginId(String loginId);
 
     boolean existsEmail(String email);
+
+//    boolean checkValidPassword(String oldPassword, String newPassword);
 }
