@@ -31,7 +31,8 @@ public class MemberController {
     private final MemberService memberService;
     private final LikeService likeService;
 
-    private static final String X_USER_ID = "X-USER-ID";
+    public static final String X_USER_ID = "X-USER-ID";
+
     /**
      * 회원 생성 요청 시 사용되는 메서드입니다.
      *

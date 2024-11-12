@@ -40,10 +40,11 @@ public class MemberAddressServiceImpl implements MemberAddressService {
     }
 
     @Override
+    @Transactional
     public MemberAddressDto createMemberAddress(Long customerId, MemberAddressDto memberAddressDto) {
         Member member = memberRepository.findById(customerId).orElseThrow(MemberNotFoundException::new);
 
-        if (memberAddressRepository.countByMemberId(customerId) >= 10L) {
+        if (countByMemberId(customerId) >= 10L) {
             throw new AddressLimitExceededException();
         }
         if (memberAddressRepository.existsByPostalCodeAndDetailAddress(memberAddressDto.postalCode(), memberAddressDto.detailAddress())) {
@@ -57,6 +58,7 @@ public class MemberAddressServiceImpl implements MemberAddressService {
     }
 
     @Override
+    @Transactional
     public MemberAddressDto updateMemberAddress(Long addressId, MemberAddressDto memberAddressDto) {
         MemberAddress memberAddress = memberAddressRepository.findById(addressId)
                 .orElseThrow(MemberAddressNotFoundException::new);
@@ -66,11 +68,17 @@ public class MemberAddressServiceImpl implements MemberAddressService {
     }
 
     @Override
+    @Transactional
     public void deleteMemberAddress(Long addressId) {
         if (!memberAddressRepository.existsById(addressId)) {
             throw new MemberAddressNotFoundException();
         }
         memberAddressRepository.deleteById(addressId);
+    }
+
+    @Override
+    public Long countByMemberId(Long customerId) {
+        return memberAddressRepository.countByMemberId(customerId);
     }
 
 }

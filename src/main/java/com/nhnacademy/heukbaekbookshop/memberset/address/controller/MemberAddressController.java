@@ -3,6 +3,7 @@ package com.nhnacademy.heukbaekbookshop.memberset.address.controller;
 
 import com.nhnacademy.heukbaekbookshop.memberset.address.dto.MemberAddressDto;
 import com.nhnacademy.heukbaekbookshop.memberset.address.service.MemberAddressService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,10 +22,12 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-@RequestMapping("/api/members/{customerId}/addresses")
+@RequestMapping("/api/members/addresses")
 public class MemberAddressController {
 
     private final MemberAddressService memberAddressService;
+
+    public static final String X_USER_ID = "X-USER-ID";
 
     /**
      * 회원 주소 생성 요청 시 사용되는 메서드입니다.
@@ -35,7 +38,7 @@ public class MemberAddressController {
      */
     @Transactional
     @PostMapping
-    public ResponseEntity<MemberAddressDto> createMemberAddress(@PathVariable Long customerId, @Valid @RequestBody MemberAddressDto memberAddressDto) {
+    public ResponseEntity<MemberAddressDto> createMemberAddress(@RequestHeader(X_USER_ID) Long customerId, @Valid @RequestBody MemberAddressDto memberAddressDto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(memberAddressService.createMemberAddress(customerId, memberAddressDto));
     }
@@ -59,7 +62,7 @@ public class MemberAddressController {
      * @return 성공 시, 응답코드 200 반환합니다.
      */
     @GetMapping
-    public ResponseEntity<List<MemberAddressDto>> getAllMemberAddresses(@PathVariable Long customerId){
+    public ResponseEntity<List<MemberAddressDto>> getAllMemberAddresses(@RequestHeader(X_USER_ID) Long customerId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(memberAddressService.getMemberAddressesList(customerId));
     }
@@ -89,5 +92,10 @@ public class MemberAddressController {
     public ResponseEntity<Void> deleteMemberAddress(@PathVariable Long addressId) {
         memberAddressService.deleteMemberAddress(addressId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<Long> countMemberAddresses(@RequestHeader(X_USER_ID) Long customerId) {
+        return ResponseEntity.status(HttpStatus.OK).body(memberAddressService.countByMemberId(customerId));
     }
 }
