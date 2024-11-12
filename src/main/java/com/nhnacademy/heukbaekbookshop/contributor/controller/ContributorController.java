@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/admins/contributors")
+@RequestMapping("/api/admin/contributors")
 public class ContributorController {
 
     private final ContributorService contributorService;
