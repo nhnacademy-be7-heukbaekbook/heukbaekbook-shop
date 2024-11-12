@@ -4,6 +4,7 @@ import com.nhnacademy.heukbaekbookshop.book.domain.SearchCondition;
 import com.nhnacademy.heukbaekbookshop.book.domain.SortCondition;
 import com.nhnacademy.heukbaekbookshop.book.domain.document.BookDocument;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookSearchRepository;
+import com.nhnacademy.heukbaekbookshop.book.util.SynonymUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -13,6 +14,8 @@ import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public class BookSearchRepositoryImpl implements BookSearchRepository {
@@ -26,12 +29,22 @@ public class BookSearchRepositoryImpl implements BookSearchRepository {
 
     @Override
     public Page<BookDocument> search(Pageable pageable, String keyword, SearchCondition searchCondition, SortCondition sortCondition) {
-        // 검색 가중치 설정
         Criteria criteria = new Criteria();
+
+        // 기본 키워드에 대한 조건 추가
         criteria = criteria.or(Criteria.where("title").contains(keyword).boost(100))
                 .or(Criteria.where("description").contains(keyword).boost(10))
                 .or(Criteria.where("tags").contains(keyword).boost(50))
                 .or(Criteria.where(searchCondition.name().toLowerCase()).contains(keyword));
+
+        // 동의어 추가
+        List<String> synonyms = SynonymUtil.getSynonyms(keyword);
+        for (String synonym : synonyms) {
+            criteria = criteria.or(Criteria.where("title").contains(synonym).boost(100))
+                    .or(Criteria.where("description").contains(synonym).boost(10))
+                    .or(Criteria.where("tags").contains(synonym).boost(50))
+                    .or(Criteria.where(searchCondition.name().toLowerCase()).contains(synonym));
+        }
 
         CriteriaQuery query = new CriteriaQuery(criteria)
                 .setPageable(pageable)
@@ -45,6 +58,7 @@ public class BookSearchRepositoryImpl implements BookSearchRepository {
                 searchHits::getTotalHits
         );
     }
+
 
     private Sort resolveSort(SortCondition sortCondition) {
         return switch (sortCondition) {
