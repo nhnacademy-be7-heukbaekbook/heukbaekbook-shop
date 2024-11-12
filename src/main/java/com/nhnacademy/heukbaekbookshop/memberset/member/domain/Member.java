@@ -66,12 +66,12 @@ public class Member extends Customer {
         this.grade = grade;
     }
 
-    public Member modifyMember(MemberUpdateRequest memberUpdateRequest, String newPassword) {
+    public Member modifyMember(MemberUpdateRequest memberUpdateRequest) {
         super.name = memberUpdateRequest.name();
         super.phoneNumber = memberUpdateRequest.phoneNumber();
         super.email = memberUpdateRequest.email();
-        if (Objects.nonNull(newPassword)) {
-            this.password = newPassword;
+        if (Objects.nonNull(memberUpdateRequest.newPassword())) {
+            this.password = memberUpdateRequest.newPassword();
         }
         this.birth = memberUpdateRequest.birth();
 

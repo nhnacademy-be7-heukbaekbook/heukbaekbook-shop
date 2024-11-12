@@ -67,17 +67,15 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findById(customerId).orElseThrow(MemberNotFoundException::new);
 
         if (Objects.nonNull(memberUpdateRequest.oldPassword())
-                && !bCryptPasswordEncoder.matches(memberUpdateRequest.oldPassword(), member.getPassword())) {
-            throw new InvalidPasswordException("현재 비밀번호가 일치하지 않습니다. 다시 시도해주세요");
+                && !bCryptPasswordEncoder.matches(member.getPassword(), memberUpdateRequest.oldPassword())) {
+            throw new InvalidPasswordException();
         }
         if (Objects.nonNull(memberUpdateRequest.newPassword()) &&
                 memberUpdateRequest.oldPassword().equals(memberUpdateRequest.newPassword())) {
-            throw new InvalidPasswordException("현재 비밀번호와 새 비밀번호가 같습니다. 다시 시도해주세요");
+            throw new InvalidPasswordException();
         }
-
-        return MemberMapper.createMemberResponse(member.modifyMember(memberUpdateRequest,
-                Objects.nonNull(memberUpdateRequest.newPassword())
-                        ? bCryptPasswordEncoder.encode(memberUpdateRequest.newPassword()) : null));
+        bCryptPasswordEncoder.encode(memberUpdateRequest.newPassword());
+        return MemberMapper.createMemberResponse(member.modifyMember(memberUpdateRequest));
     }
 
     @Override
@@ -90,27 +88,12 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.existsByEmail(email);
     }
 
-//    @Override
-//    public boolean checkValidPassword(String oldPassword, String newPassword) {
-//        Member member = memberRepository.findById(customerId).orElseThrow(MemberNotFoundException::new);
-//
-//        if (Objects.nonNull(oldPassword())
-//                && !bCryptPasswordEncoder.matches(oldPassword(), member.getPassword())) {
-//            throw new InvalidPasswordException("현재 비밀번호가 일치하지 않습니다. 다시 시도해주세요");
-//        }
-//        if (Objects.nonNull(memberUpdateRequest.newPassword()) &&
-//                memberUpdateRequest.oldPassword().equals(memberUpdateRequest.newPassword())) {
-//            throw new InvalidPasswordException("현재 비밀번호와 새 비밀번호가 같습니다. 다시 시도해주세요");
-//        }
-//
-//        return false;
-//    }
-
     @Override
     @Transactional
-    public void changeMemberStatus(Long customerId, MemberStatus newStatus) {
+    public MemberResponse changeMemberStatus(Long customerId, MemberStatus newStatus) {
         Member member = memberRepository.findById(customerId).orElseThrow(MemberNotFoundException::new);
         member.setStatus(newStatus);
+        return MemberMapper.createMemberResponse(member);
     }
 
 }
