@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/admins/publishers")
+@RequestMapping("/api/admin/publishers")
 public class PublisherController {
 
     private final PublisherService publisherService;

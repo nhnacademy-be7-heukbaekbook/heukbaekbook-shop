@@ -341,12 +341,11 @@ public class BookService {
                                 return tagRepository.save(newTag);
                             });
                     BookTag bookTag = new BookTag();
-                    book.addTag(bookTag);
                     bookTag.setBook(book);
                     bookTag.setTag(tag);
                     book.getTags().add(bookTag);
+                    book.addTag(bookTag);
                     tag.getBookTags().add(bookTag);
-
                 }
             }
         }
