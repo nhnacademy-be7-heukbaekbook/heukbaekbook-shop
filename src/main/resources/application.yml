@@ -3,9 +3,3 @@ spring:
     name: shop
   config:
     import: optional:configserver:http://localhost:9000
-  elasticsearch:
-    uris: http://115.94.72.197:9200
-    username: elastic
-    password: nhnacademy123!
-    index:
-      create-on-startup: true
