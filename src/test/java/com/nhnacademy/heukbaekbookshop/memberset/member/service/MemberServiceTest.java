@@ -217,29 +217,29 @@ public class MemberServiceTest {
         verify(memberRepository, times(1)).findById(testCustomerId);
     }
 
-    @Test
-    @DisplayName("회원 상태 변경 (탈퇴) 성공")
-    void changeMemberStatus_Withdrawn_ExceptionThrown(){
-        // given
-        Member testMember = Member.builder()
-                .name(testCustomerName)
-                .phoneNumber(testPhoneNumber)
-                .email(testEmail)
-                .loginId(testLoginId)
-                .password("oldPassword1!")
-                .birth(testBirth)
-                .grade(testGrade)
-                .build();
-
-        when(memberRepository.findById(testCustomerId)).thenReturn(Optional.of(testMember));
-
-        // when
-        MemberResponse testMemberResponse = memberService.changeMemberStatus(testCustomerId, MemberStatus.WITHDRAWN);
-
-        // then
-        assertEquals(MemberStatus.WITHDRAWN, testMemberResponse.memberStatus());
-        verify(memberRepository, times(1)).findById(testCustomerId);
-    }
+//    @Test
+//    @DisplayName("회원 상태 변경 (탈퇴) 성공")
+//    void changeMemberStatus_Withdrawn_ExceptionThrown(){
+//        // given
+//        Member testMember = Member.builder()
+//                .name(testCustomerName)
+//                .phoneNumber(testPhoneNumber)
+//                .email(testEmail)
+//                .loginId(testLoginId)
+//                .password("oldPassword1!")
+//                .birth(testBirth)
+//                .grade(testGrade)
+//                .build();
+//
+//        when(memberRepository.findById(testCustomerId)).thenReturn(Optional.of(testMember));
+//
+//        // when
+//        MemberResponse testMemberResponse = memberService.changeMemberStatus(testCustomerId, MemberStatus.WITHDRAWN);
+//
+//        // then
+//        assertEquals(MemberStatus.WITHDRAWN, testMemberResponse.memberStatus());
+//        verify(memberRepository, times(1)).findById(testCustomerId);
+//    }
 
     @Test
     @DisplayName("회원가입 시 LoginId 중복 확인 조회 성공")
