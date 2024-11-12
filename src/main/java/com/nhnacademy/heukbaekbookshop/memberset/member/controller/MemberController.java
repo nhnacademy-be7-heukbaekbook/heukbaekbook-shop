@@ -79,9 +79,9 @@ public class MemberController {
      */
     @DeleteMapping
     @Transactional
-    public ResponseEntity<MemberResponse> deleteMember(@RequestHeader(X_USER_ID) Long customerId){
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .body(memberService.changeMemberStatus(customerId, MemberStatus.WITHDRAWN));
+    public ResponseEntity<Void> deleteMember(@RequestHeader(X_USER_ID) Long customerId){
+        memberService.changeMemberStatus(customerId, MemberStatus.WITHDRAWN);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     /**
@@ -102,20 +102,19 @@ public class MemberController {
      * @param loginId 중복 확인을 위한 회원의 입력 loginId 입니다.
      * @return 성공 시, 응답코드 200 반환합니다.
      */
-    @PostMapping("/existsLoginId")
-    public ResponseEntity<Boolean> existsLoginId(@RequestBody String loginId) {
+    @GetMapping("/existsLoginId/{loginId}")
+    public ResponseEntity<Boolean> existsLoginId(@PathVariable String loginId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(memberService.existsLoginId(loginId));
     }
-
     /**
      * 회원가입의 이메일 중복 확인 요청 시 사용되는 메서드입니다.
      *
      * @param email 중복 확인을 위한 회원의 입력 email 입니다.
      * @return 성공 시, 응답코드 200 반환합니다.
      */
-    @PostMapping("/existsEmail")
-    public ResponseEntity<Boolean> existsEmail(@RequestBody String email) {
+    @GetMapping("/existsEmail/{email}")
+    public ResponseEntity<Boolean> existsEmail(@PathVariable String email) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(memberService.existsEmail(email));
     }
