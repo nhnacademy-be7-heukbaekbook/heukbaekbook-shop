@@ -14,4 +14,6 @@ public interface MemberAddressService {
     MemberAddressDto updateMemberAddress(Long addressId, MemberAddressDto memberAddressDto);
 
     void deleteMemberAddress(Long addressId);
+
+    Long countByMemberId(Long customerId);
 }

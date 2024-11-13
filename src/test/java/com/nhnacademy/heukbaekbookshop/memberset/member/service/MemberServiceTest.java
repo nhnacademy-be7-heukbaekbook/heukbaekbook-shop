@@ -147,8 +147,7 @@ public class MemberServiceTest {
         MemberUpdateRequest testMemberUpdateRequest = new MemberUpdateRequest(testLoginId,
                 "wrongPassword1!",
                 "otherPassword1!",
-                testBirth, testCustomerName, testPhoneNumber, testEmail, testPostalCode, testRoadNameAddress, testDetailAddress, testAlias
-        );
+                testBirth, testCustomerName, testPhoneNumber, testEmail);
         when(mockedMember.getPassword()).thenReturn(testPassword);
 
         // when & then
@@ -161,11 +160,11 @@ public class MemberServiceTest {
     void updateMember_SamePassword_ExceptionThrown() {
         // given
         when(memberRepository.findById(any())).thenReturn(Optional.of(mock(Member.class)));
+        when(bCryptPasswordEncoder.matches(any(), any())).thenReturn(true);
         MemberUpdateRequest testMemberUpdateRequest = new MemberUpdateRequest(testLoginId,
                 "samePassword1!",
                 "samePassword1!",
-                testBirth, testCustomerName, testPhoneNumber, testEmail, testPostalCode, testRoadNameAddress, testDetailAddress, testAlias
-        );
+                testBirth, testCustomerName, testPhoneNumber, testEmail);
 
         // when & then
         assertThrows(InvalidPasswordException.class, () -> memberService.updateMember(testCustomerId, testMemberUpdateRequest));
@@ -190,10 +189,10 @@ public class MemberServiceTest {
         MemberUpdateRequest testMemberUpdateRequest = new MemberUpdateRequest(testLoginId,
                 "oldPassword1!",
                 "newPassword1!",
-                testBirth, "changedName", testPhoneNumber, testEmail, testPostalCode, testRoadNameAddress, testDetailAddress, testAlias
-        );
+                testBirth, "changedName", testPhoneNumber, testEmail);
+
         when(memberRepository.findById(any())).thenReturn(Optional.of(testMember));
-        when(bCryptPasswordEncoder.matches(testMember.getPassword(), testMemberUpdateRequest.oldPassword())).thenReturn(true);
+        when(bCryptPasswordEncoder.matches(testMemberUpdateRequest.oldPassword(), testMember.getPassword())).thenReturn(true);
 
         // when
         MemberResponse testMemberResponse = memberService.updateMember(testCustomerId, testMemberUpdateRequest);
@@ -234,10 +233,10 @@ public class MemberServiceTest {
         when(memberRepository.findById(testCustomerId)).thenReturn(Optional.of(testMember));
 
         // when
-        MemberResponse testMemberResponse = memberService.changeMemberStatus(testCustomerId, MemberStatus.WITHDRAWN);
+        memberService.changeMemberStatus(testCustomerId, MemberStatus.WITHDRAWN);
 
         // then
-        assertEquals(MemberStatus.WITHDRAWN, testMemberResponse.memberStatus());
+        assertEquals(MemberStatus.WITHDRAWN, testMember.getStatus());
         verify(memberRepository, times(1)).findById(testCustomerId);
     }
 
