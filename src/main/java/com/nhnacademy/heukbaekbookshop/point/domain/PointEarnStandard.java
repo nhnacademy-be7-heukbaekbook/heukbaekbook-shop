@@ -31,4 +31,14 @@ public class PointEarnStandard {
     @Column(name = "point")
     private BigDecimal point;
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "point_earn_standard_status")
+    private PointEarnStandardStatus status;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "point_earn_trigger_event")
+    private PointEarnTriggerEvent triggerEvent;
+
 }
