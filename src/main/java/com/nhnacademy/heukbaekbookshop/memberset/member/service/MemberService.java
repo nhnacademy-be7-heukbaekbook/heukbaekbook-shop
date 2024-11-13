@@ -11,7 +11,7 @@ public interface  MemberService {
 
     MemberResponse getMember(Long customerId);
 
-    MemberResponse changeMemberStatus(Long customerId, MemberStatus memberStatus);
+    void changeMemberStatus(Long customerId, MemberStatus memberStatus);
 
     MemberResponse updateMember(Long customerId, MemberUpdateRequest memberUpdateRequest);
 
