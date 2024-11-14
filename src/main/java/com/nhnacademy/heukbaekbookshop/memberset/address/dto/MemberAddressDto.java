@@ -17,7 +17,7 @@ public record MemberAddressDto(
         String detailAddress,
 
         @NotBlank(message = "주소의 별칭을 입력하여 주십시오.")
-        @Pattern(regexp = "^[가-힣0-9 ]{2,10}", message = "올바른 주소 별칭 형식이 아닙니다.")
+        @Pattern(regexp = "^[가-힣0-9 ]{1,10}", message = "올바른 주소 별칭 형식이 아닙니다.")
         String alias
 ) {
 }
