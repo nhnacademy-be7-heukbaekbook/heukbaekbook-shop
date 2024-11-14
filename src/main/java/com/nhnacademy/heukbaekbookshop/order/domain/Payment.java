@@ -29,6 +29,7 @@ public class Payment {
 
     @ManyToOne
     @JoinColumn(name = "payment_type_id")
+    @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
 
     @NotNull
