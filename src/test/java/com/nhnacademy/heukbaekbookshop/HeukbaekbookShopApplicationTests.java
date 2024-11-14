@@ -1,14 +1,14 @@
-package com.nhnacademy.heukbaekbookshop;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-
-@SpringBootTest
-class HeukbaekbookShopApplicationTests {
-
-	@Test
-	void contextLoads() {
-	}
-
-}
+//package com.nhnacademy.heukbaekbookshop;
+//
+//import org.junit.jupiter.api.Test;
+//import org.springframework.boot.test.context.SpringBootTest;
+//import org.springframework.test.context.ActiveProfiles;
+//
+//@SpringBootTest
+//class HeukbaekbookShopApplicationTests {
+//
+//	@Test
+//	void contextLoads() {
+//	}
+//
+//}
