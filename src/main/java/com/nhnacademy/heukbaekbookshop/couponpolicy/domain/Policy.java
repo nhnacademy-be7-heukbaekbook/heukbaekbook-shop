@@ -1,4 +1,4 @@
-package com.nhnacademy.heukbaekbookshop.coupon.domain;
+package com.nhnacademy.heukbaekbookshop.couponpolicy.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
 

@@ -1,5 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.coupon.domain;
 
+import com.nhnacademy.heukbaekbookshop.couponpolicy.domain.Policy;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
