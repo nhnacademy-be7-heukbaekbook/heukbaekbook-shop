@@ -1,6 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.memberset.address.domain;
 
-import com.nhnacademy.heukbaekbookshop.memberset.address.dto.MemberAddressDto;
+import com.nhnacademy.heukbaekbookshop.memberset.address.dto.MemberAddressRequest;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -54,11 +54,11 @@ public class MemberAddress {
         this.createdAt = LocalDateTime.now();
     }
 
-    public MemberAddress modifyMemberAddress(MemberAddressDto memberAddressDto) {
-        this.postalCode = memberAddressDto.postalCode();
-        this.roadNameAddress = memberAddressDto.roadNameAddress();
-        this.detailAddress = memberAddressDto.detailAddress();
-        this.alias = memberAddressDto.alias();
+    public MemberAddress modifyMemberAddress(MemberAddressRequest memberAddressRequest) {
+        this.postalCode = memberAddressRequest.postalCode();
+        this.roadNameAddress = memberAddressRequest.roadNameAddress();
+        this.detailAddress = memberAddressRequest.detailAddress();
+        this.alias = memberAddressRequest.alias();
         return this;
     }
 
