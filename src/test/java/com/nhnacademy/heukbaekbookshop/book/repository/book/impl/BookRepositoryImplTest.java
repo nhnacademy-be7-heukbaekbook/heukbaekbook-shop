@@ -24,6 +24,5 @@ class BookRepositoryImplTest {
 
     @Test
     void findAllByPageable() {
-
     }
 }
