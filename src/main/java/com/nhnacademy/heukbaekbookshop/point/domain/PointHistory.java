@@ -33,10 +33,6 @@ public class PointHistory {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @ManyToOne
-    @JoinColumn(name = "point_earn_standard_id")
-    private PointEarnStandard pointEarnStandard;
-
     @NotNull
     @Column(name = "point_amount")
     private BigDecimal amount;
