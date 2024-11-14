@@ -5,8 +5,7 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 
-public record PolicyResponse(
-        Long id,
+public record PolicyCreateRequest(
         DisCountType discountType,
         BigDecimal minimumPurchaseAmount,
         BigDecimal maximumDiscountAmount,
