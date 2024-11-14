@@ -4,10 +4,10 @@ import lombok.Getter;
 
 @Getter
 public enum SearchCondition {
+    ALL(""),
     TITLE("book_title"),
     AUTHOR("book_author"),
-    DESCRIPTION("book_description"),
-    NONE("");
+    DESCRIPTION("book_description");
 
     private final String field;
 

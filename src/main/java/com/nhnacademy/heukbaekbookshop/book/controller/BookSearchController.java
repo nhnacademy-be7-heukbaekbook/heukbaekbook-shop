@@ -15,9 +15,17 @@ public class BookSearchController {
 
     private final BookSearchService bookSearchService;
 
-    @PostMapping("/search")
-    public Page<BookResponse> searchBooks(@RequestBody BookSearchRequest searchRequest) {
-        PageRequest pageRequest = PageRequest.of(searchRequest.page(), searchRequest.size());
+    @GetMapping("/search")
+    public Page<BookResponse> searchBooks(@RequestParam("keyword") String keyword,
+                                          @RequestParam("searchCondition") String searchCondition,
+                                          @RequestParam(value = "sortCondition", required = false) String sortCondition) {
+
+        if (sortCondition == null || sortCondition.isEmpty()) {
+            sortCondition = "POPULARITY";
+        }
+
+        PageRequest pageRequest = PageRequest.of(0, 10); // 기본 페이지 설정
+        BookSearchRequest searchRequest = new BookSearchRequest(keyword, searchCondition, sortCondition);
         return bookSearchService.searchBooks(pageRequest, searchRequest);
     }
 }

@@ -44,8 +44,8 @@ public class BookSearchServiceImpl implements BookSearchService {
         Page<BookDocument> bookDocuments = bookSearchRepository.search(
                 pageable,
                 searchRequest.keyword(),
-                toSearchCondition(searchRequest.searchCondition()),
-                toSortCondition(searchRequest.sortCondition())
+                SearchCondition.valueOf(searchRequest.searchCondition().toUpperCase()),
+                SortCondition.valueOf(searchRequest.sortCondition().toUpperCase())
         );
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
 
@@ -103,21 +103,21 @@ public class BookSearchServiceImpl implements BookSearchService {
                 )
         );
     }
-    public static SearchCondition toSearchCondition(String condition) {
-        try {
-            return SearchCondition.valueOf(condition.toUpperCase());
-        } catch (IllegalArgumentException | NullPointerException e) {
-            return SearchCondition.NONE;
-        }
-    }
-
-    public static SortCondition toSortCondition(String condition) {
-        try {
-            return SortCondition.valueOf(condition.toUpperCase());
-        } catch (IllegalArgumentException | NullPointerException e) {
-            return SortCondition.NONE;
-        }
-    }
+//    public static SearchCondition toSearchCondition(String condition) {
+//        try {
+//            return SearchCondition.valueOf(condition.toUpperCase());
+//        } catch (IllegalArgumentException | NullPointerException e) {
+//            return SearchCondition.NONE;
+//        }
+//    }
+//
+//    public static SortCondition toSortCondition(String condition) {
+//        try {
+//            return SortCondition.valueOf(condition.toUpperCase());
+//        } catch (IllegalArgumentException | NullPointerException e) {
+//            return SortCondition.NONE;
+//        }
+//    }
 
     private BigDecimal getSalePrice(BigDecimal price, double disCountRate) {
         BigDecimal discountRate = BigDecimal.valueOf(disCountRate).divide(BigDecimal.valueOf(100));

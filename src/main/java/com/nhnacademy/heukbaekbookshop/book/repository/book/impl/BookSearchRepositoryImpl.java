@@ -31,12 +31,16 @@ public class BookSearchRepositoryImpl implements BookSearchRepository {
     public Page<BookDocument> search(Pageable pageable, String keyword, SearchCondition searchCondition, SortCondition sortCondition) {
         Criteria criteria = new Criteria();
 
-        // 기본 키워드에 대한 조건 추가
-        criteria = criteria.or(Criteria.where("title").contains(keyword).boost(100))
-                .or(Criteria.where("description").contains(keyword).boost(10))
-                .or(Criteria.where("tags").contains(keyword).boost(50))
-                .or(Criteria.where(searchCondition.name().toLowerCase()).contains(keyword));
-
+        if (searchCondition == SearchCondition.ALL) {
+            // 통합 검색: 여러 필드에 대해 검색 조건 추가
+            criteria = criteria.or(Criteria.where("title").contains(keyword).boost(100))
+                    .or(Criteria.where("description").contains(keyword).boost(50))
+                    .or(Criteria.where("author").contains(keyword).boost(75))
+                    .or(Criteria.where("tags").contains(keyword).boost(50));
+        } else {
+            // 특정 필드에 대한 검색
+            criteria = criteria.or(Criteria.where(searchCondition.name().toLowerCase()).contains(keyword));
+        }
         // 동의어 추가
         List<String> synonyms = SynonymUtil.getSynonyms(keyword);
         for (String synonym : synonyms) {
