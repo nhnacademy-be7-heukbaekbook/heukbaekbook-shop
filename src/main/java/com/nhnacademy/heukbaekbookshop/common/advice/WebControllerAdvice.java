@@ -5,7 +5,7 @@ import com.nhnacademy.heukbaekbookshop.contributor.exception.ContributorNotFound
 import com.nhnacademy.heukbaekbookshop.contributor.exception.PublisherAlreadyExistException;
 import com.nhnacademy.heukbaekbookshop.contributor.exception.PublisherNotFoundException;
 import com.nhnacademy.heukbaekbookshop.image.exception.ImageNotFoundException;
-import com.nhnacademy.heukbaekbookshop.memberset.member.exception.InvalidPasswordException;
+import com.nhnacademy.heukbaekbookshop.order.exception.PaymentFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -45,10 +45,4 @@ public class WebControllerAdvice {
 //        ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), 400, ZonedDateTime.now());
 //        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 //    }
-
-    @ExceptionHandler(InvalidPasswordException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidPasswordException(Exception ex) {
-        ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), 400, ZonedDateTime.now());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
 }

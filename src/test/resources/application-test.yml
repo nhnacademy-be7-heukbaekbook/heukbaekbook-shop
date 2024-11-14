@@ -32,3 +32,6 @@ logging.level:
 aladin:
   api:
     key: abcde
+
+toss:
+  secret-key: 12345
