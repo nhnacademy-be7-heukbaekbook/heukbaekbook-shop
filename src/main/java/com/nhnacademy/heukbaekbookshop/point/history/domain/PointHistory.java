@@ -1,4 +1,4 @@
-package com.nhnacademy.heukbaekbookshop.point.domain;
+package com.nhnacademy.heukbaekbookshop.point.history.domain;
 
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.order.domain.Order;

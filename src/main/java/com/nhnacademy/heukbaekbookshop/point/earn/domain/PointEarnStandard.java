@@ -1,4 +1,4 @@
-package com.nhnacademy.heukbaekbookshop.point.domain.earn;
+package com.nhnacademy.heukbaekbookshop.point.earn.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

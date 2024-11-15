@@ -1,5 +1,5 @@
 package com.nhnacademy.heukbaekbookshop.point.earn.domain;
 
-public enum PointEarnStandardStatus {
-    ACTIVATED, DELETED
+public enum PointEarnType {
+    FIXED, PERCENTAGE
 }

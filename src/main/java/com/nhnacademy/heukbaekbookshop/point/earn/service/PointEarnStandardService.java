@@ -1,14 +1,15 @@
-package com.nhnacademy.heukbaekbookshop.point.service;
+package com.nhnacademy.heukbaekbookshop.point.earn.service;
 
-import com.nhnacademy.heukbaekbookshop.point.dto.request.PointEarnStandardRequest;
-import com.nhnacademy.heukbaekbookshop.point.dto.response.PointEarnStandardResponse;
+import com.nhnacademy.heukbaekbookshop.point.earn.domain.EventCode;
+import com.nhnacademy.heukbaekbookshop.point.earn.dto.request.PointEarnStandardRequest;
+import com.nhnacademy.heukbaekbookshop.point.earn.dto.response.PointEarnStandardResponse;
 
 import java.util.List;
 
 public interface PointEarnStandardService {
     PointEarnStandardResponse createPointEarnStandard(PointEarnStandardRequest pointEarnStandardRequest);
 
-    List<PointEarnStandardResponse> getAllPointEarnStandard();
+    List<PointEarnStandardResponse> getValidStandardsByEvent(EventCode eventCode);
 
     PointEarnStandardResponse updatePointEarnStandard(Long id, PointEarnStandardRequest request);
 

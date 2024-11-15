@@ -1,8 +1,9 @@
-package com.nhnacademy.heukbaekbookshop.point.controller;
+package com.nhnacademy.heukbaekbookshop.point.earn.controller;
 
-import com.nhnacademy.heukbaekbookshop.point.dto.request.PointEarnStandardRequest;
-import com.nhnacademy.heukbaekbookshop.point.dto.response.PointEarnStandardResponse;
-import com.nhnacademy.heukbaekbookshop.point.service.PointEarnStandardService;
+import com.nhnacademy.heukbaekbookshop.point.earn.domain.EventCode;
+import com.nhnacademy.heukbaekbookshop.point.earn.dto.request.PointEarnStandardRequest;
+import com.nhnacademy.heukbaekbookshop.point.earn.dto.response.PointEarnStandardResponse;
+import com.nhnacademy.heukbaekbookshop.point.earn.service.PointEarnStandardService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,11 +28,13 @@ public class PointEarnStandardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdResponse);
     }
 
-    @GetMapping
-    public ResponseEntity<List<PointEarnStandardResponse>> getPointEarnStandards() {
-        List<PointEarnStandardResponse> allPointEarnStandard = pointEarnStandardService.getAllPointEarnStandard();
+    @GetMapping("/event/{eventCode}")
+    public ResponseEntity<List<PointEarnStandardResponse>> getValidStandardsByEvent(@PathVariable String eventCode) {
+        List<PointEarnStandardResponse> pointEarnStandardResponses = pointEarnStandardService.getValidStandardsByEvent(
+                EventCode.valueOf(eventCode.toUpperCase())
+        );
 
-        return ResponseEntity.ok(allPointEarnStandard);
+        return ResponseEntity.ok(pointEarnStandardResponses);
     }
 
     @PutMapping("/{id}")

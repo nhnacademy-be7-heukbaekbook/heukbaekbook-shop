@@ -1,4 +1,4 @@
-package com.nhnacademy.heukbaekbookshop.point.domain;
+package com.nhnacademy.heukbaekbookshop.point.history.domain;
 
 public enum PointType {
     EARNED,
