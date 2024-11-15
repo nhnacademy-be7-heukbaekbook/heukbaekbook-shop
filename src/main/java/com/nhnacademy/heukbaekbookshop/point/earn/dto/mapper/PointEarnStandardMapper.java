@@ -1,6 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.point.dto.mapper;
 
-import com.nhnacademy.heukbaekbookshop.point.domain.PointEarnStandard;
+import com.nhnacademy.heukbaekbookshop.point.domain.earn.PointEarnStandard;
 import com.nhnacademy.heukbaekbookshop.point.dto.request.PointEarnStandardRequest;
 import com.nhnacademy.heukbaekbookshop.point.dto.response.PointEarnStandardResponse;
 

@@ -1,4 +1,4 @@
-package com.nhnacademy.heukbaekbookshop.point.domain;
+package com.nhnacademy.heukbaekbookshop.point.domain.earn;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -6,9 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -33,12 +33,23 @@ public class PointEarnStandard {
 
     @NotNull
     @Enumerated(EnumType.STRING)
+    @Column(name = "point_earn_type")
+    private PointEarnType pointEarnType;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(name = "point_earn_standard_status")
     private PointEarnStandardStatus status;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "point_earn_trigger_event")
-    private PointEarnTriggerEvent triggerEvent;
+    @Column(name = "point_earn_start")
+    private LocalDateTime pointEarnStart;
+
+    @Column(name = "point_earn_end")
+    private LocalDateTime pointEarnEnd;
+
+    @ManyToOne
+    @JoinColumn(name = "point_earn_event_id", nullable = false)
+    private PointEarnEvent pointEarnEvent;
 
 }

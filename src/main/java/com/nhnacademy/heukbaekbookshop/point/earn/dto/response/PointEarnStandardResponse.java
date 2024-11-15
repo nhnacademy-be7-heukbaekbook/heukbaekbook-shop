@@ -1,6 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.point.dto.response;
 
-import com.nhnacademy.heukbaekbookshop.point.domain.PointEarnStandardStatus;
+import com.nhnacademy.heukbaekbookshop.point.domain.earn.PointEarnStandardStatus;
 import com.nhnacademy.heukbaekbookshop.point.domain.PointEarnTriggerEvent;
 
 import java.math.BigDecimal;
