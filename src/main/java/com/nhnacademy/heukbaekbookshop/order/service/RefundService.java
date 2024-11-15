@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RefundService {
@@ -74,31 +73,34 @@ public class RefundService {
         List<Order> orders = orderRepository.findByCustomerId(customerId);
 
         for (Order order : orders) {
-            List<String> titles = new ArrayList<>();
-            List<Integer> quantities = new ArrayList<>();
-            List<BigDecimal> prices = new ArrayList<>();
             List<OrderBookRefund> orderBookRefunds = orderBookRefundRepository.findByOrderId(order.getId());
-
+            if (orderBookRefunds.isEmpty()) {
+                continue;
+            }
             for (OrderBookRefund orderBookRefund : orderBookRefunds) {
                 OrderBook orderBook = orderBookRepository.findByOrderIdAndBookId(orderBookRefund.getOrderId(), orderBookRefund.getBookId());
-                Refund refund = refundRepository.findById(orderBookRefund.getRefundId()).get();
+                Refund refund = refundRepository.findById(orderBookRefund.getRefundId())
+                        .orElseThrow(() -> new RefundNotFoundException("환불 정보를 찾을 수 없습니다."));
+                List<String> titles = new ArrayList<>();
+                List<Integer> quantities = new ArrayList<>();
+                List<BigDecimal> prices = new ArrayList<>();
+
                 titles.add(orderBook.getBook().getTitle());
                 quantities.add(orderBookRefund.getQuantity());
                 prices.add(orderBook.getPrice().multiply(BigDecimal.valueOf(orderBookRefund.getQuantity())));
-                refundDetailResponses.add(new RefundDetailResponse(
-                                refund.getId(),
-                                refund.getReason(),
-                                refund.getRefundRequestAt().toString(),
-                                refund.getRefundApprovedAt().toString(),
-                                refund.getRefundStatus().toString(),
-                                orderBookRefund.getOrderId(),
-                                titles,
-                                quantities,
-                                prices
-                        )
-                );
-            }
 
+                refundDetailResponses.add(new RefundDetailResponse(
+                        refund.getId(),
+                        refund.getReason(),
+                        refund.getRefundRequestAt().toString(),
+                        refund.getRefundApprovedAt().toString(),
+                        refund.getRefundStatus().toString(),
+                        orderBookRefund.getOrderId(),
+                        titles,
+                        quantities,
+                        prices
+                ));
+            }
         }
         return refundDetailResponses;
     }
