@@ -41,7 +41,7 @@ public class PaymentController {
             response = paymentService.cancelPayment(paymentKey, request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            response = new PaymentCancelResponse("환불 요청이 실패하였습니다.");
+            response = new PaymentCancelResponse("결제 취소 요청이 실패하였습니다.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }

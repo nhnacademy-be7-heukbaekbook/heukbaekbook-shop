@@ -133,7 +133,7 @@ public class PaymentService {
 
         refundRepository.save(returnInfo);
 
-        return new PaymentCancelResponse("환불 요청이 접수되었습니다.");
+        return new PaymentCancelResponse("결제 취소 요청이 접수되었습니다.");
     }
 
     public List<PaymentDetailResponse> getPayments(Long customerId) {
