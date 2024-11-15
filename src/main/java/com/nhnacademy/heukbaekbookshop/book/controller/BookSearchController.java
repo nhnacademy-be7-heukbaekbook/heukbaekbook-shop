@@ -6,6 +6,8 @@ import com.nhnacademy.heukbaekbookshop.book.service.book.BookSearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,18 +16,10 @@ import org.springframework.web.bind.annotation.*;
 public class BookSearchController {
 
     private final BookSearchService bookSearchService;
-
-    @GetMapping("/search")
-    public Page<BookResponse> searchBooks(@RequestParam("keyword") String keyword,
-                                          @RequestParam("searchCondition") String searchCondition,
-                                          @RequestParam(value = "sortCondition", required = false) String sortCondition) {
-
-        if (sortCondition == null || sortCondition.isEmpty()) {
-            sortCondition = "POPULARITY";
-        }
-
-        PageRequest pageRequest = PageRequest.of(0, 10); // 기본 페이지 설정
-        BookSearchRequest searchRequest = new BookSearchRequest(keyword, searchCondition, sortCondition);
-        return bookSearchService.searchBooks(pageRequest, searchRequest);
+    @PostMapping("/search")
+    public Page<BookResponse> searchBooks(@RequestBody BookSearchRequest searchRequest,
+                                          Pageable pageable) {
+        return bookSearchService.searchBooks(pageable, searchRequest);
     }
+
 }

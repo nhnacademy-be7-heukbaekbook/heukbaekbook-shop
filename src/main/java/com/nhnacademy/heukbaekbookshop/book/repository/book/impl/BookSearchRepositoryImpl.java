@@ -30,24 +30,29 @@ public class BookSearchRepositoryImpl implements BookSearchRepository {
     @Override
     public Page<BookDocument> search(Pageable pageable, String keyword, SearchCondition searchCondition, SortCondition sortCondition) {
         Criteria criteria = new Criteria();
+//        criteria = criteria.and(Criteria.where("status").in("IN_STOCK"));
 
-        if (searchCondition == SearchCondition.ALL) {
-            // 통합 검색: 여러 필드에 대해 검색 조건 추가
-            criteria = criteria.or(Criteria.where("title").contains(keyword).boost(100))
-                    .or(Criteria.where("description").contains(keyword).boost(50))
-                    .or(Criteria.where("author").contains(keyword).boost(75))
-                    .or(Criteria.where("tags").contains(keyword).boost(50));
-        } else {
-            // 특정 필드에 대한 검색
-            criteria = criteria.or(Criteria.where(searchCondition.name().toLowerCase()).contains(keyword));
-        }
-        // 동의어 추가
-        List<String> synonyms = SynonymUtil.getSynonyms(keyword);
-        for (String synonym : synonyms) {
-            criteria = criteria.or(Criteria.where("title").contains(synonym).boost(100))
-                    .or(Criteria.where("description").contains(synonym).boost(10))
-                    .or(Criteria.where("tags").contains(synonym).boost(50))
-                    .or(Criteria.where(searchCondition.name().toLowerCase()).contains(synonym));
+        String[] keywords = keyword.trim().split("\\s+");
+
+        for (String word : keywords) {
+            if (searchCondition == SearchCondition.ALL) {
+                criteria = criteria.or(Criteria.where("title").contains(word).boost(100))
+                        .or(Criteria.where("description").contains(word).boost(50))
+                        .or(Criteria.where("author").contains(word).boost(75))
+                        .or(Criteria.where("tags").contains(word).boost(50));
+            } else {
+                // 특정 필드에 대한 각 키워드 검색
+                criteria = criteria.or(Criteria.where(searchCondition.name().toLowerCase()).contains(word));
+            }
+
+            // 동의어 추가 처리
+            List<String> synonyms = SynonymUtil.getSynonyms(word);
+            for (String synonym : synonyms) {
+                criteria = criteria.or(Criteria.where("title").contains(synonym).boost(100))
+                        .or(Criteria.where("description").contains(synonym).boost(10))
+                        .or(Criteria.where("tags").contains(synonym).boost(50))
+                        .or(Criteria.where(searchCondition.name().toLowerCase()).contains(synonym));
+            }
         }
 
         CriteriaQuery query = new CriteriaQuery(criteria)
@@ -62,6 +67,7 @@ public class BookSearchRepositoryImpl implements BookSearchRepository {
                 searchHits::getTotalHits
         );
     }
+
 
 
     private Sort resolveSort(SortCondition sortCondition) {

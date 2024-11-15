@@ -3,6 +3,8 @@ package com.nhnacademy.heukbaekbookshop.book.repository.book.impl;
 import com.nhnacademy.heukbaekbookshop.book.domain.SearchCondition;
 import com.nhnacademy.heukbaekbookshop.book.domain.SortCondition;
 import com.nhnacademy.heukbaekbookshop.book.domain.document.BookDocument;
+import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSummaryResponse;
+import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -14,6 +16,7 @@ import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -48,9 +51,18 @@ class BookSearchRepositoryImplTest {
         }
 
         BookDocument bookDocument = new BookDocument(
-                1L, "Test Title", publishedAt, "100", 10.0,
-                "test-thumbnail-url", Collections.emptyList(), null
+                1L,
+                "Test Title",
+                publishedAt,
+                "100",
+                10.0,
+                "test-thumbnail-url",
+                Arrays.asList("Author1", "Author2"), // 예시 저자 리스트
+                "Test Description",
+                Arrays.asList(new ContributorSummaryResponse(1L, "Contributor Name")), // 예시 기여자 리스트
+                new PublisherSummaryResponse(1L, "Publisher Name") // 예시 출판사
         );
+
 
         SearchHit<BookDocument> searchHit = new SearchHit<>(
                 "books",

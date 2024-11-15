@@ -1,9 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.book.service.book.impl;
 
-import com.nhnacademy.heukbaekbookshop.book.domain.Book;
-import com.nhnacademy.heukbaekbookshop.book.domain.BookTag;
-import com.nhnacademy.heukbaekbookshop.book.domain.SearchCondition;
-import com.nhnacademy.heukbaekbookshop.book.domain.SortCondition;
+import com.nhnacademy.heukbaekbookshop.book.domain.*;
 import com.nhnacademy.heukbaekbookshop.book.domain.document.BookDocument;
 import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchRequest;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookResponse;
@@ -12,6 +9,7 @@ import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookSearchRepository;
 import com.nhnacademy.heukbaekbookshop.book.service.book.BookSearchService;
 import com.nhnacademy.heukbaekbookshop.common.formatter.BookFormatter;
+import com.nhnacademy.heukbaekbookshop.contributor.domain.ContributorRole;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.image.domain.Image;
@@ -60,10 +58,18 @@ public class BookSearchServiceImpl implements BookSearchService {
                 document.getPublisher() // 출판사 정보를 `PublisherSummaryResponse`로 변환
         ));
     }
-    @Scheduled(initialDelay = 0, fixedDelay = 30 * 1000)
+    @Scheduled(initialDelay = 0, fixedDelay = 30 * 10000) //3분
     @Transactional
     public void updateBookIndex() {
-        List<Book> allBooks = bookRepository.findAll();
+        List<Book> allBooks = bookRepository.findAllByStatusNot(BookStatus.DELETED);
+        List<Book> deletedBooks = bookRepository.findAllByStatus(BookStatus.DELETED);
+        if (!deletedBooks.isEmpty()) {
+            List<Long> deletedBookIds = deletedBooks.stream()
+                    .map(Book::getId)
+                    .collect(Collectors.toList());
+            bookDocumentRepository.deleteAllById(deletedBookIds);
+            System.out.println("Deleted books from index: " + deletedBookIds);
+        }
         if (allBooks.isEmpty()) {
             System.out.println("No books found in the database.");
             return;
@@ -74,12 +80,10 @@ public class BookSearchServiceImpl implements BookSearchService {
                 .collect(Collectors.toList());
 
         bookDocumentRepository.saveAll(bookDocuments);
-
     }
 
 
     private BookDocument bookToBookDocument(Book book) {
-
         return new BookDocument(
                 book.getId(),
                 book.getTitle(),
@@ -91,6 +95,8 @@ public class BookSearchServiceImpl implements BookSearchService {
                         .map(Image::getUrl)
                         .findFirst()
                         .orElse("no-image"),
+                getAuthorNames(book),
+                book.getDescription(),
                 book.getContributors().stream()
                         .map(bookContributor -> new ContributorSummaryResponse(
                                 bookContributor.getContributor().getId(),
@@ -103,25 +109,19 @@ public class BookSearchServiceImpl implements BookSearchService {
                 )
         );
     }
-//    public static SearchCondition toSearchCondition(String condition) {
-//        try {
-//            return SearchCondition.valueOf(condition.toUpperCase());
-//        } catch (IllegalArgumentException | NullPointerException e) {
-//            return SearchCondition.NONE;
-//        }
-//    }
-//
-//    public static SortCondition toSortCondition(String condition) {
-//        try {
-//            return SortCondition.valueOf(condition.toUpperCase());
-//        } catch (IllegalArgumentException | NullPointerException e) {
-//            return SortCondition.NONE;
-//        }
-//    }
 
     private BigDecimal getSalePrice(BigDecimal price, double disCountRate) {
         BigDecimal discountRate = BigDecimal.valueOf(disCountRate).divide(BigDecimal.valueOf(100));
         return price.multiply(BigDecimal.ONE.subtract(discountRate)).setScale(2, RoundingMode.HALF_UP);
     }
+
+    // Book 클래스에 추가
+    public List<String> getAuthorNames(Book book) {
+        return book.getContributors().stream()
+                .filter(bookContributor -> bookContributor.getRole().getRoleName() == ContributorRole.AUTHOR)
+                .map(bookContributor -> bookContributor.getContributor().getName())
+                .collect(Collectors.toList());
+    }
+
 
 }
