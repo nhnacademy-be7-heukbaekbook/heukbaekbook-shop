@@ -1,22 +1,19 @@
 package com.nhnacademy.heukbaekbookshop.category.service;
 
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
-import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryDetailResponse;
+import com.nhnacademy.heukbaekbookshop.category.dto.response.*;
 import com.nhnacademy.heukbaekbookshop.category.dto.request.CategoryCreateRequest;
 import com.nhnacademy.heukbaekbookshop.category.dto.request.CategoryUpdateRequest;
-import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryCreateResponse;
-import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryDeleteResponse;
-import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryUpdateResponse;
 import com.nhnacademy.heukbaekbookshop.category.exception.CategoryAlreadyExistsException;
 import com.nhnacademy.heukbaekbookshop.category.exception.CategoryNotFoundException;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
@@ -66,7 +63,7 @@ public class CategoryService {
     }
 
     public CategoryDeleteResponse deleteCategory(Long id) {
-        if (categoryRepository.findById(id).isEmpty())  {
+        if (categoryRepository.findById(id).isEmpty()) {
             throw new CategoryNotFoundException("존재하지 않는 카테고리 입니다.");
         }
         categoryRepository.deleteById(id);
@@ -89,5 +86,20 @@ public class CategoryService {
                 category.getName()
 
         ));
+    }
+
+    public List<CategorySummaryResponse> getTopCategories() {
+        List<Category> parentCategories = categoryRepository.findTopCategories();
+
+        return parentCategories.stream()
+                .map(this::toCategorySummaryResponse)
+                .collect(Collectors.toList());
+    }
+
+    private CategorySummaryResponse toCategorySummaryResponse(Category category) {
+        List<CategorySummaryResponse> subCategories = category.getSubCategories().stream()
+                .map(this::toCategorySummaryResponse)
+                .collect(Collectors.toList());
+        return new CategorySummaryResponse(category.getId(), category.getName(), subCategories);
     }
 }

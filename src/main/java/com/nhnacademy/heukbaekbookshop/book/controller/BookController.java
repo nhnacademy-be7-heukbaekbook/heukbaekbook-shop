@@ -59,4 +59,20 @@ public class BookController {
         Page<BookResponse> books = bookService.getBooks(pageable);
         return ResponseEntity.ok(books);
     }
+
+
+    @GetMapping("/categories/{categoryId}")
+    public ResponseEntity<Page<BookResponse>> getBooksByCategoryId(@PathVariable Long categoryId,
+                                                                   Pageable pageable) {
+        log.info("categoryId: {}", categoryId);
+        Page<BookResponse> books = bookService.getBooksByCategoryId(categoryId, pageable);
+        return ResponseEntity.ok(books);
+    }
+
+    @GetMapping("/detail")
+    public BookResponse getBookDetail(@RequestParam Long bookId) {
+        log.info("bookId: {}", bookId);
+
+        return bookService.getBookDetail(bookId);
+    }
 }
