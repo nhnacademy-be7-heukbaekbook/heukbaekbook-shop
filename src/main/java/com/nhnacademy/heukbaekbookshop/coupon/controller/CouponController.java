@@ -21,10 +21,10 @@ public class CouponController {
         this.couponService = couponService;
     }
 
-    @GetMapping("/{couponId}")
-    public ResponseEntity<CouponInfoResponse> getCouponDetails(Long couponId) {
-        return ResponseEntity.ok(couponService.getCouponDetails(couponId));
-    }
+//    @GetMapping("/{couponId}")
+//    public ResponseEntity<CouponInfoResponse> getCouponDetails(Long couponId) {
+//        return ResponseEntity.ok(couponService.getCouponDetails(couponId));
+//    }
 
     @GetMapping("/member/{memberId}")
     public ResponseEntity<Page<MemberCouponResponse>> getUserCoupons(Pageable pageable,Long memberId) {

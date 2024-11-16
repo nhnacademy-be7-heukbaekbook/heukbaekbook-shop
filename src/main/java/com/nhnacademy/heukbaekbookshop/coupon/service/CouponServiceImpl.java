@@ -22,7 +22,7 @@ public class CouponServiceImpl implements CouponService {
     private final CouponRepository couponRepository;
     private final MemberCouponRepository memberCouponRepository;
     private final CouponHistoryRepository couponHistoryRepository;
-   ;
+
 
     public CouponServiceImpl(CouponRepository couponRepository, MemberCouponRepository memberCouponRepository, CouponHistoryRepository couponHistoryRepository) {
         this.couponRepository = couponRepository;
@@ -30,12 +30,12 @@ public class CouponServiceImpl implements CouponService {
         this.couponHistoryRepository = couponHistoryRepository;
     }
 
-    @Override
-    public CouponInfoResponse getCouponDetails(Long couponId) {
-        Coupon coupon = couponRepository.findById(couponId)
-                .orElseThrow(() -> new RuntimeException("Coupon not found"));
-        return CouponInfoResponse.from(coupon);
-    }
+//    @Override
+//    public CouponInfoResponse getCouponDetails(Long couponId) {
+//        Coupon coupon = couponRepository.findById(couponId)
+//                .orElseThrow(() -> new RuntimeException("Coupon not found"));
+//        return CouponInfoResponse.from(coupon);
+//    }
 
     @Override
     public Page<MemberCouponResponse> getUserCoupons(Pageable pageable, Long memberId) {

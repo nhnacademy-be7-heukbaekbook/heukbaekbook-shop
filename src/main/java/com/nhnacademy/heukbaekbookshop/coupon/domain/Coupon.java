@@ -1,12 +1,15 @@
 package com.nhnacademy.heukbaekbookshop.coupon.domain;
 
+import com.nhnacademy.heukbaekbookshop.couponpolicy.domain.CouponDiscountPolicy;
 import com.nhnacademy.heukbaekbookshop.couponpolicy.domain.Policy;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,23 +26,38 @@ public class Coupon {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "policy_id")
-    private Policy policy;
+    @JoinColumn(name = "coupon_discount_id")
+    private CouponDiscountPolicy couponDiscountPolicy;
+
+    @Column(name = "coupon_amount")
+    private int couponAmount;
+
+    @Column(name = "coupon_status")
+    @Enumerated(EnumType.STRING)
+    private CouponStatus couponStatus;
+
+    @NotNull
+    @Column(name = "coupon_available_duration")
+    private int availableDuration;
+
+    @NotNull
+    @Column(name = "coupon_time_start")
+    private LocalDateTime couponTimeStart;
+
+    @Column(name = "coupon_time_end")
+    private LocalDateTime couponTimeEnd;
+
+    @NotNull
+    @Column(name = "coupon_name")
+    private String couponName;
+
+    @NotNull
+    @Column(name = "coupon_description")
+    private String couponDescription;
 
     @OneToOne(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
     private BookCoupon bookCoupon;
 
     @OneToOne(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
     private CategoryCoupon categoryCoupon;
-
-    @ManyToOne
-    @JoinColumn(name = "coupon_type_id")
-    private CouponType couponType;
-
-    @Column(name = "coupon_available_duration")
-    private int availableDuration;
-
-    @Column(name = "expiration_date")
-    private LocalDateTime expirationDate;
-
 }

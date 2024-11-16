@@ -1,14 +1,14 @@
 package com.nhnacademy.heukbaekbookshop.couponpolicy.service;
 
-import com.nhnacademy.heukbaekbookshop.couponpolicy.dto.PolicyCreateRequest;
-import com.nhnacademy.heukbaekbookshop.couponpolicy.dto.PolicyDeleteRequest;
+import com.nhnacademy.heukbaekbookshop.couponpolicy.dto.PolicyRequest;
 import com.nhnacademy.heukbaekbookshop.couponpolicy.dto.PolicyResponse;
-import com.nhnacademy.heukbaekbookshop.couponpolicy.dto.PolicyUpdateRequest;
+
+import java.util.List;
 
 public interface CouponPolicyService {
-    PolicyResponse createPolicy(PolicyCreateRequest request);
-    PolicyResponse getPolicy(Long id);
-    PolicyResponse updatePolicy(Long id, PolicyUpdateRequest request);
-    void deletePolicy(PolicyDeleteRequest request);
-
+    PolicyResponse createPolicy(PolicyRequest policyRequest);
+    PolicyResponse getPolicyById(long policyId);
+    List<PolicyResponse> getAllPolicies();
+    PolicyResponse updatePolicy(long policyId, PolicyRequest policyRequest);
+    void deletePolicy(long policyId);
 }

@@ -10,6 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
-    List<Coupon> findByCouponTypeId(Long couponTypeId);
+//    List<Coupon> findByCouponTypeId(Long couponTypeId);
     Optional<Coupon> findById(Long id);
 }
