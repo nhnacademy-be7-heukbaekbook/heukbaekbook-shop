@@ -12,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-import static com.nhnacademy.heukbaekbookshop.book.domain.QBook.*;
+import static com.nhnacademy.heukbaekbookshop.book.domain.QBook.book;
 import static com.nhnacademy.heukbaekbookshop.contributor.domain.QPublisher.*;
 import static com.nhnacademy.heukbaekbookshop.image.domain.QBookImage.bookImage;
 
