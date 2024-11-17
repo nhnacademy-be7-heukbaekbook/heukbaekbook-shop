@@ -4,6 +4,10 @@ import com.nhnacademy.heukbaekbookshop.point.history.dto.response.PointHistoryRe
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
+
 public interface PointHistoryService {
     Page<PointHistoryResponse> getPointHistoriesByCustomerId(Long customerId, Pageable pageable);
+
+    BigDecimal getCurrentBalanceByCustomerId(Long customerId);
 }
