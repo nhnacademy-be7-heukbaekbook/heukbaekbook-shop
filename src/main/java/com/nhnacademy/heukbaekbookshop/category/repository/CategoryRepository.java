@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CategoryRepository extends JpaRepository<Category, Long> {
+public interface CategoryRepository extends JpaRepository<Category, Long>, CategoryRepositoryCustom {
     Optional<Category> findByName(String name);
   
     @Query("SELECT c FROM Category c WHERE c.name = :name AND " +
@@ -24,4 +25,18 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     Optional<Category> findByNameAndParentCategory(String trimmedName, Category parentCategory);
 
     Page<Category> findAllBy(Pageable pageable);
+
+    @Query(value = "    WITH RECURSIVE category_hierarchy AS (\n" +
+                   "        SELECT category_id\n" +
+                   "        FROM categories\n" +
+                   "        WHERE category_id = :categoryId\n" +
+                   "        UNION ALL\n" +
+                   "        SELECT c.category_id\n" +
+                   "        FROM categories c\n" +
+                   "        INNER JOIN category_hierarchy ch ON c.parent_category_id = ch.category_id\n" +
+                   "    )\n" +
+                   "    SELECT ch.category_id\n" +
+                   "    FROM category_hierarchy ch\n", nativeQuery = true)
+    List<Long> findSubCategoryIdsByCategoryId(@Param("categoryId") Long categoryId);
+
 }

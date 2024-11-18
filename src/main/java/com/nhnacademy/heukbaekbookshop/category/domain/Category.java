@@ -28,6 +28,7 @@ public class Category {
     private Set<Category> subCategories = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @Setter
     @JoinColumn(name = "parent_category_id")
     private Category parentCategory;
 
@@ -41,12 +42,28 @@ public class Category {
 
     public void addBookCategory(BookCategory bookCategory) {
         this.bookCategories.add(bookCategory);
-        bookCategory.setCategory(this);
+    }
+
+    private void setCategory(Category parentCategory) {
+        this.parentCategory = parentCategory;
+        parentCategory.getSubCategories().add(this);
     }
 
     public void removeBookCategory(BookCategory bookCategory) {
         this.bookCategories.remove(bookCategory);
-        bookCategory.setCategory(null);
+    }
+
+    public static Category createRootCategory(String name) {
+        Category category = new Category();
+        category.setName(name);
+        return category;
+    }
+
+    public static Category createSubCategory(String name, Category parentCategory) {
+        Category subCategory = new Category();
+        subCategory.setName(name);
+        subCategory.setParentCategory(parentCategory);
+        return subCategory;
     }
 
     @Builder

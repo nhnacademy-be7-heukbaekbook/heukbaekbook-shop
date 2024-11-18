@@ -10,6 +10,7 @@ import com.nhnacademy.heukbaekbookshop.book.dto.response.book.*;
 import com.nhnacademy.heukbaekbookshop.book.exception.book.BookAlreadyExistsException;
 import com.nhnacademy.heukbaekbookshop.book.exception.book.BookNotFoundException;
 import com.nhnacademy.heukbaekbookshop.book.exception.book.BookSearchException;
+import com.nhnacademy.heukbaekbookshop.book.repository.book.BookCategoryRepository;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
@@ -24,12 +25,12 @@ import com.nhnacademy.heukbaekbookshop.image.domain.BookImage;
 import com.nhnacademy.heukbaekbookshop.image.domain.Image;
 import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import com.nhnacademy.heukbaekbookshop.image.repository.BookImageRepository;
-import com.nhnacademy.heukbaekbookshop.image.repository.ImageRepository;
 import com.nhnacademy.heukbaekbookshop.tag.domain.Tag;
 import com.nhnacademy.heukbaekbookshop.tag.repository.TagRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -52,10 +53,12 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class BookService {
 
     private final RestTemplate restTemplate;
     private final BookRepository bookRepository;
+    private final BookCategoryRepository bookCategoryRepository;
     private final PublisherRepository publisherRepository;
     private final CategoryRepository categoryRepository;
     private final ContributorRepository contributorRepository;
@@ -229,8 +232,6 @@ public class BookService {
         for (BookCategory bookCategory : categoriesToRemove) {
             book.getCategories().remove(bookCategory);
             bookCategory.getCategory().getBookCategories().remove(bookCategory);
-            bookCategory.setBook(null);
-            bookCategory.setCategory(null);
             entityManager.remove(bookCategory);
         }
         entityManager.flush();
@@ -574,30 +575,21 @@ public class BookService {
 
     public Page<BookResponse> getBooks(Pageable pageable) {
         Page<Book> allByPageable = bookRepository.findAllByPageable(pageable);
-        return allByPageable.map(book -> {
-            return new BookResponse(
-                    book.getId(),
-                    book.getTitle(),
-                    bookFormatter.formatDate(book.getPublication()),
-                    bookFormatter.formatPrice(getSalePrice(book.getPrice(), book.getDiscountRate())),
-                    book.getDiscountRate(),
-                    book.getBookImages().stream()
-                            .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
-                            .map(Image::getUrl)
-                            .findFirst()
-                            .orElse("no-image"),
-                    book.getContributors().stream()
-                            .map(bookContributor -> new ContributorSummaryResponse(
-                                    bookContributor.getContributor().getId(),
-                                    bookContributor.getContributor().getName()
-                            ))
-                            .collect(Collectors.toList()),
-                    new PublisherSummaryResponse(
-                            book.getPublisher().getId(),
-                            book.getPublisher().getName()
-                    )
-            );
-        });
+        return allByPageable.map(this::createBookResponse);
+    }
+
+    public Page<BookResponse> getBooksByCategoryId(Long categoryId, Pageable pageable) {
+        List<Long> categoryIds = categoryRepository.findSubCategoryIdsByCategoryId(categoryId);
+        Page<Book> books = bookRepository.findAllByCategoryIds(categoryIds, pageable);
+
+        return books.map(this::createBookResponse);
+    }
+
+    public BookResponse getBookDetail(Long bookId) {
+        Book book = bookRepository.findByBookId(bookId)
+                .orElseThrow(() -> new BookNotFoundException(bookId));
+
+        return createBookResponse(book);
     }
 
     public Page<BookDetailResponse> getBooksDetail(Pageable pageable) {
@@ -641,5 +633,30 @@ public class BookService {
     private BigDecimal getSalePrice(BigDecimal price, double disCountRate) {
         BigDecimal discountRate = BigDecimal.valueOf(disCountRate).divide(BigDecimal.valueOf(100));
         return price.multiply(BigDecimal.ONE.subtract(discountRate)).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private BookResponse createBookResponse(Book book) {
+        return new BookResponse (
+                book.getId(),
+                book.getTitle(),
+                bookFormatter.formatDate(book.getPublication()),
+                bookFormatter.formatPrice(getSalePrice(book.getPrice(), book.getDiscountRate())),
+                book.getDiscountRate(),
+                book.getBookImages().stream()
+                        .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
+                        .map(Image::getUrl)
+                        .findFirst()
+                        .orElse("no-image"),
+                book.getContributors().stream()
+                        .map(bookContributor -> new ContributorSummaryResponse(
+                                bookContributor.getContributor().getId(),
+                                bookContributor.getContributor().getName()
+                        ))
+                        .collect(Collectors.toList()),
+                new PublisherSummaryResponse(
+                        book.getPublisher().getId(),
+                        book.getPublisher().getName()
+                )
+        );
     }
 }
