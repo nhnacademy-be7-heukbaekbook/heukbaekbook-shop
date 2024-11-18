@@ -23,16 +23,18 @@ public class Coupon {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coupon_policy_id")
     private CouponPolicy couponPolicy;
 
-    @Column(name = "coupon_amount")
-    private int couponAmount;
-
+    @NotNull
     @Column(name = "coupon_status")
     @Enumerated(EnumType.STRING)
     private CouponStatus couponStatus;
+
+    @NotNull
+    @Column(name = "coupon_amount")
+    private int couponAmount;
 
     @NotNull
     @Column(name = "coupon_available_duration")

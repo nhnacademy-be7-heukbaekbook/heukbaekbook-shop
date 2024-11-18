@@ -2,7 +2,7 @@ package com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response;
 
 import java.time.LocalDateTime;
 
-public record CouponInfoResponse(
+public record CouponResponse(
         Long couponId,
         Long couponType,
         LocalDateTime expirationDate,
