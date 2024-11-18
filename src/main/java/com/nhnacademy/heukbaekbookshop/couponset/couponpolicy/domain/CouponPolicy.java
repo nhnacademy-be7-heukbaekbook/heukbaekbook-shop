@@ -1,14 +1,14 @@
 package com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain;
 
 
+import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 
+@Getter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -37,4 +37,21 @@ public class CouponPolicy {
     @NotNull
     @Column(name = "maximum_purchase_amount")
     private BigDecimal maximumPurchaseAmount;
+
+    @Builder
+    public CouponPolicy(DisCountType disCountType, BigDecimal discountAmount, BigDecimal minimumPurchaseAmount, BigDecimal maximumPurchaseAmount) {
+        this.disCountType = disCountType;
+        this.discountAmount = discountAmount;
+        this.minimumPurchaseAmount = minimumPurchaseAmount;
+        this.maximumPurchaseAmount = maximumPurchaseAmount;
+    }
+
+    public CouponPolicy modifyCouponPolicy(CouponPolicyRequest couponPolicyRequest) {
+        this.disCountType = couponPolicyRequest.discountType();
+        this.discountAmount = couponPolicyRequest.discountAmount();
+        this.minimumPurchaseAmount = couponPolicyRequest.minimumPurchaseAmount();
+        this.maximumPurchaseAmount = couponPolicyRequest.maximumPurchaseAmount();
+        return this;
+    }
+
 }

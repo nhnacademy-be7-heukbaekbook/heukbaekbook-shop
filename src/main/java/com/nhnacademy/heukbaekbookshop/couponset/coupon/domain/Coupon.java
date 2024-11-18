@@ -24,8 +24,8 @@ public class Coupon {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "coupon_discount_id")
-    private CouponPolicy couponDiscountPolicy;
+    @JoinColumn(name = "coupon_policy_id")
+    private CouponPolicy couponPolicy;
 
     @Column(name = "coupon_amount")
     private int couponAmount;
