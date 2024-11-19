@@ -1,6 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.order.domain;
 
-public enum ReturnStatus {
+public enum RefundStatus {
     REQUEST,
     WAITING,
     CONFIRMATION,
