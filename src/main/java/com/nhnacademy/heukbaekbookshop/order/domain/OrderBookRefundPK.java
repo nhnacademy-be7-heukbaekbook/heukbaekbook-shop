@@ -12,23 +12,23 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderBookReturnPK implements Serializable {
+public class OrderBookRefundPK implements Serializable {
     private Long orderId;
     private Long bookId;
-    private Long returnId;
+    private Long refundId;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        OrderBookReturnPK that = (OrderBookReturnPK) o;
+        OrderBookRefundPK that = (OrderBookRefundPK) o;
         return Objects.equals(orderId, that.orderId) &&
                 Objects.equals(bookId, that.bookId) &&
-                Objects.equals(returnId, that.returnId);
+                Objects.equals(refundId, that.refundId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(orderId, bookId, returnId);
+        return Objects.hash(orderId, bookId, refundId);
     }
 }

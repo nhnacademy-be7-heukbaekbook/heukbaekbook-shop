@@ -15,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class TagService {
 
@@ -66,5 +68,10 @@ public class TagService {
     public Page<TagDetailResponse> getTags(Pageable pageable) {
         Page<Tag> tags = tagRepository.findAll(pageable);
         return tags.map(tag -> new TagDetailResponse(tag.getId(), tag.getName()));
+    }
+
+    public List<String> getTagList() {
+        List<Tag> tags = tagRepository.findAll();
+        return tags.stream().map(Tag::getName).toList();
     }
 }

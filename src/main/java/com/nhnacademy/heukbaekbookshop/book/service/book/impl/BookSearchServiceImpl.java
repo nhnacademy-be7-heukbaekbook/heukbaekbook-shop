@@ -87,7 +87,7 @@ public class BookSearchServiceImpl implements BookSearchService {
         return new BookDocument(
                 book.getId(),
                 book.getTitle(),
-                book.getPublication(),
+                book.getPublishedAt(),
                 bookFormatter.formatPrice(getSalePrice(book.getPrice(), book.getDiscountRate())),
                 book.getDiscountRate(),
                 book.getBookImages().stream()

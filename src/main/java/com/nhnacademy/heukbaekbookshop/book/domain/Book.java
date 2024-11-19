@@ -5,7 +5,6 @@ import com.nhnacademy.heukbaekbookshop.contributor.domain.BookContributor;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.Publisher;
 import com.nhnacademy.heukbaekbookshop.image.domain.BookImage;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
-import com.nhnacademy.heukbaekbookshop.tag.domain.Tag;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -47,8 +46,8 @@ public class Book {
     private String description;
 
     @NotNull
-    @Column(name = "book_publication")
-    private Date publication;
+    @Column(name = "book_published_at")
+    private Date publishedAt;
 
     @NotNull
     @Length(min = 13, max = 13)
