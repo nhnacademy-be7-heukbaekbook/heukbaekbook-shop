@@ -13,7 +13,6 @@ import com.nhnacademy.heukbaekbookshop.book.exception.book.BookSearchException;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookCategoryRepository;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
-import com.nhnacademy.heukbaekbookshop.category.dto.response.CategorySummaryResponse;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
 import com.nhnacademy.heukbaekbookshop.common.formatter.BookFormatter;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.*;
@@ -556,14 +555,14 @@ public class BookService {
         return String.join(">", categoryNames);
     }
 
-    public List<BookCartResponse> getBooksSummary(List<Long> bookIds) {
+    public List<BookSummaryResponse> getBooksSummary(List<Long> bookIds) {
         List<Book> books = bookRepository.findAllByIdInAndType(bookIds, ImageType.THUMBNAIL);
         return books.stream()
-                .map(book -> new BookCartResponse(
+                .map(book -> new BookSummaryResponse(
                                 book.getId(),
                                 book.getTitle(),
-                                bookFormatter.formatPrice(book.getPrice()),
-                                bookFormatter.formatPrice(getSalePrice(book.getPrice(), book.getDiscountRate())),
+                                book.getPrice(),
+                                getSalePrice(book.getPrice(), book.getDiscountRate()),
                                 book.getDiscountRate(),
                                 book.getBookImages().stream()
                                         .map(Image::getUrl)
