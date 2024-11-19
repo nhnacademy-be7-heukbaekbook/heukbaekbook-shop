@@ -31,7 +31,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
     public Page<PointHistoryResponse> getPointHistoriesByCustomerId(Long customerId, Pageable pageable) {
         validateMemberExists(customerId);
 
-        return pointHistoryRepository.findByMemberIdOrderByCreatedAtDesc(customerId, pageable).map(PointHistoryMapper::toResponse);
+        return pointHistoryRepository.findByMemberId(customerId, pageable).map(PointHistoryMapper::toResponse);
     }
 
     @Override

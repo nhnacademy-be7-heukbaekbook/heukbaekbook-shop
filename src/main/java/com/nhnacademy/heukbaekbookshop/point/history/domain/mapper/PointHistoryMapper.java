@@ -21,6 +21,7 @@ public class PointHistoryMapper {
         pointHistory.setCreatedAt(request.createdAt());
         pointHistory.setBalance(newBalance);
         pointHistory.setType(request.type());
+        pointHistory.setName(request.pointName());
         return pointHistory;
     }
 
@@ -29,6 +30,7 @@ public class PointHistoryMapper {
                 pointHistory.getId(),
                 pointHistory.getMember().getId(),
                 pointHistory.getOrder() != null ? pointHistory.getOrder().getId() : null,
+                pointHistory.getName(),
                 pointHistory.getAmount(),
                 pointHistory.getCreatedAt(),
                 pointHistory.getBalance(),

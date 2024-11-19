@@ -9,6 +9,7 @@ public record PointHistoryResponse(
         Long id,
         Long customerId,
         Long orderId,
+        String name,
         BigDecimal amount,
         LocalDateTime createdAt,
         BigDecimal balance,

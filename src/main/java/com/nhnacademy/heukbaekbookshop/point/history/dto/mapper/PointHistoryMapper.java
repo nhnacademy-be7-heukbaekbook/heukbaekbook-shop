@@ -27,6 +27,7 @@ public class PointHistoryMapper {
                 pointHistory.getId(),
                 pointHistory.getMember().getId(),
                 pointHistory.getOrder().getId() == null ? null : pointHistory.getOrder().getId(),
+                pointHistory.getName(),
                 pointHistory.getAmount(),
                 pointHistory.getCreatedAt(),
                 pointHistory.getBalance(),

@@ -50,4 +50,6 @@ public class PointHistory {
     @Column(name = "point_type")
     private PointType type;
 
+    @Column(name = "point_name")
+    private String name;
 }
