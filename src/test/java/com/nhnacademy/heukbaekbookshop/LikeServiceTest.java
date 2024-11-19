@@ -77,7 +77,7 @@ public class LikeServiceTest {
         testBook.setTitle("Test Book");
         testBook.setIndex("Index");
         testBook.setDescription("Description");
-        testBook.setPublication(Date.valueOf(LocalDate.of(2023, 1, 1)));
+        testBook.setPublishedAt(Date.valueOf(LocalDate.of(2023, 1, 1)));
         testBook.setIsbn("1234567890123");
         testBook.setPackable(true);
         testBook.setStock(100);

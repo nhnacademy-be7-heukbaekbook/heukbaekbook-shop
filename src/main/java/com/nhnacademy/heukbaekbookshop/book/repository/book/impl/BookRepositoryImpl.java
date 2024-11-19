@@ -11,8 +11,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
-import static com.nhnacademy.heukbaekbookshop.book.domain.QBook.*;
+import static com.nhnacademy.heukbaekbookshop.book.domain.QBook.book;
+import static com.nhnacademy.heukbaekbookshop.book.domain.QBookCategory.bookCategory;
 import static com.nhnacademy.heukbaekbookshop.contributor.domain.QPublisher.*;
 import static com.nhnacademy.heukbaekbookshop.image.domain.QBookImage.bookImage;
 
@@ -51,8 +53,51 @@ public class BookRepositoryImpl implements BookRepositoryCustom {
         long total = queryFactory
                 .select(book.count())
                 .from(book)
+                .where(book.status.eq(BookStatus.IN_STOCK))
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total);
+    }
+
+    @Override
+    public Page<Book> findAllByCategoryIds(List<Long> categoryIds, Pageable pageable) {
+        List<Long> bookIds = queryFactory
+                .select(book.id)
+                .from(bookCategory)
+                .join(bookCategory.book, book)
+                .where(
+                        bookCategory.categoryId.in(categoryIds),
+                        book.status.eq(BookStatus.IN_STOCK)
+                )
+                .distinct()
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        List<Book> books = queryFactory
+                .selectFrom(book)
+                .join(book.publisher, publisher).fetchJoin()
+                .where(book.id.in(bookIds))
+                .fetch();
+
+        Long total = queryFactory
+                .select(bookCategory.book.id.countDistinct())
+                .from(bookCategory)
+                .where(
+                        bookCategory.categoryId.in(categoryIds),
+                        book.status.eq(BookStatus.IN_STOCK)
+                )
+                .fetchOne();
+
+        return new PageImpl<>(books, pageable, total);
+    }
+
+    @Override
+    public Optional<Book> findByBookId(Long bookId) {
+        return Optional.ofNullable(queryFactory
+                .selectFrom(book)
+                .join(book.publisher, publisher).fetchJoin()
+                .where(book.id.eq(bookId))
+                .fetchOne());
     }
 }

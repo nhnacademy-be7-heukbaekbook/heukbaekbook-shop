@@ -2,6 +2,12 @@ spring:
   cloud:
     config:
       enabled: false
+  elasticsearch:
+    uris: http://115.94.72.197:9200
+    username: elastic
+    password: nhnacademy123!
+    index:
+      create-on-startup: true
 
   datasource:
     url: jdbc:h2:mem:testdb
@@ -26,3 +32,6 @@ logging.level:
 aladin:
   api:
     key: abcde
+
+toss:
+  secret-key: 12345

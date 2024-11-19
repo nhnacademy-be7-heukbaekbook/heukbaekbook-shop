@@ -13,9 +13,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(OrderBookReturnPK.class)
-@Table(name = "orders_books_returns")
-public class OrderBookReturn {
+@IdClass(OrderBookRefundPK.class)
+@Table(name = "orders_books_refunds")
+public class OrderBookRefund {
 
     @Id
     @Column(name = "book_id")
@@ -26,23 +26,23 @@ public class OrderBookReturn {
     private Long orderId;
 
     @Id
-    @Column(name = "return_id")
-    private Long returnId;
+    @Column(name = "refund_id")
+    private Long refundId;
 
     @ManyToOne
     @MapsId("bookId")
-    @JoinColumn(name = "book_id")
+    @JoinColumn(name = "book_id", insertable = false, updatable = false)
     private Book book;
 
     @ManyToOne
     @MapsId("orderId")
-    @JoinColumn(name = "order_id")
+    @JoinColumn(name = "order_id", insertable = false, updatable = false)
     private Order order;
 
     @ManyToOne
-    @MapsId("returnId")
-    @JoinColumn(name = "return_id")
-    private Return returns;
+    @MapsId("refundId")
+    @JoinColumn(name = "refund_id", insertable = false, updatable = false)
+    private Refund refund;
 
     @NotNull
     @Column(name = "quantity")

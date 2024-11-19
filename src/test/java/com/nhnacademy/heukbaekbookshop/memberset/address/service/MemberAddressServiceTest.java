@@ -1,7 +1,8 @@
 package com.nhnacademy.heukbaekbookshop.memberset.address.service;
 
 import com.nhnacademy.heukbaekbookshop.memberset.address.domain.MemberAddress;
-import com.nhnacademy.heukbaekbookshop.memberset.address.dto.MemberAddressDto;
+import com.nhnacademy.heukbaekbookshop.memberset.address.dto.MemberAddressRequest;
+import com.nhnacademy.heukbaekbookshop.memberset.address.dto.MemberAddressResponse;
 import com.nhnacademy.heukbaekbookshop.memberset.address.exception.AddressLimitExceededException;
 import com.nhnacademy.heukbaekbookshop.memberset.address.exception.MemberAddressAlreadyExistsException;
 import com.nhnacademy.heukbaekbookshop.memberset.address.exception.MemberAddressNotFoundException;
@@ -64,7 +65,7 @@ class MemberAddressServiceTest {
         when(memberAddressRepository.getAllByMemberIdOrderByCreatedAtDesc(testCustomerId)).thenReturn(mockedMemberAddressList);
 
         // when
-        List<MemberAddressDto> result = memberAddressService.getMemberAddressesList(testCustomerId);
+        List<MemberAddressResponse> result = memberAddressService.getMemberAddressesList(testCustomerId);
 
         // then
         assertThat(result).hasSize(2);
@@ -75,11 +76,11 @@ class MemberAddressServiceTest {
     @DisplayName("회원 주소 생성 시 회원 조회 실패")
     void createMemberAddress_MemberNotFound_ExceptionThrown() {
         // given
-        MemberAddressDto mockedMemberAddressDto = mock(MemberAddressDto.class);
+        MemberAddressRequest memberAddressRequest = mock(MemberAddressRequest.class);
         when(memberRepository.findById(testCustomerId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(MemberNotFoundException.class, () -> memberAddressService.createMemberAddress(testMemberAddressId, mockedMemberAddressDto));
+        assertThrows(MemberNotFoundException.class, () -> memberAddressService.createMemberAddress(testMemberAddressId, memberAddressRequest));
         verify(memberRepository, times(1)).findById(testMemberAddressId);
     }
 
@@ -91,7 +92,7 @@ class MemberAddressServiceTest {
         when(memberAddressRepository.countByMemberId(testCustomerId)).thenReturn(10L);
 
         // when & then
-        assertThrows(AddressLimitExceededException.class, () -> memberAddressService.createMemberAddress(testMemberAddressId, mock(MemberAddressDto.class)));
+        assertThrows(AddressLimitExceededException.class, () -> memberAddressService.createMemberAddress(testMemberAddressId, mock(MemberAddressRequest.class)));
         verify(memberAddressRepository, times(1)).countByMemberId(testCustomerId);
     }
 
@@ -99,13 +100,13 @@ class MemberAddressServiceTest {
     @DisplayName("회원 주소 생성 시 중복 주소")
     void createMemberAddress_AddressAlreadyExists_ExceptionThrown() {
         // given
-        MemberAddressDto testMemberAddressDto = new MemberAddressDto(testPostalCode, testRoadNameAddress, testDetailAddress, testAlias);
+        MemberAddressRequest testMemberAddressRequest = new MemberAddressRequest(testPostalCode, testRoadNameAddress, testDetailAddress, testAlias);
         when(memberRepository.findById(testCustomerId)).thenReturn(Optional.of(testMember));
         when(memberAddressRepository.countByMemberId(testCustomerId)).thenReturn(1L);
         when(memberAddressRepository.existsByPostalCodeAndDetailAddress(any(), any())).thenReturn(true);
 
         // when & then
-        assertThrows(MemberAddressAlreadyExistsException.class, () -> memberAddressService.createMemberAddress(testCustomerId, testMemberAddressDto));
+        assertThrows(MemberAddressAlreadyExistsException.class, () -> memberAddressService.createMemberAddress(testCustomerId, testMemberAddressRequest));
         verify(memberAddressRepository, times(1)).existsByPostalCodeAndDetailAddress(testPostalCode, testDetailAddress);
     }
 
@@ -113,7 +114,7 @@ class MemberAddressServiceTest {
     @DisplayName("회원 주소 생성 성공")
     void createMemberAddress_CreateNewMemberAddress_Success() {
         // given
-        MemberAddressDto testMemberAddressDto = new MemberAddressDto(testPostalCode, testRoadNameAddress, testDetailAddress, testAlias);
+        MemberAddressRequest memberAddressRequest = new MemberAddressRequest(testPostalCode, testRoadNameAddress, testDetailAddress, testAlias);
         MemberAddress testMemberAddress = new MemberAddress(testMember, testPostalCode, testRoadNameAddress, testDetailAddress, testAlias);
 
         when(memberRepository.findById(any())).thenReturn(Optional.of(testMember));
@@ -122,11 +123,11 @@ class MemberAddressServiceTest {
         when(memberAddressRepository.save(any(MemberAddress.class))).thenReturn(testMemberAddress);
 
         // when
-        MemberAddressDto resultMemberAddressDto = memberAddressService.createMemberAddress(testCustomerId, testMemberAddressDto);
+        MemberAddressResponse resultMemberAddressResponse = memberAddressService.createMemberAddress(testCustomerId, memberAddressRequest);
 
         // then
         verify(memberAddressRepository, times(1)).save(any(MemberAddress.class));
-        assertNotNull(resultMemberAddressDto);
+        assertNotNull(resultMemberAddressResponse);
     }
 
     @Test
@@ -157,7 +158,7 @@ class MemberAddressServiceTest {
         when(memberAddressRepository.findById(testMemberAddressId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(MemberAddressNotFoundException.class, () -> memberAddressService.updateMemberAddress(testMemberAddressId, mock(MemberAddressDto.class)));
+        assertThrows(MemberAddressNotFoundException.class, () -> memberAddressService.updateMemberAddress(testMemberAddressId, mock(MemberAddressRequest.class)));
         verify(memberAddressRepository, times(1)).findById(testMemberAddressId);
     }
 
@@ -165,17 +166,17 @@ class MemberAddressServiceTest {
     @DisplayName("회원 주소 수정 성공")
     void updateMemberAddress_UpdateAddress_Success() {
         // given
-        MemberAddressDto testMemberAddressDto = new MemberAddressDto(testPostalCode, testRoadNameAddress, testDetailAddress,
+        MemberAddressRequest testMemberAddressRequest = new MemberAddressRequest(testPostalCode, testRoadNameAddress, testDetailAddress,
                 "newAlias");
         MemberAddress testMemberAddress = new MemberAddress(testMember, testPostalCode, testRoadNameAddress, testDetailAddress,
                 "oldAlias");
         when(memberAddressRepository.findById(testMemberAddressId)).thenReturn(Optional.of(testMemberAddress));
 
         // when
-        MemberAddressDto resultMemberAddressDto = memberAddressService.updateMemberAddress(testMemberAddressId, testMemberAddressDto);
+        MemberAddressResponse resultMemberAddressResponse = memberAddressService.updateMemberAddress(testMemberAddressId, testMemberAddressRequest);
 
         // then
         verify(memberAddressRepository, times(1)).findById(testMemberAddressId);
-        assertEquals("newAlias", resultMemberAddressDto.alias());
+        assertEquals("newAlias", resultMemberAddressResponse.alias());
     }
 }

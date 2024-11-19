@@ -5,6 +5,7 @@ import com.nhnacademy.heukbaekbookshop.contributor.exception.ContributorNotFound
 import com.nhnacademy.heukbaekbookshop.contributor.exception.PublisherAlreadyExistException;
 import com.nhnacademy.heukbaekbookshop.contributor.exception.PublisherNotFoundException;
 import com.nhnacademy.heukbaekbookshop.image.exception.ImageNotFoundException;
+import com.nhnacademy.heukbaekbookshop.order.exception.PaymentFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
