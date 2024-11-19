@@ -9,6 +9,8 @@ import com.nhnacademy.heukbaekbookshop.book.repository.book.BookDocumentReposito
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookSearchRepository;
 import com.nhnacademy.heukbaekbookshop.common.formatter.BookFormatter;
+import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSummaryResponse;
+import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -19,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 
@@ -46,7 +49,7 @@ class BookSearchServiceImplTest {
     @Test
     void testSearchBooks() {
         // given
-        BookSearchRequest searchRequest = new BookSearchRequest("test", "title", "NEWEST", 0, 10);
+        BookSearchRequest searchRequest = new BookSearchRequest("test", "title", "NEWEST");
         Pageable pageable = PageRequest.of(0, 10);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
         Date publishedAt;
@@ -57,9 +60,18 @@ class BookSearchServiceImplTest {
         }
 
         BookDocument bookDocument = new BookDocument(
-                1L, "Test Title", publishedAt, "100", 10.0,
-                "test-thumbnail-url", Collections.emptyList(), null
+                1L,
+                "Test Title",
+                publishedAt,
+                "100",
+                10.0,
+                "test-thumbnail-url",
+                Arrays.asList("Author1", "Author2"), // 예시 저자 리스트
+                "Test Description",
+                Arrays.asList(new ContributorSummaryResponse(1L, "Contributor Name")), // 예시 기여자 리스트
+                new PublisherSummaryResponse(1L, "Publisher Name") // 예시 출판사
         );
+
         Page<BookDocument> bookDocumentPage = new PageImpl<>(Collections.singletonList(bookDocument));
 
         when(bookSearchRepository.search(any(Pageable.class), any(String.class), any(SearchCondition.class), any(SortCondition.class)))
