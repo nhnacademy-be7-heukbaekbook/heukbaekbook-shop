@@ -42,12 +42,37 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
 
     @Override
     public Page<Coupon> findAllByCouponStatus(CouponStatus couponStatus, Pageable pageable) {
-        return null;
+        List<Coupon> content = queryFactory
+                .selectFrom(coupon)
+                .join(coupon.couponPolicy, couponPolicy).fetchJoin()
+                .where(coupon.couponStatus.eq(CouponStatus.ABLE))
+                .orderBy(coupon.couponCreatedAt.desc())
+                .fetch();
+
+        long total = queryFactory
+                .select(coupon.count())
+                .from(coupon)
+                .where(coupon.couponStatus.eq(couponStatus))
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable,total);
     }
 
 
     @Override
     public Page<Coupon> findAllByDiscountType(DiscountType disCountType, Pageable pageable) {
-        return null;
+        List<Coupon> content = queryFactory
+                .selectFrom(coupon)
+                .join(coupon.couponPolicy, couponPolicy).fetchJoin()
+                .where(coupon.couponPolicy.discountType.eq(disCountType))
+                .fetch();
+
+        long total = queryFactory
+                .select(coupon.count())
+                .from(coupon)
+                .where(coupon.couponPolicy.discountType.eq(disCountType))
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable,total);
     }
 }

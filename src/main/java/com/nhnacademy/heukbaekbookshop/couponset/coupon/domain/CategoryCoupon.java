@@ -2,29 +2,16 @@ package com.nhnacademy.heukbaekbookshop.couponset.coupon.domain;
 
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "categories_coupons")
-public class CategoryCoupon {
+public class CategoryCoupon extends Coupon {
 
-    @Id
-    @Column(name = "coupon_id")
-    private Long couponId;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "coupon_id", insertable = false, updatable = false)
-    private Coupon coupon;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 

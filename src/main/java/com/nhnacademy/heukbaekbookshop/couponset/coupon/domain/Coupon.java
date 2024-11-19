@@ -9,8 +9,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "coupons")
 public class Coupon {
 
@@ -67,6 +68,16 @@ public class Coupon {
         this.couponName = couponName;
         this.couponDescription = couponDescription;
         this.couponCreatedAt = LocalDateTime.now();
+    }
+
+    public Coupon modifyCoupon(CouponPolicy couponPolicy, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription) {
+        this.couponPolicy = couponPolicy;
+        this.availableDuration = availableDuration;
+        this.couponTimeStart = couponTimeStart;
+        this.couponTimeEnd = couponTimeEnd;
+        this.couponName = couponName;
+        this.couponDescription = couponDescription;
+        return this;
     }
 
 }

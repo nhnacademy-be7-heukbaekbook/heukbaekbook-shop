@@ -13,18 +13,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "books_coupons")
-public class BookCoupon {
+public class BookCoupon extends Coupon {
 
-    @Id
-    @Column(name = "coupon_id")
-    private Long couponId;
-
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "coupon_id", insertable = false, updatable = false)
-    private Coupon coupon;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
     private Book book;
 

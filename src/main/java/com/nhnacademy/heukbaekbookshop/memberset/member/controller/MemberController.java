@@ -40,7 +40,6 @@ public class MemberController {
      * @return 성공 시, 응답코드 201 반환합니다.
      */
     @PostMapping
-    @Transactional
     public ResponseEntity<MemberResponse> createMember(@Valid @RequestBody MemberCreateRequest memberCreateRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(memberService.createMember(memberCreateRequest));
@@ -66,7 +65,6 @@ public class MemberController {
      * @return 성공 시, 응답코드 200 반환합니다.
      */
     @PutMapping
-    @Transactional
     public ResponseEntity<MemberResponse> updateMember(@RequestHeader(X_USER_ID) Long customerId, @Valid @RequestBody MemberUpdateRequest memberUpdateRequest) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(memberService.updateMember(customerId, memberUpdateRequest));
@@ -79,7 +77,6 @@ public class MemberController {
      * @return 성공 시, 응답코드 204 반환합니다.
      */
     @DeleteMapping
-    @Transactional
     public ResponseEntity<Void> deleteMember(@RequestHeader(X_USER_ID) Long customerId){
         memberService.changeMemberStatus(customerId, MemberStatus.WITHDRAWN);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

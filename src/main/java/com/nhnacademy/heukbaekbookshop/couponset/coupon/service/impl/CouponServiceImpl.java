@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.couponset.coupon.service.impl;
 
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.Coupon;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CouponStatus;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.mapper.CouponMapper;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request.CouponRequest;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponResponse;
@@ -8,6 +9,7 @@ import com.nhnacademy.heukbaekbookshop.couponset.coupon.exception.CouponNotFound
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.repository.MemberCouponRepository;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.service.CouponService;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
+import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.exception.CouponPolicyNotFoundException;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.repository.CouponPolicyRepository;
 import lombok.RequiredArgsConstructor;
@@ -49,11 +51,39 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
+    public Page<CouponResponse> getCouponsByType(DiscountType discountType, Pageable pageable) {
+        Page<Coupon> coupons = couponRepository.findAllByDiscountType(discountType, pageable);
+        return CouponMapper.fromPageableEntity(coupons, pageable);
+    }
+
+    @Override
+    public Page<CouponResponse> getCouponsByStatus(CouponStatus couponStatus, Pageable pageable) {
+        Page<Coupon> coupons = couponRepository.findAllByCouponStatus(couponStatus, pageable);
+        return CouponMapper.fromPageableEntity(coupons, pageable);
+    }
+
+    @Override
     public CouponResponse updateCoupon(Long couponId, CouponRequest couponRequest) {
-        return null;
+        Coupon coupon = couponRepository.findById(couponId).orElseThrow(CouponNotFoundException::new);
+        CouponPolicy couponPolicy = couponPolicyRepository.findById(couponRequest.policyId()).orElseThrow(CouponPolicyNotFoundException::new);
+
+        return CouponMapper.fromEntity(
+                coupon.modifyCoupon(
+                        couponPolicy,
+                        couponRequest.availableDuration(),
+                        couponRequest.couponTimeStart(),
+                        couponRequest.couponTimeEnd(),
+                        couponRequest.couponName(),
+                        couponRequest.couponDescription()
+                )
+        );
     }
 
     @Override
     public void deleteCoupon(Long couponId) {
+        couponRepository.delete(
+                couponRepository.findById(couponId)
+                        .orElseThrow(CouponNotFoundException::new)
+        );
     }
 }
