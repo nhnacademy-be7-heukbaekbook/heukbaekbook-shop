@@ -15,11 +15,12 @@ import java.math.BigDecimal;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/points")
 public class PointHistoryController {
 
     private final PointHistoryService pointHistoryService;
 
-    @GetMapping("/api/points/histories")
+    @GetMapping("/histories")
     public ResponseEntity<Page<PointHistoryResponse>> getPointHistoriesByMemberId(
             @RequestHeader("X-USER-ID") Long memberId,
             Pageable pageable
@@ -28,13 +29,13 @@ public class PointHistoryController {
         return ResponseEntity.ok(pointHistoriesByCustomerId);
     }
 
-    @GetMapping("/api/points/balance")
+    @GetMapping("/balance")
     public ResponseEntity<BigDecimal> getCurrentBalanceByMemberId(@RequestHeader("X-USER-ID") Long memberId) {
         BigDecimal currentBalanceByCustomerId = pointHistoryService.getCurrentBalanceByCustomerId(memberId);
         return ResponseEntity.ok(currentBalanceByCustomerId);
     }
 
-    @PostMapping("/api/points/histories")
+    @PostMapping("/histories")
     public ResponseEntity<PointHistoryResponse> createPointHistory(
             @RequestHeader("X-USER-ID") Long memberId,
             @Valid @RequestBody PointHistoryRequest request

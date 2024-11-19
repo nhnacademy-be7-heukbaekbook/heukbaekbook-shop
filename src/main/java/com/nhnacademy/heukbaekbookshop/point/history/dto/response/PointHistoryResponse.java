@@ -5,8 +5,7 @@ import com.nhnacademy.heukbaekbookshop.point.history.domain.PointType;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record
-PointHistoryResponse(
+public record PointHistoryResponse(
         Long id,
         Long customerId,
         Long orderId,
