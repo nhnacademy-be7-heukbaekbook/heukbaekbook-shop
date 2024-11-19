@@ -60,7 +60,7 @@ public class BookSearchServiceImpl implements BookSearchService {
                 document.getPublisher() // 출판사 정보를 `PublisherSummaryResponse`로 변환
         ));
     }
-//    @Scheduled(initialDelay = 0, fixedDelay = 30 * 1000)
+    @Scheduled(initialDelay = 0, fixedDelay = 30 * 1000)
     @Transactional
     public void updateBookIndex() {
         List<Book> allBooks = bookRepository.findAll();
@@ -83,7 +83,7 @@ public class BookSearchServiceImpl implements BookSearchService {
         return new BookDocument(
                 book.getId(),
                 book.getTitle(),
-                book.getPublication(),
+                book.getPublishedAt(),
                 bookFormatter.formatPrice(getSalePrice(book.getPrice(), book.getDiscountRate())),
                 book.getDiscountRate(),
                 book.getBookImages().stream()

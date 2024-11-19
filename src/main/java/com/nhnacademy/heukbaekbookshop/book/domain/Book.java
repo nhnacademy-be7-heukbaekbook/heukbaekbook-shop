@@ -47,8 +47,8 @@ public class Book {
     private String description;
 
     @NotNull
-    @Column(name = "book_publication")
-    private Date publication;
+    @Column(name = "book_published_at")
+    private Date publishedAt;
 
     @NotNull
     @Length(min = 13, max = 13)

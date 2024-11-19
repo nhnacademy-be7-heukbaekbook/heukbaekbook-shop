@@ -115,7 +115,7 @@ public class BookService {
         book.setTitle(request.title());
         book.setIndex(request.index());
         book.setDescription(request.description());
-        book.setPublication(Date.valueOf(String.valueOf(request.publication())));
+        book.setPublishedAt(Date.valueOf(String.valueOf(request.publication())));
         book.setIsbn(request.isbn());
         book.setPrice(BigDecimal.valueOf(request.standardPrice()));
         book.setDiscountRate(request.discountRate());
@@ -183,7 +183,7 @@ public class BookService {
                 book.getTitle(),
                 book.getIndex(),
                 book.getDescription(),
-                book.getPublication().toString(),
+                book.getPublishedAt().toString(),
                 book.getIsbn(),
                 book.isPackable(),
                 book.getStock(),
@@ -207,7 +207,7 @@ public class BookService {
         book.setTitle(request.title());
         book.setIndex(request.index());
         book.setDescription(request.description());
-        book.setPublication(Date.valueOf(request.publication()));
+        book.setPublishedAt(Date.valueOf(request.publication()));
         book.setIsbn(request.isbn());
         book.setPackable(request.isPackable());
         book.setStock(request.stock());
@@ -354,7 +354,7 @@ public class BookService {
                 book.getTitle(),
                 book.getIndex(),
                 book.getDescription(),
-                book.getPublication().toString(),
+                book.getPublishedAt().toString(),
                 book.getIsbn(),
                 book.getBookImages().stream()
                         .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
@@ -397,7 +397,7 @@ public class BookService {
                 book.getTitle(),
                 book.getIndex(),
                 book.getDescription(),
-                book.getPublication().toString(),
+                book.getPublishedAt().toString(),
                 book.getIsbn(),
                 book.getBookImages().stream()
                         .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
@@ -578,7 +578,7 @@ public class BookService {
             return new BookResponse(
                     book.getId(),
                     book.getTitle(),
-                    bookFormatter.formatDate(book.getPublication()),
+                    bookFormatter.formatDate(book.getPublishedAt()),
                     bookFormatter.formatPrice(getSalePrice(book.getPrice(), book.getDiscountRate())),
                     book.getDiscountRate(),
                     book.getBookImages().stream()
@@ -608,7 +608,7 @@ public class BookService {
                 book.getTitle(),
                 book.getIndex(),
                 book.getDescription(),
-                book.getPublication().toString(),
+                book.getPublishedAt().toString(),
                 book.getIsbn(),
                 book.getBookImages().stream()
                         .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
