@@ -20,16 +20,18 @@ public class PointHistoryController {
     private final PointHistoryService pointHistoryService;
 
     @GetMapping("/api/points/histories")
-    public Page<PointHistoryResponse> getPointHistoriesByMemberId(
+    public ResponseEntity<Page<PointHistoryResponse>> getPointHistoriesByMemberId(
             @RequestHeader("X-USER-ID") Long memberId,
             Pageable pageable
     ) {
-        return pointHistoryService.getPointHistoriesByCustomerId(memberId, pageable);
+        Page<PointHistoryResponse> pointHistoriesByCustomerId = pointHistoryService.getPointHistoriesByCustomerId(memberId, pageable);
+        return ResponseEntity.ok(pointHistoriesByCustomerId);
     }
 
     @GetMapping("/api/points/balance")
-    public BigDecimal getCurrentBalanceByMemberId(@RequestHeader("X-USER-ID") Long memberId) {
-        return pointHistoryService.getCurrentBalanceByCustomerId(memberId);
+    public ResponseEntity<BigDecimal> getCurrentBalanceByMemberId(@RequestHeader("X-USER-ID") Long memberId) {
+        BigDecimal currentBalanceByCustomerId = pointHistoryService.getCurrentBalanceByCustomerId(memberId);
+        return ResponseEntity.ok(currentBalanceByCustomerId);
     }
 
     @PostMapping("/api/points/histories")
