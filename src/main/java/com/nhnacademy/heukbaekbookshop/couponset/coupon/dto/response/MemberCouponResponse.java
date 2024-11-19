@@ -11,13 +11,4 @@ public record MemberCouponResponse(
         LocalDateTime couponExpirationDate,
         Boolean isCouponUsed
 ) {
-    public static MemberCouponResponse from(MemberCoupon memberCoupon) {
-        return new MemberCouponResponse(
-                memberCoupon.getId(),
-                memberCoupon.getCoupon().getId(),
-                memberCoupon.getCreatedAt(),
-                memberCoupon.getExpirationAt(),
-                memberCoupon.isCouponUsed()
-        );
-    }
 }

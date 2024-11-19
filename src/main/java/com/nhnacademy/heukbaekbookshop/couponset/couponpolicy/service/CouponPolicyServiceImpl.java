@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.service;
 
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
+import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyRequest;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.mapper.CouponPolicyMapper;
@@ -12,8 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +41,13 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
     public Page<CouponPolicyResponse> getAllCouponPolicies(Pageable pageable) {
         return CouponPolicyMapper.fromPageableEntity(
                 couponPolicyRepository.findAll(pageable)
+        );
+    }
+
+    @Override
+    public Page<CouponPolicyResponse> getAllCouponPoliciesByType(DiscountType disCountType, Pageable pageable) {
+        return CouponPolicyMapper.fromPageableEntity(
+                couponPolicyRepository.findCouponPolicyByDiscountTypeOrderByMinimumPurchaseAmount(disCountType, pageable)
         );
     }
 

@@ -10,11 +10,15 @@ public class CouponPolicyMapper {
     public static CouponPolicyResponse fromEntity(CouponPolicy couponPolicy) {
         return new CouponPolicyResponse(
                 couponPolicy.getId(),
-                couponPolicy.getDisCountType(),
+                couponPolicy.getDiscountType(),
                 couponPolicy.getDiscountAmount(),
                 couponPolicy.getMinimumPurchaseAmount(),
                 couponPolicy.getMaximumPurchaseAmount()
         );
+    }
+
+    public static Page<CouponPolicyResponse> fromPageableEntity(Page<CouponPolicy> couponPolicyPage) {
+        return couponPolicyPage.map(CouponPolicyMapper::fromEntity);
     }
 
     public static CouponPolicy toEntity(CouponPolicyRequest couponPolicyRequest) {
@@ -24,9 +28,5 @@ public class CouponPolicyMapper {
                 .minimumPurchaseAmount(couponPolicyRequest.minimumPurchaseAmount())
                 .maximumPurchaseAmount(couponPolicyRequest.maximumPurchaseAmount())
                 .build();
-    }
-
-    public static Page<CouponPolicyResponse> fromPageableEntity(Page<CouponPolicy> couponPolicyPage) {
-        return couponPolicyPage.map(CouponPolicyMapper::fromEntity);
     }
 }

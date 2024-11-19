@@ -3,6 +3,7 @@ package com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.controller;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyRequest;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.service.CouponPolicyService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,7 +31,7 @@ public class CouponPolicyController {
      * @return 성공시, 응답코드 201 반환합니다.
      */
     @PostMapping
-    public ResponseEntity<CouponPolicyResponse> createCouponPolicy(@RequestBody CouponPolicyRequest couponPolicyRequest) {
+    public ResponseEntity<CouponPolicyResponse> createCouponPolicy(@Valid @RequestBody CouponPolicyRequest couponPolicyRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(couponPolicyService.createCouponPolicy(couponPolicyRequest)
                 );
@@ -69,7 +70,7 @@ public class CouponPolicyController {
      * @return 성공시, 응답코드 200 반환합니다.
      */
     @PutMapping("/{policyId}")
-    public ResponseEntity<CouponPolicyResponse> updateCouponPolicy(@PathVariable Long policyId, @RequestBody CouponPolicyRequest couponPolicyRequest) {
+    public ResponseEntity<CouponPolicyResponse> updateCouponPolicy(@PathVariable Long policyId, @Valid @RequestBody CouponPolicyRequest couponPolicyRequest) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(couponPolicyService.updateCouponPolicy(policyId, couponPolicyRequest));
     }
@@ -85,6 +86,4 @@ public class CouponPolicyController {
         couponPolicyService.deleteCouponPolicy(policyId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
-
-
 }

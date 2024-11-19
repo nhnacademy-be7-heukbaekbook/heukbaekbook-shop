@@ -3,16 +3,12 @@ package com.nhnacademy.heukbaekbookshop.couponset.coupon.domain;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "coupons")
@@ -33,10 +29,6 @@ public class Coupon {
     private CouponStatus couponStatus;
 
     @NotNull
-    @Column(name = "coupon_amount")
-    private int couponAmount;
-
-    @NotNull
     @Column(name = "coupon_available_duration")
     private int availableDuration;
 
@@ -55,9 +47,26 @@ public class Coupon {
     @Column(name = "coupon_description")
     private String couponDescription;
 
+    @NotNull
+    @Column(name = "coupon_created_at")
+    private LocalDateTime couponCreatedAt;
+
     @OneToOne(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
     private BookCoupon bookCoupon;
 
     @OneToOne(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
     private CategoryCoupon categoryCoupon;
+
+    @Builder
+    public Coupon(CouponPolicy couponPolicy, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription) {
+        this.couponPolicy = couponPolicy;
+        this.couponStatus = CouponStatus.ABLE;
+        this.availableDuration = availableDuration;
+        this.couponTimeStart = couponTimeStart;
+        this.couponTimeEnd = couponTimeEnd;
+        this.couponName = couponName;
+        this.couponDescription = couponDescription;
+        this.couponCreatedAt = LocalDateTime.now();
+    }
+
 }
