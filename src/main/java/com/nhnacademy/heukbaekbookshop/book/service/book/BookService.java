@@ -13,6 +13,7 @@ import com.nhnacademy.heukbaekbookshop.book.exception.book.BookSearchException;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookCategoryRepository;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
+import com.nhnacademy.heukbaekbookshop.category.dto.response.CategorySummaryResponse;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
 import com.nhnacademy.heukbaekbookshop.common.formatter.BookFormatter;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.*;
@@ -118,7 +119,7 @@ public class BookService {
         book.setTitle(request.title());
         book.setIndex(request.index());
         book.setDescription(request.description());
-        book.setPublication(Date.valueOf(String.valueOf(request.publication())));
+        book.setPublishedAt(Date.valueOf(String.valueOf(request.publication())));
         book.setIsbn(request.isbn());
         book.setPrice(BigDecimal.valueOf(request.standardPrice()));
         book.setDiscountRate(request.discountRate());
@@ -186,7 +187,7 @@ public class BookService {
                 book.getTitle(),
                 book.getIndex(),
                 book.getDescription(),
-                book.getPublication().toString(),
+                book.getPublishedAt().toString(),
                 book.getIsbn(),
                 book.isPackable(),
                 book.getStock(),
@@ -210,7 +211,7 @@ public class BookService {
         book.setTitle(request.title());
         book.setIndex(request.index());
         book.setDescription(request.description());
-        book.setPublication(Date.valueOf(request.publication()));
+        book.setPublishedAt(Date.valueOf(request.publication()));
         book.setIsbn(request.isbn());
         book.setPackable(request.isPackable());
         book.setStock(request.stock());
@@ -355,7 +356,7 @@ public class BookService {
                 book.getTitle(),
                 book.getIndex(),
                 book.getDescription(),
-                book.getPublication().toString(),
+                book.getPublishedAt().toString(),
                 book.getIsbn(),
                 book.getBookImages().stream()
                         .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
@@ -398,7 +399,7 @@ public class BookService {
                 book.getTitle(),
                 book.getIndex(),
                 book.getDescription(),
-                book.getPublication().toString(),
+                book.getPublishedAt().toString(),
                 book.getIsbn(),
                 book.getBookImages().stream()
                         .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
@@ -585,11 +586,43 @@ public class BookService {
         return books.map(this::createBookResponse);
     }
 
-    public BookResponse getBookDetail(Long bookId) {
+    public BookViewResponse getBookDetail(Long bookId) {
         Book book = bookRepository.findByBookId(bookId)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
 
-        return createBookResponse(book);
+        return new BookViewResponse (
+                book.getId(),
+                book.getTitle(),
+                book.getIndex(),
+                book.getDescription(),
+                bookFormatter.formatDate(book.getPublishedAt()),
+                book.getIsbn(),
+                book.isPackable(),
+                bookFormatter.formatPrice(book.getPrice()),
+                bookFormatter.formatPrice(getSalePrice(book.getPrice(), book.getDiscountRate())),
+                book.getDiscountRate(),
+                book.getPopularity(),
+                book.getStatus().name(),
+                book.getBookImages().stream()
+                        .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
+                        .map(Image::getUrl)
+                        .findFirst()
+                        .orElse("no-image"),
+                book.getBookImages().stream()
+                        .filter(bookImage -> bookImage.getType() == ImageType.DETAIL)
+                        .map(Image::getUrl)
+                        .collect(Collectors.toList()),
+                book.getContributors().stream()
+                        .map(bookContributor -> new ContributorSummaryResponse(
+                                bookContributor.getContributor().getId(),
+                                bookContributor.getContributor().getName()
+                        ))
+                        .collect(Collectors.toList()),
+                new PublisherSummaryResponse(
+                        book.getPublisher().getId(),
+                        book.getPublisher().getName()
+                )
+        );
     }
 
     public Page<BookDetailResponse> getBooksDetail(Pageable pageable) {
@@ -600,7 +633,7 @@ public class BookService {
                 book.getTitle(),
                 book.getIndex(),
                 book.getDescription(),
-                book.getPublication().toString(),
+                book.getPublishedAt().toString(),
                 book.getIsbn(),
                 book.getBookImages().stream()
                         .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
@@ -639,7 +672,7 @@ public class BookService {
         return new BookResponse (
                 book.getId(),
                 book.getTitle(),
-                bookFormatter.formatDate(book.getPublication()),
+                bookFormatter.formatDate(book.getPublishedAt()),
                 bookFormatter.formatPrice(getSalePrice(book.getPrice(), book.getDiscountRate())),
                 book.getDiscountRate(),
                 book.getBookImages().stream()
