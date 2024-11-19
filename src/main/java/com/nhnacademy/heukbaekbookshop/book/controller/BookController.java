@@ -3,6 +3,7 @@ package com.nhnacademy.heukbaekbookshop.book.controller;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookCartResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookDetailResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookResponse;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookViewResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.like.LikeCreateResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.like.LikeDeleteResponse;
 import com.nhnacademy.heukbaekbookshop.book.service.book.BookService;
@@ -70,7 +71,7 @@ public class BookController {
     }
 
     @GetMapping("/detail")
-    public BookResponse getBookDetail(@RequestParam Long bookId) {
+    public BookViewResponse getBookDetail(@RequestParam Long bookId) {
         log.info("bookId: {}", bookId);
 
         return bookService.getBookDetail(bookId);

@@ -1,7 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.book.service.book.impl;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
-import com.nhnacademy.heukbaekbookshop.book.domain.BookTag;
 import com.nhnacademy.heukbaekbookshop.book.domain.SearchCondition;
 import com.nhnacademy.heukbaekbookshop.book.domain.SortCondition;
 import com.nhnacademy.heukbaekbookshop.book.domain.document.BookDocument;
@@ -20,14 +19,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -83,7 +80,7 @@ public class BookSearchServiceImpl implements BookSearchService {
         return new BookDocument(
                 book.getId(),
                 book.getTitle(),
-                book.getPublication(),
+                book.getPublishedAt(),
                 bookFormatter.formatPrice(getSalePrice(book.getPrice(), book.getDiscountRate())),
                 book.getDiscountRate(),
                 book.getBookImages().stream()
