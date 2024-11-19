@@ -12,7 +12,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -86,6 +88,33 @@ public class CategoryService {
                 category.getName()
 
         ));
+    }
+
+    public List<String> getCategoryPaths() {
+        List<Category> categories = categoryRepository.findAll();
+
+        Map<Long, Category> categoryMap = categories.stream()
+                .collect(Collectors.toMap(Category::getId, category -> category));
+
+        List<String> categoryPaths = new ArrayList<>();
+        for (Category category : categories) {
+            categoryPaths.add(buildCategoryPath(category, categoryMap));
+        }
+
+        return categoryPaths.stream().distinct().collect(Collectors.toList());
+    }
+
+    private String buildCategoryPath(Category category, Map<Long, Category> categoryMap) {
+        if (category.getParentCategory() == null) {
+            return category.getName();
+        }
+
+        Category parent = categoryMap.get(category.getParentCategory().getId());
+        if (parent == null) {
+            return category.getName();
+        }
+
+        return buildCategoryPath(parent, categoryMap) + ">" + category.getName();
     }
 
     public List<CategorySummaryResponse> getTopCategories() {
