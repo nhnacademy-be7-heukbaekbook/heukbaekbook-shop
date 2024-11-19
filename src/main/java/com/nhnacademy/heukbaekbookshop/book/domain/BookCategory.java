@@ -2,6 +2,7 @@ package com.nhnacademy.heukbaekbookshop.book.domain;
 
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,41 +11,32 @@ import java.util.Objects;
 
 @Entity
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@IdClass(BookCategoryId.class)
 @Table(name = "books_categories")
 public class BookCategory {
 
-    @EmbeddedId
-    private BookCategoryPK id;
+    @Id
+    @Column(name = "book_id", insertable = false, updatable = false)
+    private Long bookId;
+
+    @Id
+    @Column(name = "category_id", insertable = false, updatable = false)
+    private Long categoryId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("bookId")
-    @JoinColumn(name = "book_id")
+    @Setter
+    @JoinColumn(name = "book_id", referencedColumnName = "book_id", insertable = false, updatable = false)
     private Book book;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("categoryId")
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", referencedColumnName = "category_id", insertable = false, updatable = false)
     private Category category;
 
     public BookCategory(Book book, Category category) {
+        this.bookId = book.getId();
+        this.categoryId = category.getId();
         this.book = book;
         this.category = category;
-        this.id = new BookCategoryPK(book.getId(), category.getId());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        BookCategory that = (BookCategory) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
     }
 }
