@@ -25,7 +25,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,24 +45,47 @@ public class BookSearchServiceImpl implements BookSearchService {
                 SearchCondition.valueOf(searchRequest.searchCondition().toUpperCase()),
                 SortCondition.valueOf(searchRequest.sortCondition().toUpperCase())
         );
+
+        bookDocuments.forEach(document -> incrementSearchCount(document.getId()));
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
 
-        return bookDocuments.map(document -> new BookResponse(
-                document.getId(),
-                document.getTitle(),
-                dateFormat.format(document.getPublishedAt()),      // 날짜를 문자열로 변환하여 사용
-                document.getSalePrice(),
-                document.getDiscountRate(),
-                document.getThumbnailUrl(),// 새로 추가된 thumbnailUrl 사용
-                document.getContributors(),         // 기여자 목록을 `ContributorSummaryResponse`로 변환하는 메서드 호출
-                document.getPublisher() // 출판사 정보를 `PublisherSummaryResponse`로 변환
-        ));
+        return bookDocuments.map(document -> {
+            Book book = bookRepository.findById(document.getId()).orElseThrow(() ->
+                    new RuntimeException("Book not found with ID: " + document.getId())
+            );
+
+            return new BookResponse(
+                    book.getId(),
+                    book.getTitle(),
+                    dateFormat.format(book.getPublishedAt()),
+                    bookFormatter.formatPrice(getSalePrice(book.getPrice(), book.getDiscountRate())), // BigDecimal -> String 변환
+                    book.getDiscountRate(),
+                    book.getBookImages().stream()
+                            .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
+                            .map(Image::getUrl)
+                            .findFirst()
+                            .orElse("no-image"),
+                    book.getContributors().stream()
+                            .map(contributor -> new ContributorSummaryResponse(
+                                    contributor.getContributor().getId(),
+                                    contributor.getContributor().getName()
+                            ))
+                            .collect(Collectors.toList()),
+                    new PublisherSummaryResponse(
+                            book.getPublisher().getId(),
+                            book.getPublisher().getName()
+                    )
+            );
+        });
     }
+
     @Scheduled(initialDelay = 0, fixedDelay = 30 * 10000) //3분
     @Transactional
     public void updateBookIndex() {
         List<Book> allBooks = bookRepository.findAllByStatusNot(BookStatus.DELETED);
         List<Book> deletedBooks = bookRepository.findAllByStatus(BookStatus.DELETED);
+
         if (!deletedBooks.isEmpty()) {
             List<Long> deletedBookIds = deletedBooks.stream()
                     .map(Book::getId)
@@ -70,17 +93,25 @@ public class BookSearchServiceImpl implements BookSearchService {
             bookDocumentRepository.deleteAllById(deletedBookIds);
             System.out.println("Deleted books from index: " + deletedBookIds);
         }
+
         if (allBooks.isEmpty()) {
             System.out.println("No books found in the database.");
             return;
         }
 
-        List<BookDocument> bookDocuments = allBooks.stream()
-                .map(this::bookToBookDocument)
-                .collect(Collectors.toList());
+        List<BookDocument> bookDocuments = allBooks.stream().map(book -> {
+            BookDocument existingDocument = bookDocumentRepository.findById(book.getId()).orElse(null);
+            int searchCount = (existingDocument != null) ? existingDocument.getSearchCount() : 0;
+
+            BookDocument newDocument = bookToBookDocument(book);
+            newDocument.setSearchCount(searchCount);
+
+            return newDocument;
+        }).collect(Collectors.toList());
 
         bookDocumentRepository.saveAll(bookDocuments);
     }
+
 
 
     private BookDocument bookToBookDocument(Book book) {
@@ -88,7 +119,7 @@ public class BookSearchServiceImpl implements BookSearchService {
                 book.getId(),
                 book.getTitle(),
                 book.getPublishedAt(),
-                bookFormatter.formatPrice(getSalePrice(book.getPrice(), book.getDiscountRate())),
+                intgetSalePrice(book.getPrice(), book.getDiscountRate()),
                 book.getDiscountRate(),
                 book.getBookImages().stream()
                         .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
@@ -115,6 +146,14 @@ public class BookSearchServiceImpl implements BookSearchService {
         return price.multiply(BigDecimal.ONE.subtract(discountRate)).setScale(2, RoundingMode.HALF_UP);
     }
 
+    private int intgetSalePrice(BigDecimal price, double discountRate) {
+        // 할인된 가격 계산
+        BigDecimal discount = price.multiply(BigDecimal.valueOf(1 - discountRate / 100));
+
+        // 소수점 반올림하여 정수형으로 반환
+        return discount.setScale(0, RoundingMode.HALF_UP).intValue();
+    }
+
     // Book 클래스에 추가
     public List<String> getAuthorNames(Book book) {
         return book.getContributors().stream()
@@ -122,6 +161,18 @@ public class BookSearchServiceImpl implements BookSearchService {
                 .map(bookContributor -> bookContributor.getContributor().getName())
                 .collect(Collectors.toList());
     }
+
+    public void incrementSearchCount(Long bookId) {
+        Optional<BookDocument> bookDocumentOpt = bookDocumentRepository.findById(bookId);
+        if (bookDocumentOpt.isPresent()) {
+            BookDocument bookDocument = bookDocumentOpt.get();
+            bookDocument.setSearchCount(bookDocument.getSearchCount() + 1);
+            bookDocumentRepository.save(bookDocument);
+        } else {
+            throw new RuntimeException("Book not found with ID: " + bookId);
+        }
+    }
+
 
 
 }

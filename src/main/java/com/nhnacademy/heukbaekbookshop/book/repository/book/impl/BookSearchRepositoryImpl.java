@@ -72,6 +72,7 @@ public class BookSearchRepositoryImpl implements BookSearchRepository {
 
     private Sort resolveSort(SortCondition sortCondition) {
         return switch (sortCondition) {
+            case POPULARITY -> Sort.by(Sort.Order.desc("searchCount"));
             case NEWEST -> Sort.by(Sort.Order.desc("publishedAt"));
             case LOWEST_PRICE -> Sort.by(Sort.Order.asc("salePrice"));
             case HIGHEST_PRICE -> Sort.by(Sort.Order.desc("salePrice"));

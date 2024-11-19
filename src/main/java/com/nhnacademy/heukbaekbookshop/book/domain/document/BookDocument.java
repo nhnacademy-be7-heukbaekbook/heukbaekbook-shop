@@ -2,8 +2,11 @@ package com.nhnacademy.heukbaekbookshop.book.domain.document;
 
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
+import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -13,7 +16,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import java.util.Date;
 import java.util.List;
 @Getter
-@Document(indexName = "${spring.elasticsearch.document.index-name}")
+@Document(indexName = "hbbooks_dev")
 public class BookDocument {
 
     @Id
@@ -25,8 +28,13 @@ public class BookDocument {
     @Field(type = FieldType.Date)
     private Date publishedAt;
 
-    @Field(type = FieldType.Text)
-    private String salePrice;
+//    @Field(type = FieldType.Text)
+//    private String salePrice;
+
+    @Field(type = FieldType.Integer)
+    private Integer salePrice;
+
+
 
     @Field(type = FieldType.Float)
     private double discountRate;
@@ -47,6 +55,14 @@ public class BookDocument {
     private PublisherSummaryResponse publisher;
 
 
+    // 새로운 필드 추가
+    @Setter
+    @Field(type = FieldType.Integer)
+    private int searchCount;
+
+
+
+
     // 나중에 추가
 //    @Field(type = FieldType.Integer)
 //    private int reviewCount;
@@ -55,7 +71,7 @@ public class BookDocument {
 //    private int reviewScore;
 
 
-    public BookDocument(Long id, String title, Date publishedAt, String salePrice, double discountRate,
+    public BookDocument(Long id, String title, Date publishedAt, int salePrice, double discountRate,
                         String thumbnailUrl, List<String> author, String description, List<ContributorSummaryResponse> contributors,
                         PublisherSummaryResponse publisher) {
         this.id = id;
@@ -73,3 +89,5 @@ public class BookDocument {
 //        this.reviewScore = reviewScore;
 
 }
+
+
