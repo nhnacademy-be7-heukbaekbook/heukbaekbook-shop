@@ -44,4 +44,8 @@ public class Payment {
     @Column(name = "payment_price")
     protected BigDecimal price;
 
+    @NotNull
+    @Column(name = "payment_key")
+    private String paymentKey;
+
 }

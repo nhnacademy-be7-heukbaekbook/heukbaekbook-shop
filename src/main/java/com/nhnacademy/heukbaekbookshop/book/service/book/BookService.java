@@ -118,7 +118,7 @@ public class BookService {
         book.setTitle(request.title());
         book.setIndex(request.index());
         book.setDescription(request.description());
-        book.setPublishedAt(Date.valueOf(String.valueOf(request.publication())));
+        book.setPublishedAt(Date.valueOf(String.valueOf(request.publishedAt())));
         book.setIsbn(request.isbn());
         book.setPrice(BigDecimal.valueOf(request.standardPrice()));
         book.setDiscountRate(request.discountRate());
@@ -210,7 +210,7 @@ public class BookService {
         book.setTitle(request.title());
         book.setIndex(request.index());
         book.setDescription(request.description());
-        book.setPublishedAt(Date.valueOf(request.publication()));
+        book.setPublishedAt(Date.valueOf(request.publishedAt()));
         book.setIsbn(request.isbn());
         book.setPackable(request.isPackable());
         book.setStock(request.stock());
