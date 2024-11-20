@@ -74,7 +74,7 @@ public class BookController {
     @GetMapping("/detail")
     public BookViewResponse getBookDetail(@RequestParam Long bookId) {
         log.info("bookId: {}", bookId);
-
+        bookService.increasePopularity(bookId);
         return bookService.getBookDetail(bookId);
     }
 }
