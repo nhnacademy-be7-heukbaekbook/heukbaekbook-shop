@@ -6,7 +6,7 @@ public record BookUpdateResponse(
         String title,
         String index,
         String description,
-        String publication,
+        String publishedAt,
         String isbn,
         String imageUrl,
         boolean isPackable,
