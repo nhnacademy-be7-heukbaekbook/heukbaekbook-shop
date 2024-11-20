@@ -3,16 +3,12 @@ package com.nhnacademy.heukbaekbookshop.couponset.coupon.domain;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "members_coupons")
@@ -37,10 +33,19 @@ public class MemberCoupon {
 
     @NotNull
     @Column(name = "coupon_created_at")
-    private LocalDateTime createdAt;
+    private LocalDateTime issuedAt;
 
     @NotNull
-    @Column(name = "coupon_expiration_at")
+    @Column(name = "coupon_expiration_date")
     private LocalDateTime expirationAt;
 
+
+    @Builder
+    private MemberCoupon(Member member, Coupon coupon, LocalDateTime issuedAt, LocalDateTime expirationAt) {
+        this.member = member;
+        this.coupon = coupon;
+        this.issuedAt = issuedAt;
+        this.expirationAt = expirationAt;
+        this.isCouponUsed = false;
+    }
 }

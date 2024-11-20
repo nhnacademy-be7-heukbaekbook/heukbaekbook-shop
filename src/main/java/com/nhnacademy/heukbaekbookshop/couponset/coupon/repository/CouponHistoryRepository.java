@@ -6,7 +6,8 @@ import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CouponHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CouponHistoryRepository extends JpaRepository<CouponHistory, Long> {
-    Page<CouponHistory> findByMemberCouponId(Pageable pageable, Long memberCouponId);
+    // 사용자 ID를 기준으로 쿠폰 사용 내역 조회
+    Page<CouponHistory> findByMemberCoupon_Member_Id(Pageable pageable, Long memberId);
 }
 
 
