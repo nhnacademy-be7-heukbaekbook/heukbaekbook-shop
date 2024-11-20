@@ -1,4 +1,4 @@
-package com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.service;
+package com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.service.impl;
 
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
@@ -7,6 +7,7 @@ import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyRe
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.mapper.CouponPolicyMapper;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.exception.CouponPolicyNotFoundException;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.repository.CouponPolicyRepository;
+import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.service.CouponPolicyService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;

@@ -54,13 +54,6 @@ public class Coupon {
     @Column(name = "coupon_created_at")
     private LocalDateTime couponCreatedAt;
 
-    @OneToOne(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
-    private BookCoupon bookCoupon;
-
-    @OneToOne(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
-    private CategoryCoupon categoryCoupon;
-
-
     public Coupon(CouponPolicy couponPolicy, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription) {
         this.couponPolicy = couponPolicy;
         this.couponStatus = CouponStatus.ABLE;

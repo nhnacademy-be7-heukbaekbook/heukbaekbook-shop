@@ -14,13 +14,9 @@ import java.time.LocalDateTime;
 @Table(name = "books_coupons")
 public class BookCoupon extends Coupon {
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
     private Book book;
-
-    @OneToOne
-    @JoinColumn(name = "coupon_id")
-    private Coupon coupon;
 
     public BookCoupon(CouponPolicy couponPolicy, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription, Book book) {
         super(couponPolicy, availableDuration, couponTimeStart, couponTimeEnd, couponName, couponDescription);
