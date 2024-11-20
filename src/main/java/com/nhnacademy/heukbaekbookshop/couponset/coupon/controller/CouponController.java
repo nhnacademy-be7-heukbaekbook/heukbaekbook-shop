@@ -4,7 +4,7 @@ import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CouponStatus;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request.CouponRequest;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.service.CouponService;
-import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
+import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DisCountType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -41,7 +41,7 @@ public class CouponController {
     }
 
     @GetMapping("/type/{type}")
-    public ResponseEntity<Page<CouponResponse>> getCouponsByType(@PathVariable("type") DiscountType discountType, Pageable pageable) {
+    public ResponseEntity<Page<CouponResponse>> getCouponsByType(@PathVariable("type") DisCountType discountType, Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(couponService.getCouponsByType(discountType,pageable)
                 );

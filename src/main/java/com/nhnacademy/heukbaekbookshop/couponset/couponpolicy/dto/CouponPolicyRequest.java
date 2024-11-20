@@ -1,13 +1,13 @@
 package com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto;
 
-import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
+import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DisCountType;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
 public record CouponPolicyRequest(
    @NotNull
-   DiscountType discountType,
+   DisCountType discountType,
 
    @NotNull
    BigDecimal discountAmount,

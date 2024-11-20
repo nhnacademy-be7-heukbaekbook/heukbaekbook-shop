@@ -24,7 +24,7 @@ public class CouponPolicy {
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "discount_type")
-    private DiscountType discountType;
+    private DisCountType discountType;
 
     @NotNull
     @Column(name = "discount_amount")
@@ -38,7 +38,7 @@ public class CouponPolicy {
     private BigDecimal maximumPurchaseAmount;
 
     @Builder
-    public CouponPolicy(DiscountType disCountType, BigDecimal discountAmount, BigDecimal minimumPurchaseAmount, BigDecimal maximumPurchaseAmount) {
+    public CouponPolicy(DisCountType disCountType, BigDecimal discountAmount, BigDecimal minimumPurchaseAmount, BigDecimal maximumPurchaseAmount) {
         this.discountType = disCountType;
         this.discountAmount = discountAmount;
         this.minimumPurchaseAmount = minimumPurchaseAmount;

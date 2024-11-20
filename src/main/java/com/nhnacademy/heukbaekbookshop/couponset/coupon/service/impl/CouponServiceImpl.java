@@ -6,10 +6,9 @@ import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.mapper.CouponMapper;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request.CouponRequest;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.exception.CouponNotFoundException;
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.repository.MemberCouponRepository;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.service.CouponService;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
-import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
+import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DisCountType;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.exception.CouponPolicyNotFoundException;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.repository.CouponPolicyRepository;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +50,7 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public Page<CouponResponse> getCouponsByType(DiscountType discountType, Pageable pageable) {
+    public Page<CouponResponse> getCouponsByType(DisCountType discountType, Pageable pageable) {
         Page<Coupon> coupons = couponRepository.findAllByDiscountType(discountType, pageable);
         return CouponMapper.fromPageableEntity(coupons, pageable);
     }
