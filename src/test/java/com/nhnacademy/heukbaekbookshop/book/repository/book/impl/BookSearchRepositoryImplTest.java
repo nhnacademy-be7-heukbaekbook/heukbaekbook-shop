@@ -54,13 +54,15 @@ class BookSearchRepositoryImplTest {
                 1L,
                 "Test Title",
                 publishedAt,
-                "100",
+                100,
                 10.0,
                 "test-thumbnail-url",
                 Arrays.asList("Author1", "Author2"), // 예시 저자 리스트
                 "Test Description",
                 Arrays.asList(new ContributorSummaryResponse(1L, "Contributor Name")), // 예시 기여자 리스트
-                new PublisherSummaryResponse(1L, "Publisher Name") // 예시 출판사
+                new PublisherSummaryResponse(1L, "Publisher Name"), // 예시 출판사
+                1L,
+                null
         );
 
 
@@ -95,7 +97,7 @@ class BookSearchRepositoryImplTest {
                 .thenReturn(searchHits);
 
         // when
-        Page<BookDocument> result = bookSearchRepository.search(pageable, keyword, searchCondition, sortCondition);
+        Page<BookDocument> result = bookSearchRepository.search(pageable, keyword, searchCondition, sortCondition,null);
 
         // then
         assertThat(result).isNotNull();

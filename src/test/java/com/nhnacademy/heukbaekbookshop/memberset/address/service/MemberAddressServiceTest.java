@@ -103,11 +103,11 @@ class MemberAddressServiceTest {
         MemberAddressRequest testMemberAddressRequest = new MemberAddressRequest(testPostalCode, testRoadNameAddress, testDetailAddress, testAlias);
         when(memberRepository.findById(testCustomerId)).thenReturn(Optional.of(testMember));
         when(memberAddressRepository.countByMemberId(testCustomerId)).thenReturn(1L);
-        when(memberAddressRepository.existsByPostalCodeAndDetailAddress(any(), any())).thenReturn(true);
+        when(memberAddressRepository.existsByMemberAndPostalCodeAndDetailAddress(any(),any(), any())).thenReturn(true);
 
         // when & then
         assertThrows(MemberAddressAlreadyExistsException.class, () -> memberAddressService.createMemberAddress(testCustomerId, testMemberAddressRequest));
-        verify(memberAddressRepository, times(1)).existsByPostalCodeAndDetailAddress(testPostalCode, testDetailAddress);
+        verify(memberAddressRepository, times(1)).existsByMemberAndPostalCodeAndDetailAddress(testMember,testPostalCode, testDetailAddress);
     }
 
     @Test
@@ -119,7 +119,7 @@ class MemberAddressServiceTest {
 
         when(memberRepository.findById(any())).thenReturn(Optional.of(testMember));
         when(memberAddressRepository.countByMemberId(any())).thenReturn(1L);
-        when(memberAddressRepository.existsByPostalCodeAndDetailAddress(any(), any())).thenReturn(false);
+        when(memberAddressRepository.existsByMemberAndPostalCodeAndDetailAddress(any(),any(), any())).thenReturn(false);
         when(memberAddressRepository.save(any(MemberAddress.class))).thenReturn(testMemberAddress);
 
         // when

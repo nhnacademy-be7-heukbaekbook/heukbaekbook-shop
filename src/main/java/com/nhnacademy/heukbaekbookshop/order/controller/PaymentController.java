@@ -2,6 +2,7 @@ package com.nhnacademy.heukbaekbookshop.order.controller;
 
 import com.nhnacademy.heukbaekbookshop.order.dto.request.PaymentApprovalRequest;
 import com.nhnacademy.heukbaekbookshop.order.dto.request.PaymentCancelRequest;
+import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentApprovalFailResponse;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentApprovalResponse;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentCancelResponse;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentDetailResponse;
@@ -23,14 +24,14 @@ public class PaymentController {
     }
 
     @PostMapping("/confirm")
-    public ResponseEntity<PaymentApprovalResponse> confirmPayment(@RequestBody PaymentApprovalRequest request) {
+    public ResponseEntity<?> confirmPayment(@RequestBody PaymentApprovalRequest request) {
         PaymentApprovalResponse response = null;
         try {
             response = paymentService.approvePayment(request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            response = new PaymentApprovalResponse("결제에 실패하였습니다.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new PaymentApprovalFailResponse("결제에 실패하였습니다."));
         }
     }
 

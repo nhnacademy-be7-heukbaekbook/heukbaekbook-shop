@@ -1,9 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.order.service;
 
 import com.nhnacademy.heukbaekbookshop.memberset.customer.repository.CustomerRepository;
-import com.nhnacademy.heukbaekbookshop.order.domain.Payment;
-import com.nhnacademy.heukbaekbookshop.order.domain.Refund;
-import com.nhnacademy.heukbaekbookshop.order.domain.RefundStatus;
+import com.nhnacademy.heukbaekbookshop.order.domain.*;
 import com.nhnacademy.heukbaekbookshop.order.dto.request.PaymentApprovalRequest;
 import com.nhnacademy.heukbaekbookshop.order.dto.request.PaymentCancelRequest;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.*;
@@ -20,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -40,13 +40,20 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
     private final RestTemplate restTemplate;
+    private final PaymentTypeRepository paymentTypeRepository;
 
-    public PaymentService(RefundRepository refundRepository, CustomerRepository customerRepository, PaymentRepository paymentRepository, OrderRepository orderRepository, PaymentTypeRepository paymentTypeRepository, RestTemplate restTemplate) {
+    public PaymentService(RefundRepository refundRepository,
+                          CustomerRepository customerRepository,
+                          PaymentRepository paymentRepository,
+                          OrderRepository orderRepository,
+                          PaymentTypeRepository paymentTypeRepository,
+                          RestTemplate restTemplate) {
         this.refundRepository = refundRepository;
         this.customerRepository = customerRepository;
         this.paymentRepository = paymentRepository;
         this.orderRepository = orderRepository;
         this.restTemplate = restTemplate;
+        this.paymentTypeRepository = paymentTypeRepository;
     }
 
     private HttpHeaders createHttpHeaders() {
@@ -87,35 +94,45 @@ public class PaymentService {
         String url = "https://api.tosspayments.com/v1/payments/confirm";
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("paymentKey", request.paymentKey());
-        requestBody.put("orderId", request.paymentOrderId());
+        requestBody.put("orderId", request.orderId());
         requestBody.put("amount", request.amount());
 
         TossPaymentApprovalResponse tossResponse = executePostRequest(url, requestBody, TossPaymentApprovalResponse.class);
 
-//        // 결제 정보 생성 로직 추가
-//        Order order = orderRepository.findById(request.orderId())
-//                .orElseThrow(() -> new PaymentFailureException("주문 정보를 찾을 수 없습니다."));
-//
-//        PaymentType paymentType = paymentTypeRepository.findByName(tossResponse.method())
-//                .orElseGet(() -> {
-//                    PaymentType newPaymentType = new PaymentType();
-//                    newPaymentType.setName(tossResponse.method());
-//                    return paymentTypeRepository.save(newPaymentType);
-//                });
-//
-//        Payment payment = new Payment();
-//        payment.setOrder(order);
-//        payment.setPaymentType(paymentType);
-//        payment.setRequestedAt(LocalDateTime.parse(tossResponse.requestedAt()));
-//        payment.setApprovedAt(LocalDateTime.parse(tossResponse.approvedAt()));
-//        payment.setPrice(BigDecimal.valueOf(request.amount()));
-//        // payment.setPaymentKey(tossResponse.paymentKey());
-//
-//        order.setStatus(OrderStatus.PAYMENT_COMPLETED);
-//
-//        paymentRepository.save(payment);
+        Order order = orderRepository.findByTossOrderId(request.orderId())
+                .orElseThrow(() -> new PaymentFailureException("주문 정보를 찾을 수 없습니다."));
 
-        return new PaymentApprovalResponse("결제에 성공하였습니다.");
+        PaymentType paymentType = paymentTypeRepository.findByName(tossResponse.method())
+                .orElseGet(() -> {
+                    PaymentType newPaymentType = new PaymentType();
+                    newPaymentType.setName(tossResponse.method());
+                    return paymentTypeRepository.save(newPaymentType);
+                });
+
+
+        Payment payment = new Payment();
+        payment.setOrder(order);
+        payment.setPaymentType(paymentType);
+        payment.setRequestedAt(LocalDateTime.parse(tossResponse.requestedAt()));
+        payment.setApprovedAt(LocalDateTime.parse(tossResponse.approvedAt()));
+        payment.setPrice(BigDecimal.valueOf(tossResponse.totalAmount()));
+        payment.setPaymentKey(tossResponse.paymentKey());
+
+        order.setStatus(OrderStatus.PAYMENT_COMPLETED);
+
+        paymentRepository.save(payment);
+
+        return new PaymentApprovalResponse(
+                order.getCreatedAt().toString(),
+                order.getStatus().name(),
+                order.getCustomerName(),
+                order.getCustomerPhoneNumber(),
+                order.getCustomerEmail(),
+                tossResponse.method(),
+                tossResponse.requestedAt(),
+                tossResponse.approvedAt(),
+                tossResponse.totalAmount(),
+                "결제에 성공하였습니다.");
     }
 
     public PaymentCancelResponse cancelPayment(String paymentKey, PaymentCancelRequest request) {

@@ -10,6 +10,7 @@ import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MemberRespo
 import com.nhnacademy.heukbaekbookshop.memberset.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,8 +25,8 @@ import java.util.List;
  */
 @RestController
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @RequestMapping("/api/members")
+@Slf4j
 public class MemberController {
 
     private final MemberService memberService;
@@ -40,7 +41,6 @@ public class MemberController {
      * @return 성공 시, 응답코드 201 반환합니다.
      */
     @PostMapping
-    @Transactional
     public ResponseEntity<MemberResponse> createMember(@Valid @RequestBody MemberCreateRequest memberCreateRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(memberService.createMember(memberCreateRequest));
@@ -54,6 +54,7 @@ public class MemberController {
      */
     @GetMapping
     public ResponseEntity<MemberResponse> getMember(@RequestHeader(X_USER_ID) Long customerId) {
+        log.info("customerId: {}", customerId);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(memberService.getMember(customerId));
     }
@@ -66,7 +67,6 @@ public class MemberController {
      * @return 성공 시, 응답코드 200 반환합니다.
      */
     @PutMapping
-    @Transactional
     public ResponseEntity<MemberResponse> updateMember(@RequestHeader(X_USER_ID) Long customerId, @Valid @RequestBody MemberUpdateRequest memberUpdateRequest) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(memberService.updateMember(customerId, memberUpdateRequest));
@@ -79,7 +79,6 @@ public class MemberController {
      * @return 성공 시, 응답코드 204 반환합니다.
      */
     @DeleteMapping
-    @Transactional
     public ResponseEntity<Void> deleteMember(@RequestHeader(X_USER_ID) Long customerId){
         memberService.changeMemberStatus(customerId, MemberStatus.WITHDRAWN);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.category.domain;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.BookCategory;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CategoryCoupon;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -39,6 +40,9 @@ public class Category {
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookCategory> bookCategories = new HashSet<>();
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<CategoryCoupon> categoryCoupons = new HashSet<>();
 
     public void addBookCategory(BookCategory bookCategory) {
         this.bookCategories.add(bookCategory);

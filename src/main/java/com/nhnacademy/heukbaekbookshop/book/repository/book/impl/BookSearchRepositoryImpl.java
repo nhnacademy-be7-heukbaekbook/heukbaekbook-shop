@@ -5,6 +5,8 @@ import com.nhnacademy.heukbaekbookshop.book.domain.SortCondition;
 import com.nhnacademy.heukbaekbookshop.book.domain.document.BookDocument;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookSearchRepository;
 import com.nhnacademy.heukbaekbookshop.book.util.SynonymUtil;
+import com.nhnacademy.heukbaekbookshop.category.domain.Category;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -28,9 +30,8 @@ public class BookSearchRepositoryImpl implements BookSearchRepository {
     }
 
     @Override
-    public Page<BookDocument> search(Pageable pageable, String keyword, SearchCondition searchCondition, SortCondition sortCondition) {
+    public Page<BookDocument> search(Pageable pageable, String keyword, SearchCondition searchCondition, SortCondition sortCondition, Long categoryId) {
         Criteria criteria = new Criteria();
-//        criteria = criteria.and(Criteria.where("status").in("IN_STOCK"));
 
         String[] keywords = keyword.trim().split("\\s+");
 
@@ -54,6 +55,9 @@ public class BookSearchRepositoryImpl implements BookSearchRepository {
                         .or(Criteria.where(searchCondition.name().toLowerCase()).contains(synonym));
             }
         }
+        if (categoryId != null) {
+            criteria = criteria.and(Criteria.where("categoryId").in(categoryId));
+        }
 
         CriteriaQuery query = new CriteriaQuery(criteria)
                 .setPageable(pageable)
@@ -72,7 +76,7 @@ public class BookSearchRepositoryImpl implements BookSearchRepository {
 
     private Sort resolveSort(SortCondition sortCondition) {
         return switch (sortCondition) {
-            case POPULARITY -> Sort.by(Sort.Order.desc("searchCount"));
+            case POPULARITY -> Sort.by(Sort.Order.desc("popularity"));
             case NEWEST -> Sort.by(Sort.Order.desc("publishedAt"));
             case LOWEST_PRICE -> Sort.by(Sort.Order.asc("salePrice"));
             case HIGHEST_PRICE -> Sort.by(Sort.Order.desc("salePrice"));

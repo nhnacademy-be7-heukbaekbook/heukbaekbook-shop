@@ -2,6 +2,7 @@ package com.nhnacademy.heukbaekbookshop.book.domain.document;
 
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
+import com.querydsl.codegen.Keywords;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.Getter;
@@ -16,7 +17,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import java.util.Date;
 import java.util.List;
 @Getter
-@Document(indexName = "hbbooks_dev")
+@Document(indexName = "hbbooks_dev") //배포할때는 hbbooks_prod!!!!!!!!!
 public class BookDocument {
 
     @Id
@@ -33,8 +34,6 @@ public class BookDocument {
 
     @Field(type = FieldType.Integer)
     private Integer salePrice;
-
-
 
     @Field(type = FieldType.Float)
     private double discountRate;
@@ -55,13 +54,11 @@ public class BookDocument {
     private PublisherSummaryResponse publisher;
 
 
-    // 새로운 필드 추가
-    @Setter
-    @Field(type = FieldType.Integer)
-    private int searchCount;
+    @Field(type = FieldType.Long)
+    private Long popularity;
 
-
-
+    @Field(type = FieldType.Long)
+    private List<Long> categoryId;
 
     // 나중에 추가
 //    @Field(type = FieldType.Integer)
@@ -73,7 +70,7 @@ public class BookDocument {
 
     public BookDocument(Long id, String title, Date publishedAt, int salePrice, double discountRate,
                         String thumbnailUrl, List<String> author, String description, List<ContributorSummaryResponse> contributors,
-                        PublisherSummaryResponse publisher) {
+                        PublisherSummaryResponse publisher, Long popularity, List<Long> categoryId) {
         this.id = id;
         this.title = title;
         this.publishedAt = publishedAt;
@@ -84,6 +81,8 @@ public class BookDocument {
         this.description = description;
         this.contributors = contributors;
         this.publisher = publisher;
+        this.popularity = popularity;
+        this.categoryId = categoryId;
     }
 //        this.reviewCount = reviewCount; 나중에 추가
 //        this.reviewScore = reviewScore;
