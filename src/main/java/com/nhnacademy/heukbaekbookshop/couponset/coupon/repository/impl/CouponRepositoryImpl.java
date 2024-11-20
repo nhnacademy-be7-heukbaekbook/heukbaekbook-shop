@@ -3,7 +3,8 @@ package com.nhnacademy.heukbaekbookshop.couponset.coupon.repository.impl;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.Coupon;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CouponStatus;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.repository.CouponRepositoryCustom;
-import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DisCountType;
+import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
+import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
@@ -60,17 +61,17 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
 
 
     @Override
-    public Page<Coupon> findAllByDiscountType(DisCountType disCountType, Pageable pageable) {
+    public Page<Coupon> findAllByDiscountType(DiscountType discountType, Pageable pageable) {
         List<Coupon> content = queryFactory
                 .selectFrom(coupon)
                 .join(coupon.couponPolicy, couponPolicy).fetchJoin()
-                .where(coupon.couponPolicy.discountType.eq(disCountType))
+                .where(coupon.couponPolicy.discountType.eq(discountType))
                 .fetch();
 
         long total = queryFactory
                 .select(coupon.count())
                 .from(coupon)
-                .where(coupon.couponPolicy.discountType.eq(disCountType))
+                .where(coupon.couponPolicy.discountType.eq(discountType))
                 .fetchOne();
 
         return new PageImpl<>(content, pageable,total);

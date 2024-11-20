@@ -1,7 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.service;
 
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
-import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DisCountType;
+import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyRequest;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.mapper.CouponPolicyMapper;
@@ -45,9 +45,9 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
     }
 
     @Override
-    public Page<CouponPolicyResponse> getAllCouponPoliciesByType(DisCountType disCountType, Pageable pageable) {
+    public Page<CouponPolicyResponse> getAllCouponPoliciesByType(DiscountType discountType, Pageable pageable) {
         return CouponPolicyMapper.fromPageableEntity(
-                couponPolicyRepository.findCouponPolicyByDiscountTypeOrderByMinimumPurchaseAmount(disCountType, pageable)
+                couponPolicyRepository.findCouponPolicyByDiscountTypeOrderByMinimumPurchaseAmount(discountType, pageable)
         );
     }
 

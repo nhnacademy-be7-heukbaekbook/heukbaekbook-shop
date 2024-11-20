@@ -4,11 +4,13 @@ import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolic
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -58,7 +60,7 @@ public class Coupon {
     @OneToOne(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
     private CategoryCoupon categoryCoupon;
 
-    @Builder
+
     public Coupon(CouponPolicy couponPolicy, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription) {
         this.couponPolicy = couponPolicy;
         this.couponStatus = CouponStatus.ABLE;

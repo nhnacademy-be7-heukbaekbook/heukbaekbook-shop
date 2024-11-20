@@ -63,7 +63,7 @@ public class CouponPolicyController {
     }
 
     /**
-     * 쿠폰 정책 전체 수정 요청 시 사용되는 메서드입니다.
+     * 쿠폰 정책 수정 요청 시 사용되는 메서드입니다.
      *
      * @param policyId  쿠폰 정책 수정 id 입니다.
      * @param couponPolicyRequest 쿠폰 정책 수정 dto 입니다.
@@ -76,7 +76,7 @@ public class CouponPolicyController {
     }
 
     /**
-     * 쿠폰 정책 전체 삭제 요청 시 사용되는 메서드입니다.
+     * 쿠폰 정책 삭제 요청 시 사용되는 메서드입니다.
      *
      * @param policyId 쿠폰 정책 삭제 id 입니다.
      * @return 성공시, 응답코드 204 반환합니다.

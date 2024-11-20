@@ -45,27 +45,24 @@ public class CouponMapper {
     }
 
     public static BookCoupon toBookCouponEntity(CouponRequest couponRequest, CouponPolicy couponPolicy, Book book) {
-        return BookCoupon.builder()
-                .couponPolicy(couponPolicy)
-                .availableDuration(couponRequest.availableDuration())
-                .couponTimeStart(couponRequest.couponTimeStart())
-                .couponTimeEnd(couponRequest.couponTimeEnd())
-                .couponName(couponRequest.couponName())
-                .couponDescription(couponRequest.couponDescription())
-                .book(book)
-                .build();
+        return new BookCoupon(couponPolicy,
+                couponRequest.availableDuration(),
+                couponRequest.couponTimeStart(),
+                couponRequest.couponTimeEnd(),
+                couponRequest.couponName(),
+                couponRequest.couponDescription(),
+                book
+        );
     }
 
     public static CategoryCoupon toCategoryCouponEntity(CouponRequest couponRequest, CouponPolicy couponPolicy, Category category) {
-        return CategoryCoupon.builder()
-                .couponPolicy(couponPolicy)
-                .availableDuration(couponRequest.availableDuration())
-                .couponTimeStart(couponRequest.couponTimeStart())
-                .couponTimeEnd(couponRequest.couponTimeEnd())
-                .couponName(couponRequest.couponName())
-                .couponDescription(couponRequest.couponDescription())
-                .category(category)
-                .build();
+        return new CategoryCoupon(couponPolicy,
+                couponRequest.availableDuration(),
+                couponRequest.couponTimeStart(),
+                couponRequest.couponTimeEnd(),
+                couponRequest.couponName(),
+                couponRequest.couponDescription(),
+                category);
     }
 
 }

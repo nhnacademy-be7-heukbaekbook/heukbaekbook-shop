@@ -5,14 +5,14 @@ import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
+@SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "categories_coupons")
 public class CategoryCoupon extends Coupon {
 
@@ -21,7 +21,6 @@ public class CategoryCoupon extends Coupon {
     private Category category;
 
 
-    @Builder
     public CategoryCoupon(CouponPolicy couponPolicy, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription, Category category) {
         super(couponPolicy, availableDuration, couponTimeStart, couponTimeEnd, couponName, couponDescription);
         this.category = category;

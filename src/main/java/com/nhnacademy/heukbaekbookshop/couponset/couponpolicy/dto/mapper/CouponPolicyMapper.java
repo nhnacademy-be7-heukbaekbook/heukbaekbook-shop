@@ -23,7 +23,7 @@ public class CouponPolicyMapper {
 
     public static CouponPolicy toEntity(CouponPolicyRequest couponPolicyRequest) {
         return CouponPolicy.builder()
-                .disCountType(couponPolicyRequest.discountType())
+                .discountType(couponPolicyRequest.discountType())
                 .discountAmount(couponPolicyRequest.discountAmount())
                 .minimumPurchaseAmount(couponPolicyRequest.minimumPurchaseAmount())
                 .maximumPurchaseAmount(couponPolicyRequest.maximumPurchaseAmount())
