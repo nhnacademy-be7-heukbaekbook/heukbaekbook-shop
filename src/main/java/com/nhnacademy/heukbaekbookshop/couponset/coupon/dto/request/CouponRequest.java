@@ -24,6 +24,10 @@ public record CouponRequest (
 
         @NotNull
         @Length(max = 200)
-        String couponDescription
+        String couponDescription,
+
+        Long bookId,
+
+        Long categoryId
 ){
 }

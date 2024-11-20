@@ -1,11 +1,11 @@
 package com.nhnacademy.heukbaekbookshop.couponset.coupon.domain;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
+import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -13,10 +13,16 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "books_coupons")
-public class BookCoupon extends Coupon {
+public class BookCoupon extends Coupon{
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "book_id")
     private Book book;
+
+    @Builder
+    public BookCoupon(CouponPolicy couponPolicy, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription, Book book) {
+        super(couponPolicy, availableDuration, couponTimeStart, couponTimeEnd, couponName, couponDescription);
+        this.book=book;
+    }
 
 }

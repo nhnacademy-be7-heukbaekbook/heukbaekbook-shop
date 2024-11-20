@@ -1,5 +1,9 @@
 package com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.mapper;
 
+import com.nhnacademy.heukbaekbookshop.book.domain.Book;
+import com.nhnacademy.heukbaekbookshop.category.domain.Category;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.BookCoupon;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CategoryCoupon;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.Coupon;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CouponStatus;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request.CouponRequest;
@@ -37,6 +41,30 @@ public class CouponMapper {
                 .couponTimeEnd(couponRequest.couponTimeEnd())
                 .couponName(couponRequest.couponName())
                 .couponDescription(couponRequest.couponDescription())
+                .build();
+    }
+
+    public static BookCoupon toBookCouponEntity(CouponRequest couponRequest, CouponPolicy couponPolicy, Book book) {
+        return BookCoupon.builder()
+                .couponPolicy(couponPolicy)
+                .availableDuration(couponRequest.availableDuration())
+                .couponTimeStart(couponRequest.couponTimeStart())
+                .couponTimeEnd(couponRequest.couponTimeEnd())
+                .couponName(couponRequest.couponName())
+                .couponDescription(couponRequest.couponDescription())
+                .book(book)
+                .build();
+    }
+
+    public static CategoryCoupon toCategoryCouponEntity(CouponRequest couponRequest, CouponPolicy couponPolicy, Category category) {
+        return CategoryCoupon.builder()
+                .couponPolicy(couponPolicy)
+                .availableDuration(couponRequest.availableDuration())
+                .couponTimeStart(couponRequest.couponTimeStart())
+                .couponTimeEnd(couponRequest.couponTimeEnd())
+                .couponName(couponRequest.couponName())
+                .couponDescription(couponRequest.couponDescription())
+                .category(category)
                 .build();
     }
 
