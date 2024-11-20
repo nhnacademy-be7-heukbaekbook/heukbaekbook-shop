@@ -10,6 +10,7 @@ import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MemberRespo
 import com.nhnacademy.heukbaekbookshop.memberset.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,8 +25,8 @@ import java.util.List;
  */
 @RestController
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @RequestMapping("/api/members")
+@Slf4j
 public class MemberController {
 
     private final MemberService memberService;
@@ -53,6 +54,7 @@ public class MemberController {
      */
     @GetMapping
     public ResponseEntity<MemberResponse> getMember(@RequestHeader(X_USER_ID) Long customerId) {
+        log.info("customerId: {}", customerId);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(memberService.getMember(customerId));
     }
