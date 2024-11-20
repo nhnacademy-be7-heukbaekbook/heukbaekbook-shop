@@ -87,7 +87,7 @@ public class PaymentService {
         String url = "https://api.tosspayments.com/v1/payments/confirm";
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("paymentKey", request.paymentKey());
-        requestBody.put("orderId", request.paymentOrderId());
+        requestBody.put("orderId", request.orderId());
         requestBody.put("amount", request.amount());
 
         TossPaymentApprovalResponse tossResponse = executePostRequest(url, requestBody, TossPaymentApprovalResponse.class);

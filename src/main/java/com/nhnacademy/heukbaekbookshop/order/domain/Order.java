@@ -69,6 +69,10 @@ public class Order {
     @Column(name = "order_customer_email")
     private String customerEmail;
 
+    @NotNull
+    @Column(name = "toss_order_id")
+    private String tossOrderId;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderBook> orderBooks;
 
