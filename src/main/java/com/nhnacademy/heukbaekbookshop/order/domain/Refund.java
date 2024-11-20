@@ -8,17 +8,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "returns")
-public class Return {
+@Table(name = "refunds")
+public class Refund {
 
     @Id
-    @Column(name = "return_id")
+    @Column(name = "refund_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -27,15 +29,18 @@ public class Return {
     private String reason;
 
     @NotNull
-    @Column(name = "return_request_at")
-    private LocalDateTime returnRequestAt;
+    @Column(name = "refund_requested_at")
+    private LocalDateTime refundRequestAt;
 
     @NotNull
-    @Column(name = "return_approved_at")
-    private LocalDateTime returnApprovedAt;
+    @Column(name = "refund_approved_at")
+    private LocalDateTime refundApprovedAt;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "return_status")
-    private ReturnStatus returnStatus;
+    @Column(name = "refund_status")
+    private RefundStatus refundStatus;
+
+    @OneToMany(mappedBy = "refund")
+    private Set<OrderBookRefund> orderBookReturns = new HashSet<>();
 }

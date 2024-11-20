@@ -1,6 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.book.controller;
 
-import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookCartResponse;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookDetailResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookViewResponse;
@@ -48,10 +48,11 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
+
     @GetMapping("/summary")
-    public ResponseEntity<List<BookCartResponse>> getBooksSummary(@RequestParam List<Long> bookIds) {
-        List<BookCartResponse> bookCartResponses = bookService.getBooksSummary(bookIds);
-        return ResponseEntity.ok(bookCartResponses);
+    public ResponseEntity<List<BookSummaryResponse>> getBooksSummary(@RequestParam List<Long> bookIds) {
+        List<BookSummaryResponse> bookSummaryResponses = bookService.getBooksSummary(bookIds);
+        return ResponseEntity.ok(bookSummaryResponses);
     }
 
     @GetMapping

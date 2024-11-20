@@ -8,7 +8,7 @@ public class SynonymUtil {
     private static final Map<String, List<String>> SYNONYM_MAP = new HashMap<>();
 
     static {
-        addSynonyms("자바", "좌봐");
+        addSynonyms("자바", "java");
         addSynonyms("학생", "제자");
         addSynonyms("구입", "구매");
         addSynonyms("예쁜", "아름다운");

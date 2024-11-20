@@ -12,9 +12,8 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.Date;
 import java.util.List;
-
 @Getter
-@Document(indexName = "books")
+@Document(indexName = "${spring.elasticsearch.document.index-name}")
 public class BookDocument {
 
     @Id
@@ -22,7 +21,6 @@ public class BookDocument {
 
     @Field(type = FieldType.Text)
     private String title;
-
 
     @Field(type = FieldType.Date)
     private Date publishedAt;
@@ -36,11 +34,18 @@ public class BookDocument {
     @Field(type = FieldType.Text)
     private String thumbnailUrl;
 
+    @Field(type = FieldType.Text)
+    private List<String> author;
+
+    @Field(type = FieldType.Text)
+    private String description;
+
     @Field(type = FieldType.Nested)
     private List<ContributorSummaryResponse> contributors;
 
     @Field(type = FieldType.Object)
     private PublisherSummaryResponse publisher;
+
 
     // 나중에 추가
 //    @Field(type = FieldType.Integer)
@@ -51,7 +56,7 @@ public class BookDocument {
 
 
     public BookDocument(Long id, String title, Date publishedAt, String salePrice, double discountRate,
-                        String thumbnailUrl, List<ContributorSummaryResponse> contributors,
+                        String thumbnailUrl, List<String> author, String description, List<ContributorSummaryResponse> contributors,
                         PublisherSummaryResponse publisher) {
         this.id = id;
         this.title = title;
@@ -59,6 +64,8 @@ public class BookDocument {
         this.salePrice = salePrice;
         this.discountRate = discountRate;
         this.thumbnailUrl = thumbnailUrl;
+        this.author = author;
+        this.description = description;
         this.contributors = contributors;
         this.publisher = publisher;
     }
