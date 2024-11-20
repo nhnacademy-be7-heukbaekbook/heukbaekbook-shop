@@ -1,4 +1,4 @@
-package com.nhnacademy.heukbaekbookshop.coupon.domain;
+package com.nhnacademy.heukbaekbookshop.couponset.coupon.domain;
 
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import jakarta.persistence.*;

@@ -21,7 +21,6 @@ import java.util.List;
  */
 @RestController
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @RequestMapping("/api/members/addresses")
 public class MemberAddressController {
 
@@ -36,7 +35,6 @@ public class MemberAddressController {
      * @param memberAddressRequest 회원 주소 생성 dto 입니다.
      * @return 성공 시, 응답코드 201 반환합니다.
      */
-    @Transactional
     @PostMapping
     public ResponseEntity<MemberAddressResponse> createMemberAddress(@RequestHeader(X_USER_ID) Long customerId, @Valid @RequestBody MemberAddressRequest memberAddressRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -74,7 +72,6 @@ public class MemberAddressController {
      * @param memberAddressRequest 회원 주소 수정 dto 입니다.
      * @return 성공 시, 응답코드 200 반환합니다.
      */
-    @Transactional
     @PutMapping("/{addressId}")
     public ResponseEntity<MemberAddressResponse> updateMemberAddress(@PathVariable Long addressId, @Valid @RequestBody MemberAddressRequest memberAddressRequest) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -87,7 +84,6 @@ public class MemberAddressController {
      * @param addressId 회원 주소 존재 확인을 위한 주소의 id 입니다.
      * @return 성공 시, 응답코드 204 반환합니다.
      */
-    @Transactional
     @DeleteMapping("/{addressId}")
     public ResponseEntity<Void> deleteMemberAddress(@PathVariable Long addressId) {
         memberAddressService.deleteMemberAddress(addressId);
