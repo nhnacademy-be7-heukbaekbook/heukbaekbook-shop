@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/coupon-policy")
+@RequestMapping("/api/admin/coupons/policy")
 public class CouponPolicyController {
 
     private final CouponPolicyService couponPolicyService;
