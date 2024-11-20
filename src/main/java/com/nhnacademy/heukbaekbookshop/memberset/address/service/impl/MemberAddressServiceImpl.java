@@ -47,7 +47,7 @@ public class MemberAddressServiceImpl implements MemberAddressService {
         if (countByMemberId(customerId) >= 10L) {
             throw new AddressLimitExceededException();
         }
-        if (memberAddressRepository.existsByPostalCodeAndDetailAddress(memberAddressRequest.postalCode(), memberAddressRequest.detailAddress().trim())) {
+        if (memberAddressRepository.existsByMemberAndPostalCodeAndDetailAddress(member, memberAddressRequest.postalCode(), memberAddressRequest.detailAddress().trim())) {
             throw new MemberAddressAlreadyExistsException();
         }
 
