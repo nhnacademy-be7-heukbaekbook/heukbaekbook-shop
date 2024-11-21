@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/admin/categories")
 public class CategoryAdminController {
@@ -54,4 +56,11 @@ public class CategoryAdminController {
         Page<CategoryDetailResponse> responses = categoryService.getCategories(pageable);
         return ResponseEntity.ok(responses);
     }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<String>> getCategoryPaths() {
+        List<String> responses = categoryService.getCategoryPaths();
+        return ResponseEntity.ok(responses);
+    }
+
 }
