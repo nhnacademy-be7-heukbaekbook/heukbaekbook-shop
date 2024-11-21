@@ -4,18 +4,21 @@ import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.Coupon;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CouponHistory;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.MemberCoupon;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.mapper.CouponMapper;
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponHistoryResponse;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request.CouponHistoryRequest;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.MemberCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.exception.CouponNotFoundException;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.exception.MemberCouponNotFoundException;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.repository.CouponHistoryRepository;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.repository.CouponRepository;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.repository.MemberCouponRepository;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.service.CouponHistoryService;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.service.MemberCouponService;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
+import com.nhnacademy.heukbaekbookshop.order.repository.OrderBookRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,17 +31,19 @@ import java.time.LocalDateTime;
 public class MemberCouponServiceImpl implements MemberCouponService {
 
     private final MemberCouponRepository memberCouponRepository;
-    private final CouponHistoryRepository couponHistoryRepository;
     private final MemberRepository memberRepository;
     private final CouponRepository couponRepository;
+    private final CouponHistoryRepository couponHistoryRepository;
+    private final OrderBookRepository orderBookRepository;
 
     @Override
+    @Transactional
     public MemberCouponResponse issueCoupon(Long memberId, Long couponId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(MemberNotFoundException::new);
 
         Coupon coupon = couponRepository.findById(couponId)
-                .orElseThrow(() -> new CouponNotFoundException("Coupon not found: " + couponId));
+                .orElseThrow(() -> new CouponNotFoundException("해당 ID의 쿠폰을 찾을 수 없습니다: " + couponId));
 
         MemberCoupon memberCoupon = CouponMapper.toMemberCouponEntity(member, coupon, coupon.getAvailableDuration());
 
@@ -46,34 +51,24 @@ public class MemberCouponServiceImpl implements MemberCouponService {
     }
 
     @Override
-    public MemberCouponResponse useCoupon(Long memberCouponId) {
+    @Transactional
+    public MemberCouponResponse useCoupon(Long memberCouponId, Long orderId, Long bookId) {
         MemberCoupon memberCoupon = memberCouponRepository.findById(memberCouponId)
-                .orElseThrow(() -> new MemberCouponNotFoundException("MemberCoupon not found: " + memberCouponId));
+                .orElseThrow(() -> new MemberCouponNotFoundException("해당 ID의 회원 쿠폰을 찾을 수 없습니다: " + memberCouponId));
 
         if (memberCoupon.isCouponUsed()) {
-            throw new IllegalStateException("Coupon is already used.");
+            throw new IllegalStateException("쿠폰이 이미 사용되었습니다.");
         }
 
-        // 쿠폰 사용 내역 저장
-        CouponHistory couponHistory = new CouponHistory(
-                null,
-                memberCoupon,
-                LocalDateTime.now(),
-                new OrderBook()
-        );
+        OrderBook orderBook = orderBookRepository.findByOrderIdAndBookId(orderId, bookId);
 
+        memberCoupon.markAsUsed();
+        memberCouponRepository.save(memberCoupon);
+
+        CouponHistory couponHistory = CouponMapper.toCouponHistoryEntity(memberCoupon, orderBook);
         couponHistoryRepository.save(couponHistory);
 
-        MemberCoupon updatedCoupon = new MemberCoupon(
-                memberCoupon.getId(),
-                memberCoupon.getMember(),
-                memberCoupon.getCoupon(),
-                true,
-                memberCoupon.getIssuedAt(),
-                memberCoupon.getExpirationAt()
-        );
-
-        return CouponMapper.fromMemberCouponEntity(memberCouponRepository.save(updatedCoupon));
+        return CouponMapper.fromMemberCouponEntity(memberCoupon);
     }
 
     @Override

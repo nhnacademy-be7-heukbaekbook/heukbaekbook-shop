@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -37,4 +36,9 @@ public class CouponHistory {
     })
     private OrderBook orderBook;
 
+    @ManyToOne
+    @JoinColumn(name = "coupon_id", referencedColumnName = "coupon_id")
+    private Coupon coupon;
 }
+
+

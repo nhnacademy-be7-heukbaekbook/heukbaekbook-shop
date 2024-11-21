@@ -48,4 +48,12 @@ public class MemberCoupon {
         this.expirationAt = expirationAt;
         this.isCouponUsed = false;
     }
+
+    public void markAsUsed() {
+        if (this.isCouponUsed) {
+            throw new IllegalStateException("쿠폰이 이미 사용되었습니다");
+        }
+        this.isCouponUsed = true;
+    }
+
 }

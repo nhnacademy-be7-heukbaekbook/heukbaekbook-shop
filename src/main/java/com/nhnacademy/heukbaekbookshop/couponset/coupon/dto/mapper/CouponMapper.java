@@ -10,6 +10,7 @@ import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.MemberCoupo
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.mapper.CouponPolicyMapper;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
+import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -84,6 +85,17 @@ public class CouponMapper {
                 memberCoupon.getExpirationAt()
         );
     }
+
+    public static CouponHistory toCouponHistoryEntity(MemberCoupon memberCoupon, OrderBook orderBook) {
+        return new CouponHistory(
+                null,
+                memberCoupon,
+                LocalDateTime.now(),
+                orderBook,
+                memberCoupon.getCoupon()
+        );
+    }
+
 
     public static Page<MemberCouponResponse> fromMemberCouponPageableEntity(Page<MemberCoupon> memberCoupons) {
         return memberCoupons.map(CouponMapper::fromMemberCouponEntity);

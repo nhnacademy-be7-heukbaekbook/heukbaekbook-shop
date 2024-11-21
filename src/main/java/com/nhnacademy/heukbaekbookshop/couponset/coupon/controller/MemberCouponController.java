@@ -1,5 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.couponset.coupon.controller;
 
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request.UseCouponRequest;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponHistoryResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.MemberCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.service.MemberCouponService;
@@ -35,11 +36,19 @@ public class MemberCouponController {
      * 회원 쿠폰 사용
      *
      * @param memberCouponId 회원 쿠폰 ID
+     * @param useRequest 요청 본문에 포함된 주문 ID와 도서 ID
      * @return MemberCouponResponse
      */
     @PutMapping("/{memberCouponId}/use")
-    public ResponseEntity<MemberCouponResponse> useCoupon(@PathVariable Long memberCouponId) {
-        MemberCouponResponse response = memberCouponService.useCoupon(memberCouponId);
+    public ResponseEntity<MemberCouponResponse> useCoupon(
+            @PathVariable Long memberCouponId,
+            @RequestBody UseCouponRequest useRequest) {
+
+        MemberCouponResponse response = memberCouponService.useCoupon(
+                memberCouponId,
+                useRequest.orderId(),
+                useRequest.bookId()
+        );
         return ResponseEntity.ok(response);
     }
 

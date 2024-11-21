@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 public interface MemberCouponService {
     MemberCouponResponse issueCoupon(Long memberId, Long couponId);
-    MemberCouponResponse useCoupon(Long memberCouponId);
+    MemberCouponResponse useCoupon(Long memberCouponId, Long orderId, Long bookId);
     // 쿠폰 조회 관련 메서드
     Page<MemberCouponResponse> getUserCoupons(Pageable pageable, Long memberId);
 }

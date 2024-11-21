@@ -45,7 +45,7 @@ public class Order {
     private BigDecimal totalPrice;
 
     @NotNull
-    @Column(name = "order_cretaed_at")
+    @Column(name = "order_created_at")
     private LocalDateTime createdAt;
 
     @NotNull
