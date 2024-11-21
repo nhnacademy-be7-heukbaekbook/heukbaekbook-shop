@@ -4,6 +4,6 @@ public record TossPaymentApprovalResponse(
         String paymentKey,
         String requestedAt,
         String approvedAt,
-        int paymentPrice,
+        int totalAmount,
         String method
 ) {}

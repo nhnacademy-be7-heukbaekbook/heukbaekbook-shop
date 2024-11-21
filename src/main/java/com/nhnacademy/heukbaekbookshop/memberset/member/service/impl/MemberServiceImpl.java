@@ -16,7 +16,9 @@ import com.nhnacademy.heukbaekbookshop.memberset.grade.repository.GradeRepositor
 import com.nhnacademy.heukbaekbookshop.memberset.address.repository.MemberAddressRepository;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import com.nhnacademy.heukbaekbookshop.memberset.member.service.MemberService;
+import com.nhnacademy.heukbaekbookshop.point.history.event.SignupEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +35,7 @@ public class MemberServiceImpl implements MemberService {
     private final MemberAddressRepository memberAddressRepository;
     private final CustomerRepository customerRepository;
     private final GradeRepository gradeRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -52,6 +55,7 @@ public class MemberServiceImpl implements MemberService {
         MemberAddress memberAddress = MemberMapper.createMemberAddressEntity(memberCreateRequest, member);
         memberAddressRepository.save(memberAddress);
 
+        eventPublisher.publishEvent(new SignupEvent(member.getId()));
         return MemberMapper.createMemberResponse(member);
     }
 

@@ -4,7 +4,6 @@ import com.nhnacademy.heukbaekbookshop.category.dto.response.CategorySummaryResp
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public record BookViewResponse(Long id,

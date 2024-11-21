@@ -6,7 +6,7 @@ public record BookCreateResponse(
         String title,
         String index,
         String description,
-        String publication,
+        String publishedAt,
         String isbn,
         boolean isPackable,
         int stock,

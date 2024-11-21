@@ -1,7 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.memberset.member.domain;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Like;
-import com.nhnacademy.heukbaekbookshop.cart.domain.Cart;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 import com.nhnacademy.heukbaekbookshop.memberset.grade.domain.Grade;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberUpdateRequest;
@@ -16,7 +15,6 @@ import java.util.Set;
 
 @Entity
 @Getter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "members")

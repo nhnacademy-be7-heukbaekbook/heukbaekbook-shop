@@ -100,4 +100,13 @@ public class BookRepositoryImpl implements BookRepositoryCustom {
                 .where(book.id.eq(bookId))
                 .fetchOne());
     }
+
+    @Override
+    public void increasePopularityByBookId(Long bookId) {
+        queryFactory
+                .update(book)
+                .set(book.popularity, book.popularity.add(1))
+                .where(book.id.eq(bookId))
+                .execute();
+    }
 }

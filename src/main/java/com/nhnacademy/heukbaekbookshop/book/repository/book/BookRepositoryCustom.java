@@ -17,4 +17,6 @@ public interface BookRepositoryCustom {
     Page<Book> findAllByCategoryIds(List<Long> categoryIds, Pageable pageable);
 
     Optional<Book> findByBookId(Long bookId);
+
+    void increasePopularityByBookId(Long bookId);
 }
