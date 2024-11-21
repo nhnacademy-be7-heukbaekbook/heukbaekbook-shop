@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +48,11 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
     }
 
     @Override
+    public List<CouponPolicyResponse> getAllCouponPolicyList() {
+        return CouponPolicyMapper.fromEntityList(couponPolicyRepository.findAll());
+    }
+
+    @Override
     public Page<CouponPolicyResponse> getAllCouponPoliciesByType(DiscountType discountType, Pageable pageable) {
         return CouponPolicyMapper.fromPageableEntity(
                 couponPolicyRepository.findCouponPolicyByDiscountTypeOrderByMinimumPurchaseAmount(discountType, pageable)
@@ -53,6 +60,7 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
     }
 
     @Override
+    @Transactional
     public CouponPolicyResponse updateCouponPolicy(long policyId, CouponPolicyRequest couponPolicyRequest) {
         CouponPolicy couponPolicy = couponPolicyRepository.findById(policyId)
                 .orElseThrow(CouponPolicyNotFoundException::new);
@@ -63,6 +71,7 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
     }
 
     @Override
+    @Transactional
     public void deleteCouponPolicy(long policyId) {
         if(couponPolicyRepository.existsById(policyId)) {
             throw new CouponPolicyNotFoundException();

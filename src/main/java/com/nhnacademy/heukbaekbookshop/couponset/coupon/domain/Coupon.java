@@ -27,6 +27,7 @@ public class Coupon {
     private CouponPolicy couponPolicy;
 
     @NotNull
+    @Setter
     @Column(name = "coupon_status")
     @Enumerated(EnumType.STRING)
     private CouponStatus couponStatus;

@@ -1,5 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response;
 
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CouponStatus;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyResponse;
 
 import java.time.LocalDateTime;
@@ -7,7 +8,7 @@ import java.time.LocalDateTime;
 public record CouponResponse(
         Long couponId,
         CouponPolicyResponse couponPolicyResponse,
-        String couponStatus,
+        CouponStatus couponStatus,
         int availableDuration,
         LocalDateTime couponTimeStart,
         LocalDateTime couponTimeEnd,

@@ -11,6 +11,8 @@ import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.Coupon;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CouponStatus;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.mapper.CouponMapper;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request.CouponRequest;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.BookCouponResponse;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CategoryCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.exception.CouponNotFoundException;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.service.CouponService;
@@ -23,11 +25,13 @@ import com.nhnacademy.heukbaekbookshop.couponset.coupon.repository.CouponReposit
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CouponServiceImpl implements CouponService {
 
     private final CouponRepository couponRepository;
@@ -36,6 +40,7 @@ public class CouponServiceImpl implements CouponService {
     private final CategoryRepository categoryRepository;
 
     @Override
+    @Transactional
     public CouponResponse createCoupon(CouponRequest couponRequest) {
         CouponPolicy couponPolicy = couponPolicyRepository.findById(couponRequest.policyId())
                 .orElseThrow(CouponPolicyNotFoundException::new);
@@ -65,9 +70,19 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public Page<CouponResponse> getAllCoupons(Pageable pageable) {
-        Page<Coupon> coupons = couponRepository.findAllByPageable(pageable);
+    public Page<CouponResponse> getAllNormalCoupons(Pageable pageable) {
+        Page<Coupon> coupons = couponRepository.findAllNormalCoupons(pageable);
         return CouponMapper.fromPageableEntity(coupons, pageable);
+    }
+
+    @Override
+    public Page<BookCouponResponse> getAllBookCoupons(Pageable pageable) {
+        return couponRepository.findAllBookCoupons(pageable);
+    }
+
+    @Override
+    public Page<CategoryCouponResponse> getAllCategoryCoupons(Pageable pageable) {
+        return couponRepository.findAllCategoryCoupons(pageable);
     }
 
     @Override
@@ -83,6 +98,7 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
+    @Transactional
     public CouponResponse updateCoupon(Long couponId, CouponRequest couponRequest) {
         Coupon coupon = couponRepository.findById(couponId).orElseThrow(CouponNotFoundException::new);
         CouponPolicy couponPolicy = couponPolicyRepository.findById(couponRequest.policyId()).orElseThrow(CouponPolicyNotFoundException::new);
@@ -100,10 +116,15 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public void deleteCoupon(Long couponId) {
-        couponRepository.delete(
-                couponRepository.findById(couponId)
-                        .orElseThrow(CouponNotFoundException::new)
-        );
+    @Transactional
+    public void changeCouponStatus(Long couponId, CouponStatus couponStatus) {
+        Coupon coupon = couponRepository.findById(couponId)
+                .orElseThrow(CouponNotFoundException::new);
+        coupon.setCouponStatus(couponStatus);
+
+//        couponRepository.delete(
+//                couponRepository.findById(couponId)
+//                        .orElseThrow(CouponNotFoundException::new)
+//        );
     }
 }
