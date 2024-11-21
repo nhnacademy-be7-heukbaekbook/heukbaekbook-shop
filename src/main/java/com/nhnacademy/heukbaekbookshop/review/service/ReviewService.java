@@ -2,6 +2,11 @@ package com.nhnacademy.heukbaekbookshop.review.service;
 
 import com.nhnacademy.heukbaekbookshop.common.auth.AuthService;
 import com.nhnacademy.heukbaekbookshop.image.domain.ReviewImage;
+import com.nhnacademy.heukbaekbookshop.order.domain.Order;
+import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
+import com.nhnacademy.heukbaekbookshop.order.domain.OrderStatus;
+import com.nhnacademy.heukbaekbookshop.order.repository.OrderBookRepository;
+import com.nhnacademy.heukbaekbookshop.order.repository.OrderRepository;
 import com.nhnacademy.heukbaekbookshop.review.dto.request.ReviewCreateRequest;
 import com.nhnacademy.heukbaekbookshop.review.dto.request.ReviewUpdateRequest;
 import com.nhnacademy.heukbaekbookshop.review.dto.response.ReviewDetailResponse;
@@ -22,6 +27,8 @@ public class ReviewService {
     private final ReviewImageRepository reviewImageRepository;
     private final AuthService authService;
     private final ImageUploadService imageUploadService;
+    private final OrderRepository orderRepository;
+    private final OrderBookRepository orderBookRepository;
 
     @Value("${nhn.cloud.tenant-id}")
     private String tenantId;
@@ -35,15 +42,32 @@ public class ReviewService {
     public ReviewService(ReviewRepository reviewRepository,
                          ReviewImageRepository reviewImageRepository,
                          AuthService authService,
-                         ImageUploadService imageUploadService) {
+                         ImageUploadService imageUploadService,
+                         OrderRepository orderRepository,
+                         OrderBookRepository orderBookRepository) {
         this.reviewRepository = reviewRepository;
         this.reviewImageRepository = reviewImageRepository;
         this.authService = authService;
         this.imageUploadService = imageUploadService;
+        this.orderRepository = orderRepository;
+        this.orderBookRepository = orderBookRepository;
     }
 
     @Transactional
     public ReviewDetailResponse createReview(ReviewCreateRequest request) {
+        // 주문 유효성 검증
+        Order order = orderRepository.findById(request.orderId())
+                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
+        if (order.getStatus() != OrderStatus.DELIVERED) {
+            throw new IllegalArgumentException("리뷰는 배송 완료된 주문에 대해서만 작성 가능합니다.");
+        }
+
+        // 특정 주문 내 책 확인
+        OrderBook orderBook = orderBookRepository.findByOrderIdAndBookId(request.orderId(), request.bookId());
+        if (orderBook == null) {
+            throw new IllegalArgumentException("주문에 해당 책이 포함되어 있지 않습니다.");
+        }
+
         // 인증 토큰 발급
         String tokenId = authService.requestToken(tenantId, apiUserId, apiPassword);
 
@@ -71,6 +95,7 @@ public class ReviewService {
         // 응답 데이터 생성
         return convertToResponse(review, uploadedUrls);
     }
+
 
     @Transactional
     public ReviewDetailResponse updateReview(Long reviewId, ReviewUpdateRequest request) {
