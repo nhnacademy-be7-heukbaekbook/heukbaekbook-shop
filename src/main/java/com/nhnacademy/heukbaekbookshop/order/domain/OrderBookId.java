@@ -8,11 +8,9 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.Objects;
 
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderBookPK implements Serializable {
+public class OrderBookId implements Serializable {
     private Long bookId;
     private Long orderId;
 
@@ -20,7 +18,7 @@ public class OrderBookPK implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        OrderBookPK that = (OrderBookPK) o;
+        OrderBookId that = (OrderBookId) o;
         return Objects.equals(orderId, that.orderId) &&
                 Objects.equals(bookId, that.bookId);
     }

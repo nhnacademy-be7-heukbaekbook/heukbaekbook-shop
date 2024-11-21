@@ -14,11 +14,11 @@ import java.time.LocalDateTime;
 @Table(name = "books_coupons")
 public class BookCoupon extends Coupon {
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
     private Book book;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coupon_id")
     private Coupon coupon;
 

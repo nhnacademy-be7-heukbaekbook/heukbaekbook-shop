@@ -54,10 +54,10 @@ public class Coupon {
     @Column(name = "coupon_created_at")
     private LocalDateTime couponCreatedAt;
 
-    @OneToOne(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private BookCoupon bookCoupon;
 
-    @OneToOne(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private CategoryCoupon categoryCoupon;
 
 
