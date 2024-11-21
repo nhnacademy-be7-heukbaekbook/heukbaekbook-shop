@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.order.domain;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
+import com.nhnacademy.heukbaekbookshop.image.domain.ReviewImage;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +11,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -46,6 +49,9 @@ public class Review {
     @MapsId("orderId")
     @JoinColumn(name = "order_id")
     private Order order;
+
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewImage> reviewImages = new ArrayList<>();
 
     @NotNull
     @Column(name = "review_score")

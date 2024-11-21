@@ -1,27 +1,18 @@
 package com.nhnacademy.heukbaekbookshop.review.service;
 
-import com.nhnacademy.heukbaekbookshop.image.domain.Image;
+import com.nhnacademy.heukbaekbookshop.common.auth.AuthService;
 import com.nhnacademy.heukbaekbookshop.image.domain.ReviewImage;
-import com.nhnacademy.heukbaekbookshop.order.domain.Review;
-import com.nhnacademy.heukbaekbookshop.order.domain.ReviewPK;
 import com.nhnacademy.heukbaekbookshop.review.dto.request.ReviewCreateRequest;
 import com.nhnacademy.heukbaekbookshop.review.dto.request.ReviewUpdateRequest;
 import com.nhnacademy.heukbaekbookshop.review.dto.response.ReviewDetailResponse;
 import com.nhnacademy.heukbaekbookshop.review.repository.ReviewImageRepository;
 import com.nhnacademy.heukbaekbookshop.review.repository.ReviewRepository;
-import com.nhnacademy.heukbaekbookshop.image.repository.ImageRepository;
-import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
-import com.nhnacademy.heukbaekbookshop.order.domain.Order;
-import com.nhnacademy.heukbaekbookshop.book.domain.Book;
-import com.nhnacademy.heukbaekbookshop.memberset.customer.repository.CustomerRepository;
-import com.nhnacademy.heukbaekbookshop.order.domain.OrderRepository;
-import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
+import com.nhnacademy.heukbaekbookshop.image.service.ImageUploadService;
+import com.nhnacademy.heukbaekbookshop.order.domain.Review;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,74 +20,123 @@ import java.util.stream.Collectors;
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
-    private final ImageRepository imageRepository;
-    private final CustomerRepository customerRepository;
-    private final OrderRepository orderRepository;
-    private final BookRepository bookRepository;
+    private final AuthService authService;
+    private final ImageUploadService imageUploadService;
 
-    public ReviewService(ReviewRepository reviewRepository, ReviewImageRepository reviewImageRepository,
-                         ImageRepository imageRepository, CustomerRepository customerRepository,
-                         OrderRepository orderRepository, BookRepository bookRepository) {
+    @Value("${nhn.cloud.tenant-id}")
+    private String tenantId;
+
+    @Value("${nhn.cloud.api-user-id}")
+    private String apiUserId;
+
+    @Value("${nhn.cloud.api-password}")
+    private String apiPassword;
+
+    public ReviewService(ReviewRepository reviewRepository,
+                         ReviewImageRepository reviewImageRepository,
+                         AuthService authService,
+                         ImageUploadService imageUploadService) {
         this.reviewRepository = reviewRepository;
         this.reviewImageRepository = reviewImageRepository;
-        this.imageRepository = imageRepository;
-        this.customerRepository = customerRepository;
-        this.orderRepository = orderRepository;
-        this.bookRepository = bookRepository;
+        this.authService = authService;
+        this.imageUploadService = imageUploadService;
     }
 
     @Transactional
-    public Review createReview(ReviewCreateRequest request) {
-        Customer customer = customerRepository.findById(request.getCustomerId())
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 고객 ID입니다."));
-        Order order = orderRepository.findById(request.getOrderId())
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 주문 ID입니다."));
-        Book book = bookRepository.findById(request.getBookId())
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 도서 ID입니다."));
+    public ReviewDetailResponse createReview(ReviewCreateRequest request) {
+        // 인증 토큰 발급
+        String tokenId = authService.requestToken(tenantId, apiUserId, apiPassword);
 
+        // 리뷰 데이터 저장
         Review review = new Review();
-        review.setCustomer(customer);
-        review.setOrder(order);
-        review.setBook(book);
-        review.setTitle(request.getTitle());
-        review.setContent(request.getContent());
-        review.setScore(request.getScore());
-        review.setCreatedAt(LocalDateTime.now());
+        review.setCustomerId(request.customerId());
+        review.setBookId(request.bookId());
+        review.setOrderId(request.orderId());
+        review.setContent(request.content());
+        review.setScore(request.score());
+        review.setTitle(request.title());
         reviewRepository.save(review);
 
-        return review;
+        // 이미지 업로드 및 저장
+        List<String> uploadedUrls = imageUploadService.uploadImages(tokenId, request.base64Images());
+        List<ReviewImage> reviewImages = uploadedUrls.stream().map(url -> {
+            ReviewImage image = new ReviewImage();
+            image.setReview(review);
+            image.setUrl(url);
+            image.setImageType("DETAIL");
+            return image;
+        }).collect(Collectors.toList());
+        reviewImageRepository.saveAll(reviewImages);
+
+        // 응답 데이터 생성
+        return convertToResponse(review, uploadedUrls);
     }
 
     @Transactional
-    public Review updateReview(Long customerId, Long bookId, Long orderId, ReviewUpdateRequest request) {
-        Review review = reviewRepository.findById(new ReviewPK(customerId, bookId, orderId))
-                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰를 찾을 수 없습니다."));
+    public ReviewDetailResponse updateReview(Long reviewId, ReviewUpdateRequest request) {
+        // 리뷰 조회
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("Review not found"));
 
-        if (!StringUtils.hasText(request.getNewTitle()) || !StringUtils.hasText(request.getNewContent())) {
-            throw new IllegalArgumentException("제목과 내용은 필수 항목입니다.");
+        // 리뷰 데이터 수정
+        if (request.content() != null) {
+            review.setContent(request.content());
         }
+        if (request.score() > 0) {
+            review.setScore(request.score());
+        }
+        if (request.title() != null) {
+            review.setTitle(request.title());
+        }
+        reviewRepository.save(review);
 
-        review.setTitle(request.getNewTitle());
-        review.setContent(request.getNewContent());
-        review.setScore(request.getNewScore());
-        review.setUpdatedAt(LocalDateTime.now());
+        // 이미지 URL 추출
+        List<String> imageUrls = review.getReviewImages().stream()
+                .map(ReviewImage::getUrl)
+                .collect(Collectors.toList());
 
-        return reviewRepository.save(review);
+        // 응답 데이터 생성
+        return convertToResponse(review, imageUrls);
     }
 
-    public List<ReviewDetailResponse> getReviewsByBook(Long bookId) {
-        return reviewRepository.findByBookId(bookId)
-                .stream()
-                .map(review -> new ReviewDetailResponse(
-                        review.getBookId(),
-                        review.getOrderId(),
-                        review.getTitle(),
-                        review.getContent(),
-                        review.getScore(),
-                        review.getCreatedAt(),
-                        review.getUpdatedAt(),
-                        Collections.emptyList() // 이미지 관련 기능은 추후 구현
-                ))
+    @Transactional(readOnly = true)
+    public ReviewDetailResponse getReview(Long reviewId) {
+        // 리뷰 조회
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("Review not found"));
+
+        // 이미지 URL 추출
+        List<String> imageUrls = review.getReviewImages().stream()
+                .map(ReviewImage::getUrl)
                 .collect(Collectors.toList());
+
+        // 응답 데이터 생성
+        return convertToResponse(review, imageUrls);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewDetailResponse> getReviewsByBook(Long bookId) {
+        // 특정 도서의 리뷰 조회
+        List<Review> reviews = reviewRepository.findAllByBookId(bookId);
+
+        // 리뷰 목록 변환
+        return reviews.stream().map(review -> {
+            List<String> imageUrls = review.getReviewImages().stream()
+                    .map(ReviewImage::getUrl)
+                    .collect(Collectors.toList());
+            return convertToResponse(review, imageUrls);
+        }).collect(Collectors.toList());
+    }
+
+    private ReviewDetailResponse convertToResponse(Review review, List<String> imageUrls) {
+        return new ReviewDetailResponse(
+                review.getCustomerId(),
+                review.getBookId(),
+                review.getOrderId(),
+                review.getContent(),
+                review.getScore(),
+                review.getTitle(),
+                imageUrls
+        );
     }
 }

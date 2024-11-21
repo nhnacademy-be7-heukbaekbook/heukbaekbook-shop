@@ -22,4 +22,9 @@ public class ReviewImage extends Image {
     })
     private Review review;
 
+    @Column(name = "image_url", nullable = false)
+    private String url;
+
+    @Column(name = "image_type", nullable = false)
+    private String imageType;
 }

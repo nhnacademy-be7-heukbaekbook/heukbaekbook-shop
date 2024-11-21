@@ -1,4 +1,3 @@
-// ReviewImageRepository.java
 package com.nhnacademy.heukbaekbookshop.review.repository;
 
 import com.nhnacademy.heukbaekbookshop.image.domain.ReviewImage;
