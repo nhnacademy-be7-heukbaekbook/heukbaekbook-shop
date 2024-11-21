@@ -76,4 +76,24 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderBook> orderBooks;
 
+
+    public static Order createOrder(BigDecimal totalPrice,
+                                    String customerName,
+                                    String customerPhoneNumber,
+                                    String customerEmail,
+                                    String tossOrderId,
+                                    Customer customer,
+                                    DeliveryFee deliveryFee) {
+        Order order = new Order();
+        order.totalPrice = totalPrice;
+        order.customerName = customerName;
+        order.customerPhoneNumber = customerPhoneNumber;
+        order.customerEmail = customerEmail;
+        order.tossOrderId = tossOrderId;
+        order.setCustomer(customer);
+        order.deliveryFee = deliveryFee;
+
+        return order;
+    }
+
 }

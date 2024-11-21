@@ -58,7 +58,6 @@ public class BookService {
 
     private final RestTemplate restTemplate;
     private final BookRepository bookRepository;
-    private final BookCategoryRepository bookCategoryRepository;
     private final PublisherRepository publisherRepository;
     private final CategoryRepository categoryRepository;
     private final ContributorRepository contributorRepository;
@@ -386,7 +385,6 @@ public class BookService {
         return new BookDeleteResponse("Book deleted successfully.");
     }
 
-    @Transactional
     public BookDetailResponse getBook(Long bookId) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
@@ -425,6 +423,11 @@ public class BookService {
                         .map(bt -> bt.getTag().getName())
                         .collect(Collectors.toList())
         );
+    }
+
+    @Transactional
+    public void increasePopularity(Long bookId) {
+        bookRepository.increasePopularityByBookId(bookId);
     }
 
     private static class ParsedPerson {
@@ -561,6 +564,7 @@ public class BookService {
                 .map(book -> new BookSummaryResponse(
                                 book.getId(),
                                 book.getTitle(),
+                                book.isPackable(),
                                 book.getPrice(),
                                 getSalePrice(book.getPrice(), book.getDiscountRate()),
                                 book.getDiscountRate(),
@@ -585,6 +589,7 @@ public class BookService {
         return books.map(this::createBookResponse);
     }
 
+    @Transactional
     public BookViewResponse getBookDetail(Long bookId) {
         Book book = bookRepository.findByBookId(bookId)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
