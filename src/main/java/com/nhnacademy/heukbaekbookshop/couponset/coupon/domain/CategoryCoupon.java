@@ -16,11 +16,11 @@ import java.time.LocalDateTime;
 @Table(name = "categories_coupons")
 public class CategoryCoupon extends Coupon {
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coupon_id")
     private Coupon coupon;
 

@@ -5,6 +5,7 @@ import com.nhnacademy.heukbaekbookshop.book.domain.BookCategory;
 import com.nhnacademy.heukbaekbookshop.book.domain.BookStatus;
 import com.nhnacademy.heukbaekbookshop.book.domain.BookTag;
 import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookCreateRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchCondition;
 import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookUpdateRequest;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.*;
 import com.nhnacademy.heukbaekbookshop.book.exception.book.BookAlreadyExistsException;
@@ -559,7 +560,7 @@ public class BookService {
     }
 
     public List<BookSummaryResponse> getBooksSummary(List<Long> bookIds) {
-        List<Book> books = bookRepository.findAllByIdInAndType(bookIds, ImageType.THUMBNAIL);
+        List<Book> books = bookRepository.findAllByBookSearchCondition(new BookSearchCondition(bookIds, ImageType.THUMBNAIL));
         return books.stream()
                 .map(book -> new BookSummaryResponse(
                                 book.getId(),

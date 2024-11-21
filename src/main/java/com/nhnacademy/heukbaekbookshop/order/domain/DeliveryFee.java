@@ -2,10 +2,7 @@ package com.nhnacademy.heukbaekbookshop.order.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
@@ -30,4 +27,11 @@ public class DeliveryFee {
     @NotNull
     @Column(name = "delivery_fee")
     private BigDecimal fee;
+
+    @Builder
+    public DeliveryFee(String name, BigDecimal fee) {
+        this.name = name;
+        this.fee = fee;
+    }
+
 }
