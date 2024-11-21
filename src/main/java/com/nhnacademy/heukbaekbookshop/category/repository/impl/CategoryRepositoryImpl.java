@@ -19,6 +19,16 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
     }
 
     @Override
+    public List<Long> findAllCategoryIdsByCategoryId(Long categoryId) {
+        return queryFactory
+                .select(category.id)
+                .from(category)
+                .where(category.id.eq(categoryId)
+                        .or(category.parentCategory.id.eq(categoryId))) // 상위 카테고리 포함
+                .fetch();
+    }
+
+    @Override
     public List<Category> findTopCategories() {
         return queryFactory
                 .selectFrom(category)

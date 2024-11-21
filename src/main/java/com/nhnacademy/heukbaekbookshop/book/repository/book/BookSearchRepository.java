@@ -11,5 +11,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 
 public interface BookSearchRepository {
-    Page<BookDocument> search(Pageable pageable, String keyword, SearchCondition searchCondition, SortCondition sortCondition);
+    Page<BookDocument> search(Pageable pageable, String keyword, SearchCondition searchCondition, SortCondition sortCondition, Long categoryId);
 }
