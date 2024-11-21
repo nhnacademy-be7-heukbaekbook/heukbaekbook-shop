@@ -2,9 +2,10 @@ package com.nhnacademy.heukbaekbookshop.review.service;
 
 import com.nhnacademy.heukbaekbookshop.common.auth.AuthService;
 import com.nhnacademy.heukbaekbookshop.image.domain.ReviewImage;
+import com.nhnacademy.heukbaekbookshop.image.service.ImageUploadService;
 import com.nhnacademy.heukbaekbookshop.order.domain.Order;
-import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderStatus;
+import com.nhnacademy.heukbaekbookshop.order.domain.Review;
 import com.nhnacademy.heukbaekbookshop.order.repository.OrderBookRepository;
 import com.nhnacademy.heukbaekbookshop.order.repository.OrderRepository;
 import com.nhnacademy.heukbaekbookshop.review.dto.request.ReviewCreateRequest;
@@ -12,23 +13,22 @@ import com.nhnacademy.heukbaekbookshop.review.dto.request.ReviewUpdateRequest;
 import com.nhnacademy.heukbaekbookshop.review.dto.response.ReviewDetailResponse;
 import com.nhnacademy.heukbaekbookshop.review.repository.ReviewImageRepository;
 import com.nhnacademy.heukbaekbookshop.review.repository.ReviewRepository;
-import com.nhnacademy.heukbaekbookshop.image.service.ImageUploadService;
-import com.nhnacademy.heukbaekbookshop.order.domain.Review;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
-    private final AuthService authService;
-    private final ImageUploadService imageUploadService;
     private final OrderRepository orderRepository;
     private final OrderBookRepository orderBookRepository;
+    private final AuthService authService;
+    private final ImageUploadService imageUploadService;
 
     @Value("${nhn.cloud.tenant-id}")
     private String tenantId;
@@ -41,16 +41,16 @@ public class ReviewService {
 
     public ReviewService(ReviewRepository reviewRepository,
                          ReviewImageRepository reviewImageRepository,
-                         AuthService authService,
-                         ImageUploadService imageUploadService,
                          OrderRepository orderRepository,
-                         OrderBookRepository orderBookRepository) {
+                         OrderBookRepository orderBookRepository,
+                         AuthService authService,
+                         ImageUploadService imageUploadService) {
         this.reviewRepository = reviewRepository;
         this.reviewImageRepository = reviewImageRepository;
-        this.authService = authService;
-        this.imageUploadService = imageUploadService;
         this.orderRepository = orderRepository;
         this.orderBookRepository = orderBookRepository;
+        this.authService = authService;
+        this.imageUploadService = imageUploadService;
     }
 
     @Transactional
@@ -63,15 +63,19 @@ public class ReviewService {
         }
 
         // 특정 주문 내 책 확인
-        OrderBook orderBook = orderBookRepository.findByOrderIdAndBookId(request.orderId(), request.bookId());
-        if (orderBook == null) {
+        if (orderBookRepository.findByOrderIdAndBookId(request.orderId(), request.bookId()) == null) {
             throw new IllegalArgumentException("주문에 해당 책이 포함되어 있지 않습니다.");
+        }
+
+        // 평가 점수 유효성 검증
+        if (request.score() < 1 || request.score() > 5) {
+            throw new IllegalArgumentException("평가 점수는 1~5점 사이여야 합니다.");
         }
 
         // 인증 토큰 발급
         String tokenId = authService.requestToken(tenantId, apiUserId, apiPassword);
 
-        // 리뷰 데이터 저장
+        // 리뷰 저장
         Review review = new Review();
         review.setCustomerId(request.customerId());
         review.setBookId(request.bookId());
@@ -82,7 +86,11 @@ public class ReviewService {
         reviewRepository.save(review);
 
         // 이미지 업로드 및 저장
-        List<String> uploadedUrls = imageUploadService.uploadImages(tokenId, request.base64Images());
+        List<String> uploadedUrls = imageUploadService.uploadImages(
+                tokenId,
+                request.base64Images()
+        );
+
         List<ReviewImage> reviewImages = uploadedUrls.stream().map(url -> {
             ReviewImage image = new ReviewImage();
             image.setReview(review);
@@ -92,10 +100,8 @@ public class ReviewService {
         }).collect(Collectors.toList());
         reviewImageRepository.saveAll(reviewImages);
 
-        // 응답 데이터 생성
         return convertToResponse(review, uploadedUrls);
     }
-
 
     @Transactional
     public ReviewDetailResponse updateReview(Long reviewId, ReviewUpdateRequest request) {
@@ -107,7 +113,7 @@ public class ReviewService {
         if (request.content() != null) {
             review.setContent(request.content());
         }
-        if (request.score() > 0) {
+        if (request.score() >= 1 && request.score() <= 5) {
             review.setScore(request.score());
         }
         if (request.title() != null) {
@@ -120,7 +126,6 @@ public class ReviewService {
                 .map(ReviewImage::getUrl)
                 .collect(Collectors.toList());
 
-        // 응답 데이터 생성
         return convertToResponse(review, imageUrls);
     }
 
@@ -135,7 +140,6 @@ public class ReviewService {
                 .map(ReviewImage::getUrl)
                 .collect(Collectors.toList());
 
-        // 응답 데이터 생성
         return convertToResponse(review, imageUrls);
     }
 
@@ -144,7 +148,6 @@ public class ReviewService {
         // 특정 도서의 리뷰 조회
         List<Review> reviews = reviewRepository.findAllByBookId(bookId);
 
-        // 리뷰 목록 변환
         return reviews.stream().map(review -> {
             List<String> imageUrls = review.getReviewImages().stream()
                     .map(ReviewImage::getUrl)
@@ -159,8 +162,8 @@ public class ReviewService {
                 review.getBookId(),
                 review.getOrderId(),
                 review.getContent(),
-                review.getScore(),
                 review.getTitle(),
+                review.getScore(),
                 imageUrls
         );
     }

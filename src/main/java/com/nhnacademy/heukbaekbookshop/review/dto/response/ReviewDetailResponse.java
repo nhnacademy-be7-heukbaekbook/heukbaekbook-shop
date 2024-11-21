@@ -10,7 +10,7 @@ public record ReviewDetailResponse(
         Long bookId,
         Long orderId,
         String content,
-        int score,
         String title,
+        int score,
         List<String> imageUrls // 업로드된 이미지 URL 리스트
 ) {}
