@@ -1,38 +1,29 @@
 package com.nhnacademy.heukbaekbookshop.review.service;
 
-import com.nhnacademy.heukbaekbookshop.book.domain.Book;
-import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
-import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
-import com.nhnacademy.heukbaekbookshop.memberset.customer.repository.CustomerRepository;
-import com.nhnacademy.heukbaekbookshop.order.domain.Order;
-import com.nhnacademy.heukbaekbookshop.order.domain.Review;
-import com.nhnacademy.heukbaekbookshop.order.domain.ReviewPK;
-import com.nhnacademy.heukbaekbookshop.order.domain.OrderRepository;
+import com.nhnacademy.heukbaekbookshop.common.auth.AuthService;
+import com.nhnacademy.heukbaekbookshop.image.service.ImageUploadService;
+import com.nhnacademy.heukbaekbookshop.order.domain.*;
 import com.nhnacademy.heukbaekbookshop.review.dto.request.ReviewCreateRequest;
 import com.nhnacademy.heukbaekbookshop.review.dto.request.ReviewUpdateRequest;
 import com.nhnacademy.heukbaekbookshop.review.dto.response.ReviewDetailResponse;
-import com.nhnacademy.heukbaekbookshop.review.repository.ReviewRepository;
-import com.nhnacademy.heukbaekbookshop.image.repository.ImageRepository;
 import com.nhnacademy.heukbaekbookshop.review.repository.ReviewImageRepository;
+import com.nhnacademy.heukbaekbookshop.review.repository.ReviewRepository;
+import com.nhnacademy.heukbaekbookshop.order.repository.OrderBookRepository;
+import com.nhnacademy.heukbaekbookshop.order.repository.OrderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 class ReviewServiceTest {
-
-    @InjectMocks
-    private ReviewService reviewService;
-
     @Mock
     private ReviewRepository reviewRepository;
 
@@ -40,16 +31,19 @@ class ReviewServiceTest {
     private ReviewImageRepository reviewImageRepository;
 
     @Mock
-    private ImageRepository imageRepository;
-
-    @Mock
-    private CustomerRepository customerRepository;
-
-    @Mock
     private OrderRepository orderRepository;
 
     @Mock
-    private BookRepository bookRepository;
+    private OrderBookRepository orderBookRepository;
+
+    @Mock
+    private AuthService authService;
+
+    @Mock
+    private ImageUploadService imageUploadService;
+
+    @InjectMocks
+    private ReviewService reviewService;
 
     @BeforeEach
     void setUp() {
@@ -57,106 +51,154 @@ class ReviewServiceTest {
     }
 
     @Test
-    void createReview() {
+    void createReview_success() {
         // Given
-        ReviewCreateRequest request = new ReviewCreateRequest();
-        request.setCustomerId(1L);
-        request.setOrderId(1L);
-        request.setBookId(1L);
-        request.setTitle("Book1");
-        request.setContent("Good");
-        request.setScore(5);
+        ReviewCreateRequest request = new ReviewCreateRequest(
+                1L, 1L, 1L, "Enjoyed it!", "Great Book", 5, List.of("base64Image1", "base64Image2")
+        );
 
-        Customer customer = Customer.createCustomer("name", "010-1234-5678", "abc@gmail.com");
-        when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
-
-        Order order = new Order();
-        order.setId(1L);
+        Order order = mock(Order.class);
+        when(order.getStatus()).thenReturn(OrderStatus.DELIVERED);
         when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
 
-        Book book = new Book();
-        book.setId(1L);
-        when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+        OrderBook orderBook = mock(OrderBook.class);
+        when(orderBookRepository.findByOrderIdAndBookId(1L, 1L)).thenReturn(orderBook);
+
+        when(authService.requestToken(anyString(), anyString(), anyString())).thenReturn("mockToken");
+
+        List<String> mockUrls = List.of("http://mock-url1.com", "http://mock-url2.com");
+        when(imageUploadService.uploadImages(eq("mockToken"), anyList())).thenReturn(mockUrls);
 
         Review review = new Review();
-        review.setCustomer(customer);
-        review.setOrder(order);
-        review.setBook(book);
-        review.setTitle(request.getTitle());
-        review.setContent(request.getContent());
-        review.setScore(request.getScore());
-        review.setCreatedAt(LocalDateTime.now());
-
+        review.setCustomerId(1L);
+        review.setOrderId(1L);
+        review.setBookId(1L);
+        review.setScore(5);
+        review.setTitle("Great Book");
+        review.setContent("Enjoyed it!");
         when(reviewRepository.save(any(Review.class))).thenReturn(review);
 
         // When
-        Review createdReview = reviewService.createReview(request);
+        ReviewDetailResponse response = reviewService.createReview(request);
 
         // Then
-        assertNotNull(createdReview);
-        assertEquals("Book1", createdReview.getTitle());
-        assertEquals("Good", createdReview.getContent());
-        assertEquals(5, createdReview.getScore());
-        assertEquals(customer, createdReview.getCustomer());
-        assertEquals(order, createdReview.getOrder());
-        assertEquals(book, createdReview.getBook());
+        assertNotNull(response);
+        assertEquals("Great Book", response.title());
+        assertEquals("Enjoyed it!", response.content());
+        assertEquals(mockUrls, response.imageUrls()); // 이미지 URL 검증
     }
 
     @Test
-    void updateReview() {
+    void createReview_noImages() {
         // Given
-        Long customerId = 1L;
-        Long bookId = 1L;
-        Long orderId = 1L;
-        ReviewUpdateRequest request = new ReviewUpdateRequest();
-        request.setNewTitle("Updated Title");
-        request.setNewContent("Updated Content");
-        request.setNewScore(4);
+        ReviewCreateRequest request = new ReviewCreateRequest(
+                1L, 1L, 1L, "Enjoyed it!", "No Image Review", 4, List.of()
+        );
+
+        Order order = mock(Order.class);
+        when(order.getStatus()).thenReturn(OrderStatus.DELIVERED);
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+
+        OrderBook orderBook = mock(OrderBook.class);
+        when(orderBookRepository.findByOrderIdAndBookId(1L, 1L)).thenReturn(orderBook);
+
+        when(authService.requestToken(anyString(), anyString(), anyString())).thenReturn("mockToken");
+
+        when(imageUploadService.uploadImages(eq("mockToken"), anyList())).thenReturn(List.of());
 
         Review review = new Review();
-        review.setCustomerId(customerId);
-        review.setBookId(bookId);
-        review.setOrderId(orderId);
+        review.setCustomerId(1L);
+        review.setOrderId(1L);
+        review.setBookId(1L);
+        review.setScore(4);
+        review.setTitle("No Image Review");
+        review.setContent("Enjoyed it!");
+        when(reviewRepository.save(any(Review.class))).thenReturn(review);
+
+        // When
+        ReviewDetailResponse response = reviewService.createReview(request);
+
+        // Then
+        assertNotNull(response);
+        assertEquals("No Image Review", response.title());
+        assertTrue(response.imageUrls().isEmpty());
+    }
+
+    @Test
+    void updateReview_success() {
+        // Given
+        ReviewUpdateRequest request = new ReviewUpdateRequest("Updated Title", "Updated Content", 4);
+
+        Review review = new Review();
+        review.setCustomerId(1L);
+        review.setOrderId(1L);
+        review.setBookId(1L);
+        review.setScore(5);
         review.setTitle("Old Title");
         review.setContent("Old Content");
-        review.setScore(3);
 
-        when(reviewRepository.findById(new ReviewPK(customerId, bookId, orderId))).thenReturn(Optional.of(review));
+        // Mock 설정
+        when(reviewRepository.findById(1L)).thenReturn(Optional.of(review));
         when(reviewRepository.save(any(Review.class))).thenReturn(review);
 
         // When
-        Review updatedReview = reviewService.updateReview(customerId, bookId, orderId, request);
+        ReviewDetailResponse response = reviewService.updateReview(1L, request);
 
         // Then
-        assertNotNull(updatedReview);
-        assertEquals("Updated Title", updatedReview.getTitle());
-        assertEquals("Updated Content", updatedReview.getContent());
-        assertEquals(4, updatedReview.getScore());
+        assertNotNull(response);
+        assertEquals("Updated Title", response.title());
+        assertEquals("Updated Content", response.content());
+        assertEquals(4, response.score());
     }
 
     @Test
-    void getReviewsByBook() {
+    void getReviewsByBook_success() {
         // Given
-        Long bookId = 1L;
         Review review = new Review();
-        review.setBookId(bookId);
-        review.setTitle("Review");
-        review.setContent("Content");
+        review.setCustomerId(1L);
+        review.setOrderId(1L);
+        review.setBookId(1L);
         review.setScore(5);
-        review.setCreatedAt(LocalDateTime.now());
-        review.setUpdatedAt(LocalDateTime.now());
-
-        when(reviewRepository.findByBookId(bookId)).thenReturn(List.of(review));
+        review.setTitle("Good Review");
+        review.setContent("Amazing Book");
+        when(reviewRepository.findAllByBookId(1L)).thenReturn(List.of(review));
 
         // When
-        List<ReviewDetailResponse> reviews = reviewService.getReviewsByBook(bookId);
+        List<ReviewDetailResponse> reviews = reviewService.getReviewsByBook(1L);
 
         // Then
-        assertNotNull(reviews);
         assertFalse(reviews.isEmpty());
         assertEquals(1, reviews.size());
-        assertEquals("Review", reviews.get(0).getTitle());
-        assertEquals("Content", reviews.get(0).getContent());
-        assertEquals(5, reviews.get(0).getScore());
+        assertEquals("Good Review", reviews.get(0).title());
+        assertEquals("Amazing Book", reviews.get(0).content());
+    }
+
+    @Test
+    void createReview_orderNotFound() {
+        // Given
+        ReviewCreateRequest request = new ReviewCreateRequest(1L, 1L, 1L, "Great Book", "Enjoyed it!", 5, List.of());
+
+        when(orderRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // When & Then
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> reviewService.createReview(request));
+        assertEquals("주문이 존재하지 않습니다.", exception.getMessage());
+    }
+
+    @Test
+    void createReview_invalidScore() {
+        // Given
+        ReviewCreateRequest request = new ReviewCreateRequest(1L, 1L, 1L, "Great Book", "Enjoyed it!", 6, List.of());
+
+        Order order = mock(Order.class);
+        when(order.getStatus()).thenReturn(OrderStatus.DELIVERED);
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+
+        OrderBook orderBook = mock(OrderBook.class);
+        when(orderBookRepository.findByOrderIdAndBookId(1L, 1L)).thenReturn(orderBook);
+
+        // When & Then
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> reviewService.createReview(request));
+        assertEquals("평가 점수는 1~5점 사이여야 합니다.", exception.getMessage());
     }
 }

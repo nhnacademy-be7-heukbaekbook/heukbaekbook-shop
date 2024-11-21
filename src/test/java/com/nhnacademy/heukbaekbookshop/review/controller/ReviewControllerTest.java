@@ -1,127 +1,148 @@
 package com.nhnacademy.heukbaekbookshop.review.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nhnacademy.heukbaekbookshop.order.domain.Review;
 import com.nhnacademy.heukbaekbookshop.review.dto.request.ReviewCreateRequest;
 import com.nhnacademy.heukbaekbookshop.review.dto.request.ReviewUpdateRequest;
 import com.nhnacademy.heukbaekbookshop.review.dto.response.ReviewDetailResponse;
 import com.nhnacademy.heukbaekbookshop.review.service.ReviewService;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
-import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@WebMvcTest(ReviewController.class)
 class ReviewControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
-    @Mock
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockBean
     private ReviewService reviewService;
 
-    @InjectMocks
-    private ReviewController reviewController;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(reviewController).build();
-    }
-
     @Test
-    void createReview() throws Exception {
+    @DisplayName("POST /reviews - 성공")
+    void createReview_success() throws Exception {
         // Given
-        ReviewCreateRequest request = new ReviewCreateRequest();
-        request.setCustomerId(1L);
-        request.setOrderId(1L);
-        request.setBookId(1L);
-        request.setTitle("Book1");
-        request.setContent("Good");
-        request.setScore(5);
+        ReviewCreateRequest request = new ReviewCreateRequest(
+                1L, // orderId
+                2L, // bookId
+                3L, // customerId
+                "Amazing book!",
+                "This book is fantastic.",
+                5,
+                List.of("base64Image1", "base64Image2")
+        );
 
-        Review review = new Review();
-        review.setCustomerId(1L);
-        review.setOrderId(1L);
-        review.setBookId(1L);
-        review.setTitle("Book1");
-        review.setContent("Good");
-        review.setScore(5);
-        review.setCreatedAt(LocalDateTime.now());
+        ReviewDetailResponse response = new ReviewDetailResponse(
+                3L,
+                2L,
+                1L,
+                "This book is fantastic.",
+                "Amazing book!",
+                5,
+                List.of("uploadedImage1", "uploadedImage2")
+        );
 
-        when(reviewService.createReview(any(ReviewCreateRequest.class))).thenReturn(review);
+        Mockito.when(reviewService.createReview(any(ReviewCreateRequest.class))).thenReturn(response);
 
         // When & Then
-        mockMvc.perform(post("/api/reviews")
+        mockMvc.perform(post("/reviews")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title", is("Book1")))
-                .andExpect(jsonPath("$.content", is("Good")))
-                .andExpect(jsonPath("$.score", is(5)));
+                .andExpect(jsonPath("$.customerId").value(3))
+                .andExpect(jsonPath("$.bookId").value(2))
+                .andExpect(jsonPath("$.orderId").value(1))
+                .andExpect(jsonPath("$.content").value("This book is fantastic."))
+                .andExpect(jsonPath("$.title").value("Amazing book!"))
+                .andExpect(jsonPath("$.score").value(5))
+                .andExpect(jsonPath("$.imageUrls[0]").value("uploadedImage1"))
+                .andExpect(jsonPath("$.imageUrls[1]").value("uploadedImage2"));
     }
 
     @Test
-    void updateReview() throws Exception {
+    @DisplayName("POST /reviews - 실패: 잘못된 요청")
+    void createReview_failure_invalidRequest() throws Exception {
         // Given
-        ReviewUpdateRequest request = new ReviewUpdateRequest();
-        request.setNewTitle("Updated Title");
-        request.setNewContent("Updated Content");
-        request.setNewScore(4);
-
-        Review updatedReview = new Review();
-        updatedReview.setCustomerId(1L);
-        updatedReview.setBookId(1L);
-        updatedReview.setOrderId(1L);
-        updatedReview.setTitle("Updated Title");
-        updatedReview.setContent("Updated Content");
-        updatedReview.setScore(4);
-        updatedReview.setUpdatedAt(LocalDateTime.now());
-
-        when(reviewService.updateReview(anyLong(), anyLong(), anyLong(), any(ReviewUpdateRequest.class)))
-                .thenReturn(updatedReview);
-
-        // When & Then
-        mockMvc.perform(put("/api/reviews/1/1/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title", is("Updated Title")))
-                .andExpect(jsonPath("$.content", is("Updated Content")))
-                .andExpect(jsonPath("$.score", is(4)));
-    }
-
-    @Test
-    void getReviewsByBook() throws Exception {
-        // Given
-        ReviewDetailResponse response = new ReviewDetailResponse(
-                1L, 1L, "Review", "Content", 5, LocalDateTime.now(), LocalDateTime.now(), Collections.emptyList()
+        ReviewCreateRequest invalidRequest = new ReviewCreateRequest(
+                null, // orderId
+                null, // bookId
+                null, // customerId
+                null,
+                null,
+                0,
+                null
         );
 
-        when(reviewService.getReviewsByBook(anyLong())).thenReturn(List.of(response));
+        // When & Then
+        mockMvc.perform(post("/reviews")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("GET /reviews/{reviewId} - 성공")
+    void getReview_success() throws Exception {
+        // Given
+        ReviewDetailResponse response = new ReviewDetailResponse(
+                3L,
+                2L,
+                1L,
+                "This book is fantastic.",
+                "Amazing book!",
+                5,
+                List.of("uploadedImage1", "uploadedImage2")
+        );
+
+        Mockito.when(reviewService.getReview(anyLong())).thenReturn(response);
 
         // When & Then
-        mockMvc.perform(get("/api/reviews/book/1")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/reviews/1")
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].title", is("Review")))
-                .andExpect(jsonPath("$[0].content", is("Content")))
-                .andExpect(jsonPath("$[0].score", is(5)));
+                .andExpect(jsonPath("$.customerId").value(3))
+                .andExpect(jsonPath("$.bookId").value(2))
+                .andExpect(jsonPath("$.orderId").value(1))
+                .andExpect(jsonPath("$.content").value("This book is fantastic."))
+                .andExpect(jsonPath("$.title").value("Amazing book!"))
+                .andExpect(jsonPath("$.score").value(5))
+                .andExpect(jsonPath("$.imageUrls[0]").value("uploadedImage1"))
+                .andExpect(jsonPath("$.imageUrls[1]").value("uploadedImage2"));
+    }
+
+    @Test
+    @DisplayName("GET /reviews/book/{bookId} - 성공")
+    void getReviewsByBook_success() throws Exception {
+        // Given
+        List<ReviewDetailResponse> responses = List.of(
+                new ReviewDetailResponse(3L, 2L, 1L, "Content 1", "Title 1", 4, List.of("image1")),
+                new ReviewDetailResponse(3L, 2L, 1L, "Content 2", "Title 2", 5, List.of("image2"))
+        );
+
+        Mockito.when(reviewService.getReviewsByBook(anyLong())).thenReturn(responses);
+
+        // When & Then
+        mockMvc.perform(get("/reviews/book/2")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("Title 1"))
+                .andExpect(jsonPath("$[0].content").value("Content 1"))
+                .andExpect(jsonPath("$[1].title").value("Title 2"))
+                .andExpect(jsonPath("$[1].content").value("Content 2"));
     }
 }

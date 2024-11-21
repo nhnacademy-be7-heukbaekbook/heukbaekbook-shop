@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -103,13 +102,35 @@ public class ReviewService {
         return convertToResponse(review, uploadedUrls);
     }
 
-    @Transactional
-    public ReviewDetailResponse updateReview(Long reviewId, ReviewUpdateRequest request) {
-        // 리뷰 조회
+    @Transactional(readOnly = true)
+    public ReviewDetailResponse getReview(Long reviewId) {
+        // 리뷰를 ID로 조회
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("Review not found"));
 
-        // 리뷰 데이터 수정
+        // 리뷰에 연결된 이미지 URL 추출
+        List<String> imageUrls = review.getReviewImages().stream()
+                .map(ReviewImage::getUrl)
+                .collect(Collectors.toList());
+
+        // ReviewDetailResponse로 변환
+        return new ReviewDetailResponse(
+                review.getCustomerId(),
+                review.getBookId(),
+                review.getOrderId(),
+                review.getContent(),
+                review.getTitle(),
+                review.getScore(),
+                imageUrls
+        );
+    }
+
+
+    @Transactional
+    public ReviewDetailResponse updateReview(Long reviewId, ReviewUpdateRequest request) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("Review not found"));
+
         if (request.content() != null) {
             review.setContent(request.content());
         }
@@ -121,21 +142,6 @@ public class ReviewService {
         }
         reviewRepository.save(review);
 
-        // 이미지 URL 추출
-        List<String> imageUrls = review.getReviewImages().stream()
-                .map(ReviewImage::getUrl)
-                .collect(Collectors.toList());
-
-        return convertToResponse(review, imageUrls);
-    }
-
-    @Transactional(readOnly = true)
-    public ReviewDetailResponse getReview(Long reviewId) {
-        // 리뷰 조회
-        Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("Review not found"));
-
-        // 이미지 URL 추출
         List<String> imageUrls = review.getReviewImages().stream()
                 .map(ReviewImage::getUrl)
                 .collect(Collectors.toList());
@@ -145,7 +151,6 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public List<ReviewDetailResponse> getReviewsByBook(Long bookId) {
-        // 특정 도서의 리뷰 조회
         List<Review> reviews = reviewRepository.findAllByBookId(bookId);
 
         return reviews.stream().map(review -> {
