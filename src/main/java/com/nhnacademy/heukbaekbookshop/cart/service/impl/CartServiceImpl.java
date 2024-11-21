@@ -27,6 +27,7 @@ public class CartServiceImpl implements CartService {
     private final MemberRepository memberRepository;
 
     @Override
+    @Transactional
     public void createCart(Long customerId, List<CartCreateRequest> cartCreateRequests) {
         List<Cart> carts = cartCreateRequests.stream()
                 .map(cartCreateRequest -> Cart.createCart(

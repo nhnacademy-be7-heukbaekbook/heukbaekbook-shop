@@ -9,7 +9,6 @@ import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
@@ -21,7 +20,6 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "books")
 public class Book {
 
@@ -29,10 +27,6 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "book_id")
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "publisher_id")
-    private Publisher publisher;
 
     @NotNull
     @Length(min = 1, max = 100)
@@ -80,6 +74,10 @@ public class Book {
     @Enumerated(EnumType.STRING)
     @Column(name = "book_status")
     private BookStatus status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "publisher_id")
+    private Publisher publisher;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookTag> tags = new HashSet<>();

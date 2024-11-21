@@ -3,36 +3,31 @@ package com.nhnacademy.heukbaekbookshop.order.domain;
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Entity
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@IdClass(OrderBookPK.class)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@IdClass(OrderBookId.class)
 @Table(name = "orders_books")
 public class OrderBook {
 
     @Id
-    @Column(name = "book_id")
+    @Column(name = "book_id", insertable = false, updatable = false)
     private Long bookId;
 
     @Id
-    @Column(name = "order_id")
+    @Column(name = "order_id", insertable = false, updatable = false)
     private Long orderId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("bookId")
     @JoinColumn(name = "book_id", insertable = false, updatable = false)
     private Book book;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("orderId")
     @JoinColumn(name = "order_id", insertable = false, updatable = false)
     private Order order;
@@ -45,4 +40,19 @@ public class OrderBook {
     @Column(name = "price")
     private BigDecimal price;
 
+    private void setOrder(Order order) {
+        this.order = order;
+        order.getOrderBooks().add(this);
+    }
+
+    public static OrderBook createOrderBook(Long bookId, Long orderId, Book book, Order order, int quantity, BigDecimal price) {
+        OrderBook orderBook = new OrderBook();
+        orderBook.bookId = bookId;
+        orderBook.orderId = orderId;
+        orderBook.book = book;
+        orderBook.setOrder(order);
+        orderBook.quantity = quantity;
+        orderBook.price = price;
+        return orderBook;
+    }
 }
