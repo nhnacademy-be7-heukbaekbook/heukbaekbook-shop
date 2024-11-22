@@ -6,7 +6,6 @@ import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.category.exception.CategoryNotFoundException;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.BookCoupon;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.Coupon;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CouponStatus;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.mapper.CouponMapper;
@@ -121,10 +120,5 @@ public class CouponServiceImpl implements CouponService {
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(CouponNotFoundException::new);
         coupon.setCouponStatus(couponStatus);
-
-//        couponRepository.delete(
-//                couponRepository.findById(couponId)
-//                        .orElseThrow(CouponNotFoundException::new)
-//        );
     }
 }
