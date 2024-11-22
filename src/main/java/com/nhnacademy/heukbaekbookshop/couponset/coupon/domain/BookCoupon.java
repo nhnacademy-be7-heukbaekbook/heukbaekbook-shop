@@ -18,10 +18,6 @@ public class BookCoupon extends Coupon {
     @JoinColumn(name = "book_id")
     private Book book;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coupon_id")
-    private Coupon coupon;
-
     public BookCoupon(CouponPolicy couponPolicy, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription, Book book) {
         super(couponPolicy, availableDuration, couponTimeStart, couponTimeEnd, couponName, couponDescription);
         this.book=book;

@@ -6,11 +6,14 @@ import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyRe
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface CouponPolicyService {
     CouponPolicyResponse createCouponPolicy(CouponPolicyRequest policyRequest);
-    CouponPolicyResponse getCouponPolicyById(long policyId);
+    CouponPolicyResponse getCouponPolicyById(Long policyId);
     Page<CouponPolicyResponse> getAllCouponPolicies(Pageable pageable);
+    List<CouponPolicyResponse> getAllCouponPolicyList();
     Page<CouponPolicyResponse> getAllCouponPoliciesByType(DiscountType discountType, Pageable pageable);
-    CouponPolicyResponse updateCouponPolicy(long policyId, CouponPolicyRequest policyRequest);
-    void deleteCouponPolicy(long policyId);
+    CouponPolicyResponse updateCouponPolicy(Long policyId, CouponPolicyRequest policyRequest);
+    void deleteCouponPolicy(Long policyId);
 }

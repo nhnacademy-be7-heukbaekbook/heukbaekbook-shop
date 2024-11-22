@@ -10,10 +10,10 @@ public record CouponPolicyRequest(
         DiscountType discountType,
 
         @NotNull
-   BigDecimal discountAmount,
+        BigDecimal discountAmount,
 
         @NotNull
-   BigDecimal minimumPurchaseAmount,
+        BigDecimal minimumPurchaseAmount,
 
         BigDecimal maximumPurchaseAmount
 ) {

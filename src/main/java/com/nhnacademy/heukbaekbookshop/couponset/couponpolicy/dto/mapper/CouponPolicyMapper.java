@@ -5,6 +5,8 @@ import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyRe
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyResponse;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public class CouponPolicyMapper {
 
     public static CouponPolicyResponse fromEntity(CouponPolicy couponPolicy) {
@@ -19,6 +21,10 @@ public class CouponPolicyMapper {
 
     public static Page<CouponPolicyResponse> fromPageableEntity(Page<CouponPolicy> couponPolicyPage) {
         return couponPolicyPage.map(CouponPolicyMapper::fromEntity);
+    }
+
+    public static List<CouponPolicyResponse> fromEntityList(List<CouponPolicy> couponPolicyList) {
+        return couponPolicyList.stream().map(CouponPolicyMapper::fromEntity).toList();
     }
 
     public static CouponPolicy toEntity(CouponPolicyRequest couponPolicyRequest) {
