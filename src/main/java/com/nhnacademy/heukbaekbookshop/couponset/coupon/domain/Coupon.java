@@ -4,7 +4,6 @@ import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolic
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 

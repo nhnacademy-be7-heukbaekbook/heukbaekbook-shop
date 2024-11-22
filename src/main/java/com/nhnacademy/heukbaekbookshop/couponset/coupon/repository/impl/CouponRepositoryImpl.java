@@ -51,7 +51,7 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
                                 .where(categoryCoupon.id.eq(coupon.id))
                                 .notExists()
                 )
-                .orderBy(coupon.couponCreatedAt.desc())
+                .orderBy(coupon.couponCreatedAt.desc(), coupon.couponPolicy.discountAmount.asc())
                 .fetch();
 
         long total = queryFactory
@@ -93,7 +93,7 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
                 ))
                 .from(bookCoupon)
                 .where(bookCoupon.couponStatus.eq(CouponStatus.ABLE))
-                .orderBy(bookCoupon.couponCreatedAt.desc())
+                .orderBy(bookCoupon.couponCreatedAt.desc(), bookCoupon.couponPolicy.discountType.asc())
                 .fetch();
 
         long total = queryFactory
@@ -125,8 +125,8 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
                         categoryCoupon.category.name
                         ))
                 .from(categoryCoupon)
-                .where(bookCoupon.couponStatus.eq(CouponStatus.ABLE))
-                .orderBy(categoryCoupon.couponCreatedAt.desc())
+                .where(categoryCoupon.couponStatus.eq(CouponStatus.ABLE))
+                .orderBy(categoryCoupon.couponCreatedAt.desc(), categoryCoupon.couponPolicy.discountType.asc())
                 .fetch();
 
         long total = queryFactory

@@ -5,17 +5,13 @@ import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.BookCoupon;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CategoryCoupon;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.Coupon;
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CouponStatus;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request.CouponRequest;
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.BookCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.mapper.CouponPolicyMapper;
-import com.querydsl.core.Tuple;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import static com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.QCoupon.coupon;
 
 public class CouponMapper {
 
