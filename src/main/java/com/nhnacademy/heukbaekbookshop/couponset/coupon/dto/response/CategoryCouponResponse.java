@@ -16,6 +16,7 @@ public record CategoryCouponResponse (
         LocalDateTime couponTimeStart,
         LocalDateTime couponTimeEnd,
 
+        Long policyId,
         DiscountType discountType,
         BigDecimal discountAmount,
         BigDecimal minimumPurchaseAmount,

@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@SuperBuilder
 @NoArgsConstructor
 @Table(name = "categories_coupons")
 public class CategoryCoupon extends Coupon {
@@ -21,7 +20,14 @@ public class CategoryCoupon extends Coupon {
     private Category category;
 
 
-    public CategoryCoupon(CouponPolicy couponPolicy, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription, Category category) {
+    public CategoryCoupon(CouponPolicy couponPolicy,
+                          int availableDuration,
+                          LocalDateTime couponTimeStart,
+                          LocalDateTime couponTimeEnd,
+                          String couponName,
+                          String couponDescription,
+                          Category category
+    ) {
         super(couponPolicy, availableDuration, couponTimeStart, couponTimeEnd, couponName, couponDescription);
         this.category = category;
     }

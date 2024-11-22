@@ -43,6 +43,7 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
                 .selectFrom(coupon)
                 .join(coupon.couponPolicy, couponPolicy).fetchJoin()
                 .where(
+                        coupon.couponStatus.eq(CouponStatus.ABLE),
                        JPAExpressions.selectFrom(bookCoupon)
                                .where(bookCoupon.id.eq(coupon.id))
                                .notExists(),
@@ -63,6 +64,7 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
                         JPAExpressions.selectFrom(categoryCoupon)
                                 .where(categoryCoupon.id.eq(coupon.id))
                                 .notExists()
+
                 )
                 .fetchOne();
 
@@ -81,6 +83,7 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
                         bookCoupon.availableDuration,
                         bookCoupon.couponTimeStart,
                         bookCoupon.couponTimeEnd,
+                        bookCoupon.couponPolicy.id,
                         bookCoupon.couponPolicy.discountType,
                         bookCoupon.couponPolicy.discountAmount,
                         bookCoupon.couponPolicy.minimumPurchaseAmount,
@@ -89,6 +92,7 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
                         bookCoupon.book.title
                 ))
                 .from(bookCoupon)
+                .where(bookCoupon.couponStatus.eq(CouponStatus.ABLE))
                 .orderBy(bookCoupon.couponCreatedAt.desc())
                 .fetch();
 
@@ -112,6 +116,7 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
                         categoryCoupon.availableDuration,
                         categoryCoupon.couponTimeStart,
                         categoryCoupon.couponTimeEnd,
+                        categoryCoupon.couponPolicy.id,
                         categoryCoupon.couponPolicy.discountType,
                         categoryCoupon.couponPolicy.discountAmount,
                         categoryCoupon.couponPolicy.minimumPurchaseAmount,
@@ -120,6 +125,7 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
                         categoryCoupon.category.name
                         ))
                 .from(categoryCoupon)
+                .where(bookCoupon.couponStatus.eq(CouponStatus.ABLE))
                 .orderBy(categoryCoupon.couponCreatedAt.desc())
                 .fetch();
 

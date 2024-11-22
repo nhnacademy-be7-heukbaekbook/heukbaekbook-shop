@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -55,6 +54,7 @@ public class Coupon {
     @Column(name = "coupon_created_at")
     private LocalDateTime couponCreatedAt;
 
+    @Builder
     public Coupon(CouponPolicy couponPolicy, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription) {
         this.couponPolicy = couponPolicy;
         this.couponStatus = CouponStatus.ABLE;

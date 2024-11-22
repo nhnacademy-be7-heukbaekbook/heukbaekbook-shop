@@ -33,7 +33,7 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 
 
     @Override
-    public CouponPolicyResponse getCouponPolicyById(long policyId) {
+    public CouponPolicyResponse getCouponPolicyById(Long policyId) {
         return CouponPolicyMapper.fromEntity(
                 couponPolicyRepository.findById(policyId)
                         .orElseThrow(CouponPolicyNotFoundException::new)
@@ -61,7 +61,7 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 
     @Override
     @Transactional
-    public CouponPolicyResponse updateCouponPolicy(long policyId, CouponPolicyRequest couponPolicyRequest) {
+    public CouponPolicyResponse updateCouponPolicy(Long policyId, CouponPolicyRequest couponPolicyRequest) {
         CouponPolicy couponPolicy = couponPolicyRepository.findById(policyId)
                 .orElseThrow(CouponPolicyNotFoundException::new);
 
@@ -72,10 +72,11 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 
     @Override
     @Transactional
-    public void deleteCouponPolicy(long policyId) {
-        if(couponPolicyRepository.existsById(policyId)) {
+    public void deleteCouponPolicy(Long policyId) {
+        if(!couponPolicyRepository.existsById(policyId)) {
             throw new CouponPolicyNotFoundException();
         }
+
         couponPolicyRepository.deleteById(policyId);
     }
 
