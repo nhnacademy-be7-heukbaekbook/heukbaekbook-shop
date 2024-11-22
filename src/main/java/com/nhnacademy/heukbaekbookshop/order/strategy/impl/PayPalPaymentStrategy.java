@@ -7,7 +7,7 @@ import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentGatewayCancelRe
 import com.nhnacademy.heukbaekbookshop.order.strategy.PaymentStrategy;
 import org.springframework.stereotype.Component;
 
-@Component
+// @Component
 public class PayPalPaymentStrategy implements PaymentStrategy {
 
     // PayPal 결제 전략 클래스. 예시 클래스임으로 실제로 동작하지 않음.

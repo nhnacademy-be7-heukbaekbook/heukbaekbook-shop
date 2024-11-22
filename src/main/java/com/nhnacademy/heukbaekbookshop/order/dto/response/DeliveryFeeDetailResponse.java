@@ -5,5 +5,6 @@ import java.math.BigDecimal;
 public record DeliveryFeeDetailResponse(
         Long id,
         String name,
-        BigDecimal fee
+        BigDecimal fee,
+        BigDecimal minimumOrderAmount
 ) {}

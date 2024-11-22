@@ -28,10 +28,15 @@ public class DeliveryFee {
     @Column(name = "delivery_fee")
     private BigDecimal fee;
 
+    @NotNull
+    @Column(name = "minimum_order_amount")
+    private BigDecimal minimumOrderAmount;
+
     @Builder
-    public DeliveryFee(String name, BigDecimal fee) {
+    public DeliveryFee(String name, BigDecimal fee, BigDecimal minimumOrderAmount) {
         this.name = name;
         this.fee = fee;
+        this.minimumOrderAmount = minimumOrderAmount;
     }
 
 }

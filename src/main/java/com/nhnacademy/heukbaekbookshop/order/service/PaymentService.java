@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,13 +61,15 @@ public class PaymentService {
                     return paymentTypeRepository.save(newPaymentType);
                 });
 
-        Payment payment = new Payment();
-        payment.setOrder(order);
-        payment.setPaymentType(paymentType);
-        payment.setRequestedAt(LocalDateTime.parse(gatewayResponse.requestedAt()));
-        payment.setApprovedAt(LocalDateTime.parse(gatewayResponse.approvedAt()));
-        payment.setPrice(BigDecimal.valueOf(gatewayResponse.totalAmount()));
-        payment.setPaymentKey(gatewayResponse.paymentKey());
+        Payment payment = Payment.builder()
+                .id(gatewayResponse.paymentKey())
+                .order(order)
+                .paymentType(paymentType)
+                .requestedAt(ZonedDateTime.parse(gatewayResponse.requestedAt()).toLocalDateTime())
+                .approvedAt(ZonedDateTime.parse(gatewayResponse.approvedAt()).toLocalDateTime())
+                .price(BigDecimal.valueOf(gatewayResponse.totalAmount()))
+                .build();
+
 
         order.setStatus(OrderStatus.PAYMENT_COMPLETED);
 
