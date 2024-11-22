@@ -1,9 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.order.dto.response;
 
-public record PaymentDetailResponse(
-        String paymentId,
-        String paymentType,
+public record PaymentGatewayCancelResponse(
         String requestedAt,
         String approvedAt,
-        Long amount
+        String message
 ) {}
