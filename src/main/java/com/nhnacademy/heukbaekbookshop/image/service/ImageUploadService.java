@@ -1,93 +1,39 @@
 package com.nhnacademy.heukbaekbookshop.image.service;
 
-import com.nhnacademy.heukbaekbookshop.common.storage.ContainerService;
+import com.nhnacademy.heukbaekbookshop.image.domain.PhotoType;
+import com.nhnacademy.heukbaekbookshop.image.domain.ReviewImage;
+import com.nhnacademy.heukbaekbookshop.order.domain.Review;
+import com.nhnacademy.heukbaekbookshop.order.domain.ReviewPK;
+import com.nhnacademy.heukbaekbookshop.review.repository.ReviewImageRepository;
+import com.nhnacademy.heukbaekbookshop.review.repository.ReviewRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Base64;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
+@RequiredArgsConstructor
 public class ImageUploadService {
-    private final ContainerService containerService;
-    private final String containerName = "heukbaekbook";
 
-    public ImageUploadService(ContainerService containerService) {
-        this.containerService = containerService;
-    }
+    private final ObjectService objectService;
+    private final ReviewRepository reviewRepository;
+    private final ReviewImageRepository reviewImageRepository;
+    @Transactional
+    public String uploadReviewImage(MultipartFile file, Long customerId, Long bookId, Long orderId) {
+        // 복합키로 리뷰 조회
+        ReviewPK reviewPK = new ReviewPK(customerId, bookId, orderId);
+        Review review = reviewRepository.findById(reviewPK)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
 
-    /**
-     * 이미지 업로드
-     *
-     * @param tokenId      인증 토큰
-     * @param base64Images Base64 인코딩된 이미지 리스트
-     * @return 업로드된 이미지 URL 리스트
-     */
-    public List<String> uploadImages(String tokenId, List<String> base64Images) {
-        return base64Images.stream()
-                .map(base64Image -> {
-                    try {
-                        // Base64 디코드
-                        byte[] imageData = Base64.getDecoder().decode(base64Image.split(",")[1]);
+        // ObjectService를 사용해 이미지 업로드
+        String imageUrl = objectService.uploadPhoto(file, PhotoType.REVIEW);
 
-                        // 이미지 검증
-                        validateImage(imageData);
+        // 업로드된 이미지 정보를 데이터베이스에 저장
+        ReviewImage reviewImage = new ReviewImage();
+        reviewImage.setReview(review);
+        reviewImage.setUrl(imageUrl);
+        reviewImageRepository.save(reviewImage);
 
-                        // 고유 파일명 생성
-                        String objectName = generateFileName();
-
-                        // 업로드 및 URL 반환
-                        return containerService.uploadObject(tokenId, containerName, objectName, imageData);
-                    } catch (Exception e) {
-                        throw new RuntimeException("이미지 업로드 중 오류가 발생했습니다: " + e.getMessage(), e);
-                    }
-                })
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * 이미지 검증 (크기 및 포맷)
-     *
-     * @param imageData 이미지 바이트 배열
-     */
-    private void validateImage(byte[] imageData) {
-        final int MAX_SIZE = 5 * 1024 * 1024; // 5MB 제한
-
-        // 크기 검증
-        if (imageData.length > MAX_SIZE) {
-            throw new IllegalArgumentException("이미지 크기가 5MB를 초과합니다.");
-        }
-
-        // 형식 검증 (JPEG/PNG만 허용)
-        String mimeType = detectMimeType(imageData);
-        if (!"image/jpeg".equals(mimeType) && !"image/png".equals(mimeType)) {
-            throw new IllegalArgumentException("지원하지 않는 이미지 형식입니다: " + mimeType);
-        }
-    }
-
-    /**
-     * 이미지 MIME 타입 감지
-     *
-     * @param imageData 이미지 바이트 배열
-     * @return MIME 타입 (image/jpeg 또는 image/png)
-     */
-    private String detectMimeType(byte[] imageData) {
-        if (imageData[0] == (byte) 0xFF && imageData[1] == (byte) 0xD8) {
-            return "image/jpeg";
-        } else if (imageData[0] == (byte) 0x89 && imageData[1] == (byte) 0x50) {
-            return "image/png";
-        } else {
-            return "unknown";
-        }
-    }
-
-    /**
-     * 고유 파일명 생성
-     *
-     * @return UUID 기반 고유 파일명
-     */
-    private String generateFileName() {
-        return "img_" + UUID.randomUUID();
+        return imageUrl;
     }
 }

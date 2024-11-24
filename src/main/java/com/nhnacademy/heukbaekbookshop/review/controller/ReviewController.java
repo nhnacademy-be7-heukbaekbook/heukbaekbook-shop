@@ -1,5 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.review.controller;
 
+import com.nhnacademy.heukbaekbookshop.order.domain.Review;
 import com.nhnacademy.heukbaekbookshop.review.dto.request.ReviewCreateRequest;
 import com.nhnacademy.heukbaekbookshop.review.dto.request.ReviewUpdateRequest;
 import com.nhnacademy.heukbaekbookshop.review.dto.response.ReviewDetailResponse;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/reviews")
+@RequestMapping("/api/reviews")
 public class ReviewController {
     private final ReviewService reviewService;
 
@@ -20,28 +21,26 @@ public class ReviewController {
     }
 
     @PostMapping
-    public ResponseEntity<ReviewDetailResponse> createReview(@RequestBody ReviewCreateRequest request) {
-        ReviewDetailResponse response = reviewService.createReview(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public ResponseEntity<Review> createReview(@RequestHeader(value = "X-USER-ID") Long customerId,
+            @RequestBody ReviewCreateRequest request) {
+        Review review = reviewService.createReview(customerId, request);
+        return new ResponseEntity<>(review, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{reviewId}")
+    @PutMapping("/{orderId}/{bookId}")
     public ResponseEntity<ReviewDetailResponse> updateReview(
-            @PathVariable Long reviewId,
+            @RequestHeader(value = "X-USER-ID") Long customerId,
+            @PathVariable Long orderId,
+            @PathVariable Long bookId,
             @RequestBody ReviewUpdateRequest request) {
-        ReviewDetailResponse response = reviewService.updateReview(reviewId, request);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/{reviewId}")
-    public ResponseEntity<ReviewDetailResponse> getReview(@PathVariable Long reviewId) {
-        ReviewDetailResponse response = reviewService.getReview(reviewId);
-        return ResponseEntity.ok(response);
+        ReviewDetailResponse updatedReview = reviewService.updateReview(customerId, orderId, bookId, request);
+        return ResponseEntity.ok(updatedReview);
     }
 
     @GetMapping("/book/{bookId}")
     public ResponseEntity<List<ReviewDetailResponse>> getReviewsByBook(@PathVariable Long bookId) {
-        List<ReviewDetailResponse> responses = reviewService.getReviewsByBook(bookId);
-        return ResponseEntity.ok(responses);
+        List<ReviewDetailResponse> reviews = reviewService.getReviewsByBook(bookId);
+        return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 }

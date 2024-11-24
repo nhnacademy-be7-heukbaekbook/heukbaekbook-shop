@@ -9,6 +9,7 @@ import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;

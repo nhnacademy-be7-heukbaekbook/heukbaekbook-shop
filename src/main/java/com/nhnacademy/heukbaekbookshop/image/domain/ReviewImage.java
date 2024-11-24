@@ -16,15 +16,9 @@ import lombok.Setter;
 public class ReviewImage extends Image {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "customer_id", referencedColumnName = "customer_id"),
-            @JoinColumn(name = "book_id", referencedColumnName = "book_id"),
-            @JoinColumn(name = "order_id", referencedColumnName = "order_id")
+            @JoinColumn(name = "customer_id", referencedColumnName = "customer_id", nullable = false),
+            @JoinColumn(name = "book_id", referencedColumnName = "book_id", nullable = false),
+            @JoinColumn(name = "order_id", referencedColumnName = "order_id", nullable = false)
     })
     private Review review;
-
-    @Column(name = "image_url", nullable = false)
-    private String url;
-
-    @Column(name = "image_type", nullable = false)
-    private String imageType;
 }
