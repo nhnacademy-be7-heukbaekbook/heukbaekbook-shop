@@ -3,9 +3,9 @@ package com.nhnacademy.heukbaekbookshop.review.service;
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.common.auth.AuthService;
-import com.nhnacademy.heukbaekbookshop.image.domain.PhotoType;
+import com.nhnacademy.heukbaekbookshop.image.ImageManagerService;
+import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import com.nhnacademy.heukbaekbookshop.image.domain.ReviewImage;
-import com.nhnacademy.heukbaekbookshop.image.service.ImageUploadService;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.repository.CustomerRepository;
 import com.nhnacademy.heukbaekbookshop.order.domain.Order;
@@ -21,6 +21,7 @@ import com.nhnacademy.heukbaekbookshop.review.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,14 +36,14 @@ public class ReviewService {
     private final CustomerRepository customerRepository;
     private final BookRepository bookRepository;
     private final AuthService authService;
-    private final ImageUploadService imageUploadService;
+    private final ImageManagerService imageManagerService;
 
     public ReviewService(ReviewRepository reviewRepository,
                          ReviewImageRepository reviewImageRepository,
                          OrderRepository orderRepository,
                          OrderBookRepository orderBookRepository,
                          AuthService authService,
-                         ImageUploadService imageUploadService,
+                         ImageManagerService imageManagerService,
                          CustomerRepository customerRepository,
                          BookRepository bookRepository) {
         this.reviewRepository = reviewRepository;
@@ -50,26 +51,24 @@ public class ReviewService {
         this.orderRepository = orderRepository;
         this.orderBookRepository = orderBookRepository;
         this.authService = authService;
-        this.imageUploadService = imageUploadService;
+        this.imageManagerService = imageManagerService;
         this.customerRepository = customerRepository;
         this.bookRepository = bookRepository;
     }
 
     @Transactional
     public Review createReview(Long customerId, ReviewCreateRequest request) {
+        // 고객, 주문, 도서 유효성 확인
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 고객 ID입니다."));
+
         Order order = orderRepository.findById(request.orderId())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 주문 ID입니다."));
+
         Book book = bookRepository.findById(request.bookId())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 도서 ID입니다."));
 
-
-        List<String> imageUrls = request.images().stream()
-                .map(image -> imageUploadService.uploadPhoto(image, PhotoType.REVIEW))
-                .collect(Collectors.toList());
-
-
+        List<MultipartFile> files = request.images();
         Review review = Review.createReview(
                 customerId,
                 request.bookId(),
@@ -77,15 +76,26 @@ public class ReviewService {
                 request.score(),
                 request.title(),
                 request.content(),
-                imageUrls
+                files,
+                file -> imageManagerService.uploadPhoto(file, ImageType.REVIEW)
         );
+        reviewRepository.save(review);
 
-        boolean isBookInOrder = order.getOrderBooks().stream()
-                .anyMatch(orderBook -> orderBook.getBookId().equals(request.bookId()));
 
-        if (!isBookInOrder) {
-            throw new IllegalArgumentException("해당 도서는 이 주문에 포함되지 않았습니다.");
-        }
+
+        // 리뷰 이미지 처리
+        List<ReviewImage> reviewImages = request.images().stream()
+                .map(image -> {
+                    String imageUrl = imageManagerService.uploadPhoto(image, ImageType.REVIEW);
+                    ReviewImage reviewImage = new ReviewImage();
+                    reviewImage.setUrl(imageUrl);
+                    reviewImage.setReview(review); // review 설정
+                    reviewImage.setType(ImageType.REVIEW);
+                    return reviewImage;
+                })
+                .collect(Collectors.toList());
+
+        review.setReviewImages(reviewImages); // Review와 연결
 
         reviewRepository.save(review);
 
@@ -93,7 +103,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewDetailResponse updateReview(Long customerId, Long orderId, Long bookId,ReviewUpdateRequest request) {
+    public ReviewDetailResponse updateReview(Long customerId, Long orderId, Long bookId, ReviewUpdateRequest request) {
         ReviewPK reviewPK = new ReviewPK(customerId, bookId, orderId);
 
         Review review = reviewRepository.findById(reviewPK)

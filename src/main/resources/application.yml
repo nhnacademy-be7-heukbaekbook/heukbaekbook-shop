@@ -4,16 +4,15 @@ spring:
   config:
     import: optional:configserver:http://localhost:9000
 
-nhn:
-  cloud:
-    tenant-id: fcb81f74e379456b8ca0e091d351a7af
-    api-user-id: fa38a82e97d646eb8c0bf90b5e3bae18
-    api-password: gmrqoransrh!!!
+#nhn:
+#  cloud:
+#    tenant-id: fcb81f74e379456b8ca0e091d351a7af
+#    api-user-id: fa38a82e97d646eb8c0bf90b5e3bae18
+#    api-password: gmrqoransrh!!!
 
-object:
-  storage:
-    auth-url: https://api-identity-infrastructure.nhncloudservice.com/v2.0
-    url: https://kr1-api-object-storage.nhncloudservice.com/v1/AUTH_fcb81f74e379456b8ca0e091d351a7af
-    tenant-id: fcb81f74e379456b8ca0e091d351a7af
-    username: fa38a82e97d646eb8c0bf90b5e3bae18
-    password: gmrqoransrh!!!
+cloud:
+  nhn:
+    image-manager:
+      url: https://api-image.nhncloudservice.com/image/v2.0/appkeys/rUN43QEwj1P6jThk
+      app-key: rUN43QEwj1P6jThk
+      secret-id: 6f5396562412430883fbd023ef2c50d9

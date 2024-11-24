@@ -23,7 +23,7 @@ public class ReviewController {
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
     public ResponseEntity<Review> createReview(@RequestHeader(value = "X-USER-ID") Long customerId,
-            @RequestBody ReviewCreateRequest request) {
+            @ModelAttribute ReviewCreateRequest request) {
         Review review = reviewService.createReview(customerId, request);
         return new ResponseEntity<>(review, HttpStatus.CREATED);
     }

@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.order.domain;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
+import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import com.nhnacademy.heukbaekbookshop.image.domain.ReviewImage;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 import jakarta.persistence.*;
@@ -11,10 +12,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 @Entity
 @Getter
@@ -77,7 +80,8 @@ public class Review {
     private String content;
 
 
-    public static Review createReview(Long customerId, Long bookId, Long orderId, int reviewScore, String reviewTitle, String reviewContent, List<ReviewImage> reviewImages) {
+    public static Review createReview(Long customerId, Long bookId, Long orderId, int reviewScore, String reviewTitle, String reviewContent, List<MultipartFile> reviewImages, Function<MultipartFile, String> uploadFunction
+    ) {
         Review review = new Review();
         review.customerId = customerId;
         review.bookId = bookId;
@@ -86,8 +90,14 @@ public class Review {
         review.title = reviewTitle;
         review.content = reviewContent;
         review.createdAt = LocalDateTime.now();
-        review.reviewImages = reviewImages;
-        return review;
+        for (MultipartFile file : reviewImages) {
+            String imageUrl = uploadFunction.apply(file); // 업로드 후 URL 반환
+            ReviewImage reviewImage = new ReviewImage();
+            reviewImage.setUrl(imageUrl);
+            reviewImage.setReview(review); // 양방향 관계 설정
+            reviewImage.setType(ImageType.REVIEW); // imageType 설정
+            review.reviewImages.add(reviewImage);
+        }        return review;
     }
 
     public void updateReview(int reviewScore, String reviewTitle, String reviewContent) {
