@@ -7,6 +7,6 @@ public record BookSummaryResponse(Long id,
                                   boolean isPackable,
                                   BigDecimal price,
                                   BigDecimal salePrice,
-                                  double discountRate,
+                                  BigDecimal discountRate,
                                   String thumbnailUrl) {
 }

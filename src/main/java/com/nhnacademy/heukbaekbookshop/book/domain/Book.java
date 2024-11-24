@@ -13,7 +13,9 @@ import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -64,7 +66,7 @@ public class Book {
 
     @NotNull
     @Column(name = "book_discount_rate")
-    private float discountRate;
+    private BigDecimal discountRate;
 
     @NotNull
     @Column(name = "book_popularity")
@@ -89,7 +91,7 @@ public class Book {
     private Set<Cart> carts = new HashSet<>();
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<BookCategory> categories = new HashSet<>();
+    private List<BookCategory> categories = new ArrayList<>();
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderBook> orderBooks = new HashSet<>();
