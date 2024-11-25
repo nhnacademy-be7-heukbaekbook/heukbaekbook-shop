@@ -22,7 +22,8 @@ public class ReviewController {
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    public ResponseEntity<Review> createReview(@RequestHeader(value = "X-USER-ID") Long customerId,
+    public ResponseEntity<Review> createReview(
+            @RequestHeader(value = "X-USER-ID") Long customerId,
             @ModelAttribute ReviewCreateRequest request) {
         Review review = reviewService.createReview(customerId, request);
         return new ResponseEntity<>(review, HttpStatus.CREATED);
@@ -33,7 +34,7 @@ public class ReviewController {
             @RequestHeader(value = "X-USER-ID") Long customerId,
             @PathVariable Long orderId,
             @PathVariable Long bookId,
-            @RequestBody ReviewUpdateRequest request) {
+            @ModelAttribute ReviewUpdateRequest request) {
         ReviewDetailResponse updatedReview = reviewService.updateReview(customerId, orderId, bookId, request);
         return ResponseEntity.ok(updatedReview);
     }
@@ -41,6 +42,12 @@ public class ReviewController {
     @GetMapping("/book/{bookId}")
     public ResponseEntity<List<ReviewDetailResponse>> getReviewsByBook(@PathVariable Long bookId) {
         List<ReviewDetailResponse> reviews = reviewService.getReviewsByBook(bookId);
+        return new ResponseEntity<>(reviews, HttpStatus.OK);
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<ReviewDetailResponse>> getMyReviews(@RequestHeader(value = "X-USER-ID") Long customerId) {
+        List<ReviewDetailResponse> reviews = reviewService.getReviewsByCustomer(customerId);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 }

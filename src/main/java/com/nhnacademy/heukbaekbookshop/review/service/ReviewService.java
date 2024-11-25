@@ -88,6 +88,7 @@ public class ReviewService {
     public ReviewDetailResponse updateReview(Long customerId, Long orderId, Long bookId, ReviewUpdateRequest request) {
         ReviewPK reviewPK = new ReviewPK(customerId, bookId, orderId);
 
+        // 기존 리뷰 조회
         Review review = reviewRepository.findById(reviewPK)
                 .orElseThrow(() -> new IllegalArgumentException("Review not found"));
 
@@ -95,19 +96,51 @@ public class ReviewService {
             throw new IllegalArgumentException("제목과 내용은 필수 항목입니다.");
         }
 
-        review.setTitle(request.getTitle());
-        review.setContent(request.getContent());
-        review.setScore(request.getScore());
-        review.setUpdatedAt(LocalDateTime.now());
-        reviewRepository.save(review);
+        // 리뷰 정보 업데이트
+        review.updateReview(request.getScore(), request.getTitle(), request.getContent());
 
-        List<String> imageUrls = reviewImageRepository.findAllByReview(review)
-                .stream()
+        // 현재 저장된 리뷰 이미지 URL 리스트
+        List<String> currentImageUrls = review.getReviewImages().stream()
                 .map(ReviewImage::getUrl)
                 .collect(Collectors.toList());
 
-        return convertToResponse(review, imageUrls);
+        // 요청된 업로드 이미지 URL 리스트
+        List<String> uploadedImageUrls = request.getUploadedImages().stream()
+                .map(image -> imageManagerService.uploadPhoto(image, ImageType.REVIEW)) // 새 이미지를 업로드
+                .collect(Collectors.toList());
+
+        // 삭제해야 할 이미지 처리
+        List<ReviewImage> imagesToDelete = review.getReviewImages().stream()
+                .filter(image -> !uploadedImageUrls.contains(image.getUrl()))
+                .collect(Collectors.toList());
+        for (ReviewImage image : imagesToDelete) {
+            reviewImageRepository.delete(image); // 삭제를 명시적으로 처리
+            review.getReviewImages().remove(image); // 리뷰와 연결 끊기
+        }
+
+        // 추가해야 할 이미지 처리
+        for (String imageUrl : uploadedImageUrls) {
+            if (!currentImageUrls.contains(imageUrl)) {
+                ReviewImage newReviewImage = new ReviewImage();
+                newReviewImage.setUrl(imageUrl);
+                newReviewImage.setReview(review);
+                newReviewImage.setType(ImageType.REVIEW);
+                reviewImageRepository.save(newReviewImage); // 명시적으로 저장
+                review.getReviewImages().add(newReviewImage);
+            }
+        }
+
+        // 리뷰 저장
+        reviewRepository.save(review);
+
+        // 반환할 이미지 URL 리스트
+        List<String> finalImageUrls = review.getReviewImages().stream()
+                .map(ReviewImage::getUrl)
+                .collect(Collectors.toList());
+
+        return convertToResponse(review, finalImageUrls);
     }
+
 
     @Transactional(readOnly = true)
     public List<ReviewDetailResponse> getReviewsByBook(Long bookId) {
@@ -132,6 +165,18 @@ public class ReviewService {
                 review.getScore(),
                 imageUrls
         );
+    }
+
+    public List<ReviewDetailResponse> getReviewsByCustomer(Long customerId) {
+        List<Review> reviews = reviewRepository.findAllByCustomerId(customerId);
+
+        return reviews.stream().map(review -> {
+            List<String> imageUrls = reviewImageRepository.findAllByReview(review)
+                    .stream()
+                    .map(ReviewImage::getUrl)
+                    .collect(Collectors.toList());
+            return convertToResponse(review, imageUrls);
+        }).collect(Collectors.toList());
     }
 }
 

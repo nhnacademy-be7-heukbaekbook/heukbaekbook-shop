@@ -8,11 +8,14 @@ import com.nhnacademy.heukbaekbookshop.order.dto.response.DeliveryFeeDeleteRespo
 import com.nhnacademy.heukbaekbookshop.order.dto.response.DeliveryFeeUpdateResponse;
 import com.nhnacademy.heukbaekbookshop.order.exception.DeliveryFeeAlreadyExistsException;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.DeliveryFeeDetailResponse;
+import com.nhnacademy.heukbaekbookshop.order.exception.DeliveryFeeNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.exception.DeliveryNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.repository.DeliveryFeeRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 @Service
 public class DeliveryFeeService {
@@ -31,18 +34,19 @@ public class DeliveryFeeService {
         DeliveryFee deliveryFee = DeliveryFee.builder()
                 .name(request.name())
                 .fee(request.fee())
+                .minimumOrderAmount(request.minimumOrderAmount())
                 .build();
 
         deliveryFeeRepository.save(deliveryFee);
 
-        return new DeliveryFeeCreateResponse(request.name(), request.fee());
+        return new DeliveryFeeCreateResponse(request.name(), request.fee(), request.minimumOrderAmount());
     }
 
     public DeliveryFeeDetailResponse getDeliveryFee(Long deliveryFeeId) {
         DeliveryFee deliveryFee = deliveryFeeRepository.findById(deliveryFeeId)
                 .orElseThrow(() -> new DeliveryNotFoundException("존재하지 않는 배송비 정보입니다."));
 
-        return new DeliveryFeeDetailResponse(deliveryFee.getId(), deliveryFee.getName(), deliveryFee.getFee());
+        return new DeliveryFeeDetailResponse(deliveryFee.getId(), deliveryFee.getName(), deliveryFee.getFee(), deliveryFee.getMinimumOrderAmount());
     }
 
     public DeliveryFeeUpdateResponse updateDeliveryFee(Long deliveryFeeId, DeliveryFeeUpdateRequest request) {
@@ -51,10 +55,11 @@ public class DeliveryFeeService {
 
         deliveryFee.setName(request.name());
         deliveryFee.setFee(request.fee());
+        deliveryFee.setMinimumOrderAmount(request.minimumOrderAmount());
 
         deliveryFeeRepository.save(deliveryFee);
 
-        return new DeliveryFeeUpdateResponse(request.name(), request.fee());
+        return new DeliveryFeeUpdateResponse(request.name(), request.fee(), request.minimumOrderAmount());
     }
 
     public DeliveryFeeDeleteResponse deleteDeliveryFee(Long deliveryFeeId) {
@@ -63,11 +68,16 @@ public class DeliveryFeeService {
 
         deliveryFeeRepository.delete(deliveryFee);
 
-        return new DeliveryFeeDeleteResponse(deliveryFee.getId(), deliveryFee.getName(), deliveryFee.getFee());
+        return new DeliveryFeeDeleteResponse(deliveryFee.getId(), deliveryFee.getName(), deliveryFee.getFee(), deliveryFee.getMinimumOrderAmount());
     }
 
     public Page<DeliveryFeeDetailResponse> getDeliveryFees(Pageable pageable) {
         Page<DeliveryFee> deliveryFees = deliveryFeeRepository.findAll(pageable);
-        return deliveryFees.map(deliveryFee -> new DeliveryFeeDetailResponse(deliveryFee.getId(), deliveryFee.getName(), deliveryFee.getFee()));
+        return deliveryFees.map(deliveryFee -> new DeliveryFeeDetailResponse(deliveryFee.getId(), deliveryFee.getName(), deliveryFee.getFee(), deliveryFee.getMinimumOrderAmount()));
+    }
+
+    public BigDecimal getDeliveryFeeByMinimumOrderAmount(BigDecimal minimumOrderAmount) {
+        return deliveryFeeRepository.findByMinimumOrderAmount(minimumOrderAmount)
+                .orElseThrow(() -> new DeliveryFeeNotFoundException("delivery fee not found")).getFee();
     }
 }

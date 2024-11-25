@@ -1,16 +1,14 @@
 package com.nhnacademy.heukbaekbookshop.order.controller;
 
 import com.nhnacademy.heukbaekbookshop.order.dto.request.OrderCreateRequest;
+import com.nhnacademy.heukbaekbookshop.order.dto.response.OrderDetailResponse;
 import com.nhnacademy.heukbaekbookshop.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -25,5 +23,12 @@ public class OrderController {
         log.info("orderCreateRequest: {}", orderCreateRequest);
 
         return new ResponseEntity<>(orderService.createOrder(orderCreateRequest), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{orderId}")
+    public OrderDetailResponse getOrderDetailResponse(@PathVariable String orderId) {
+        log.info("orderId: {}", orderId);
+
+        return orderService.getOrderDetailResponse(orderId);
     }
 }

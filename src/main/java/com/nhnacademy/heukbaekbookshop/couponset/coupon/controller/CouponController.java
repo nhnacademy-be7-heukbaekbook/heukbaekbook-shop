@@ -1,7 +1,10 @@
 package com.nhnacademy.heukbaekbookshop.couponset.coupon.controller;
 
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.BookCoupon;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CouponStatus;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request.CouponRequest;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.BookCouponResponse;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CategoryCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.service.CouponService;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
@@ -40,14 +43,43 @@ public class CouponController {
 
     /**
      * 쿠폰 전체 조회 기본 요청 시 사용되는 메서드입니다.
+     * 도서, 카테고리 쿠폰이 아닌 쿠폰 리스트입니다.
      *
      * @param pageable Page 처리 용 pageble 객체입니다.
      * @return 성공시, 응답코드 200 반환합니다.
      */
     @GetMapping
-    public ResponseEntity<Page<CouponResponse>> getAllCoupons(Pageable pageable) {
+    public ResponseEntity<Page<CouponResponse>> getAllNormalCoupons(Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(couponService.getAllCoupons(pageable)
+                .body(couponService.getAllNormalCoupons(pageable)
+                );
+    }
+
+    /**
+     * 쿠폰 전체 조회 기본 요청 시 사용되는 메서드입니다.
+     * 도서 쿠폰 리스트입니다.
+     *
+     * @param pageable Page 처리 용 pageble 객체입니다.
+     * @return 성공시, 응답코드 200 반환합니다.
+     */
+    @GetMapping("/book-coupon")
+    public ResponseEntity<Page<BookCouponResponse>> getAllBookCoupons(Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(couponService.getAllBookCoupons(pageable)
+                );
+    }
+
+    /**
+     * 쿠폰 전체 조회 기본 요청 시 사용되는 메서드입니다.
+     * 카테고리 쿠폰 리스트입니다.
+     *
+     * @param pageable Page 처리 용 pageble 객체입니다.
+     * @return 성공시, 응답코드 200 반환합니다.
+     */
+    @GetMapping("/category-coupon")
+    public ResponseEntity<Page<CategoryCouponResponse>> getAllCategoryCoupons(Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(couponService.getAllCategoryCoupons(pageable)
                 );
     }
 
@@ -114,7 +146,7 @@ public class CouponController {
      */
     @DeleteMapping("/{couponId}")
     public ResponseEntity<Void> deleteCoupon(@PathVariable("couponId") Long couponId) {
-        couponService.deleteCoupon(couponId);
+        couponService.changeCouponStatus(couponId, CouponStatus.DISABLE);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

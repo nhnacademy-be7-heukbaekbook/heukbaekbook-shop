@@ -25,9 +25,8 @@ public class PaymentController {
 
     @PostMapping("/confirm")
     public ResponseEntity<?> confirmPayment(@RequestBody PaymentApprovalRequest request) {
-        PaymentApprovalResponse response = null;
         try {
-            response = paymentService.approvePayment(request);
+            PaymentApprovalResponse response = paymentService.approvePayment(request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -36,13 +35,13 @@ public class PaymentController {
     }
 
     @PostMapping("/{payment-key}/cancel")
-    public ResponseEntity<PaymentCancelResponse> cancelPayment(@PathVariable(name = "payment-key") String paymentKey, @RequestBody PaymentCancelRequest request) {
-        PaymentCancelResponse response = null;
+    public ResponseEntity<PaymentCancelResponse> cancelPayment(@PathVariable(name = "payment-key") String paymentKey,
+                                                               @RequestBody PaymentCancelRequest request) {
         try {
-            response = paymentService.cancelPayment(paymentKey, request);
+            PaymentCancelResponse response = paymentService.cancelPayment(paymentKey, request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            response = new PaymentCancelResponse("결제 취소 요청이 실패하였습니다.");
+            PaymentCancelResponse response = new PaymentCancelResponse("결제 취소 요청이 실패하였습니다.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
@@ -53,10 +52,9 @@ public class PaymentController {
         return ResponseEntity.ok(payment);
     }
 
-    @GetMapping("/{customer-id}")
+    @GetMapping("/customer/{customer-id}")
     public ResponseEntity<List<PaymentDetailResponse>> getPayments(@PathVariable(name = "customer-id") Long customerId) {
         List<PaymentDetailResponse> payments = paymentService.getPayments(customerId);
         return ResponseEntity.ok(payments);
     }
-
 }
