@@ -2,8 +2,8 @@ package com.nhnacademy.heukbaekbookshop.couponset.membercoupon.service.impl;
 
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.Coupon;
 import com.nhnacademy.heukbaekbookshop.couponset.couponhistory.domain.CouponHistory;
-import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.domain.MemberCoupon;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.mapper.CouponMapper;
+import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.domain.MemberCoupon;
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.dto.response.MemberCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.exception.CouponNotFoundException;
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.exception.MemberCouponNotFoundException;

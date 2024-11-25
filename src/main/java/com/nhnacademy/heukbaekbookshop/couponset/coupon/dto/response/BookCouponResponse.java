@@ -14,6 +14,7 @@ public record BookCouponResponse(
         String couponDescription,
         LocalDateTime couponCreatedAt,
         CouponStatus couponStatus,
+        int couponQuantity,
         int availableDuration,
         LocalDateTime couponTimeStart,
         LocalDateTime couponTimeEnd,

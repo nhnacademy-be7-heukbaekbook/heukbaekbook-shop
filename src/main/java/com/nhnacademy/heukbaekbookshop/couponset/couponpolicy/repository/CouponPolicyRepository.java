@@ -6,6 +6,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface CouponPolicyRepository extends JpaRepository<CouponPolicy, Long> {
     Page<CouponPolicy> findCouponPolicyByDiscountTypeOrderByMinimumPurchaseAmount(DiscountType discountType, Pageable pageable);
+
+    Page<CouponPolicy> findAllByOrderByDiscountTypeAscDiscountAmountAsc(Pageable pageable);
+
+    List<CouponPolicy> findAllByOrderByDiscountTypeAscDiscountAmountAsc();
 }
+
