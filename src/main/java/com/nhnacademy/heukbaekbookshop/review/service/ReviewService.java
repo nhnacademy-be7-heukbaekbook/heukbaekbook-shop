@@ -68,7 +68,7 @@ public class ReviewService {
         Book book = bookRepository.findById(request.bookId())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 도서 ID입니다."));
 
-        List<MultipartFile> files = request.images();
+        // 리뷰 생성 및 이미지 업로드 처리
         Review review = Review.createReview(
                 customerId,
                 request.bookId(),
@@ -76,30 +76,12 @@ public class ReviewService {
                 request.score(),
                 request.title(),
                 request.content(),
-                files,
-                file -> imageManagerService.uploadPhoto(file, ImageType.REVIEW)
+                request.images(), // 업로드할 이미지 리스트
+                file -> imageManagerService.uploadPhoto(file, ImageType.REVIEW) // 업로드 함수 전달
         );
-        reviewRepository.save(review);
 
-
-
-        // 리뷰 이미지 처리
-        List<ReviewImage> reviewImages = request.images().stream()
-                .map(image -> {
-                    String imageUrl = imageManagerService.uploadPhoto(image, ImageType.REVIEW);
-                    ReviewImage reviewImage = new ReviewImage();
-                    reviewImage.setUrl(imageUrl);
-                    reviewImage.setReview(review); // review 설정
-                    reviewImage.setType(ImageType.REVIEW);
-                    return reviewImage;
-                })
-                .collect(Collectors.toList());
-
-        review.setReviewImages(reviewImages); // Review와 연결
-
-        reviewRepository.save(review);
-
-        return review;
+        // 리뷰 저장 (연관된 이미지도 함께 저장됨)
+        return reviewRepository.save(review);
     }
 
     @Transactional
