@@ -145,8 +145,8 @@ public class CouponController {
      * @return 성공시, 응답코드 204 반환합니다.
      */
     @DeleteMapping("/{couponId}")
-    public ResponseEntity<Void> deleteCoupon(@PathVariable("couponId") Long couponId) {
-        couponService.changeCouponStatus(couponId, CouponStatus.DISABLE);
+    public ResponseEntity<Void> changeIssuedCoupon(@PathVariable("couponId") Long couponId) {
+        couponService.changeCouponStatus(couponId, CouponStatus.ISSUED);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

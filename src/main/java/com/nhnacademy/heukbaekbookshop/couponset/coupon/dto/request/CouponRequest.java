@@ -10,6 +10,8 @@ public record CouponRequest (
         @NotNull
         Long policyId,
 
+        int couponQuantity,
+
         @NotNull
         int availableDuration,
 

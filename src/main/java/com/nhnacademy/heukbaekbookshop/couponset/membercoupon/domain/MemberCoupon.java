@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "members_coupons")
@@ -32,21 +33,19 @@ public class MemberCoupon {
     @Column(name = "is_coupon_used")
     private boolean isCouponUsed;
 
-    @NotNull
-    @Column(name = "coupon_created_at")
-    private LocalDateTime issuedAt;
+    @Column(name = "coupon_issued_at")
+    private LocalDateTime couponIssuedAt;
 
-    @NotNull
-    @Column(name = "coupon_expiration_date")
-    private LocalDateTime expirationAt;
+    @Column(name = "coupon_expiration_at")
+    private LocalDateTime couponExpirationAt;
 
 
     @Builder
     private MemberCoupon(Member member, Coupon coupon, LocalDateTime issuedAt, LocalDateTime expirationAt) {
         this.member = member;
         this.coupon = coupon;
-        this.issuedAt = issuedAt;
-        this.expirationAt = expirationAt;
+        this.couponIssuedAt = issuedAt;
+        this.couponExpirationAt = expirationAt;
         this.isCouponUsed = false;
     }
 

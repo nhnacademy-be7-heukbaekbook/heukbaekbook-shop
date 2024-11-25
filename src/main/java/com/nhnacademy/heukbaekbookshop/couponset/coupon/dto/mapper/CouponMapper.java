@@ -14,12 +14,14 @@ import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.domain.MemberCoupo
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.dto.response.MemberCouponResponse;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 
-
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CouponMapper {
 
     public static CouponResponse fromEntity(Coupon coupon) {
@@ -27,6 +29,7 @@ public class CouponMapper {
                 coupon.getId(),
                 CouponPolicyMapper.fromEntity(coupon.getCouponPolicy()),
                 coupon.getCouponStatus(),
+                coupon.getCouponQuantity(),
                 coupon.getAvailableDuration(),
                 coupon.getCouponTimeStart(),
                 coupon.getCouponTimeEnd(),
@@ -36,7 +39,7 @@ public class CouponMapper {
         );
     }
 
-    public static Page<CouponResponse> fromPageableEntity(Page<Coupon> coupons, Pageable pageable) {
+    public static Page<CouponResponse> fromPageableEntity(Page<Coupon> coupons) {
         return coupons.map(CouponMapper::fromEntity);
     }
 
@@ -53,6 +56,7 @@ public class CouponMapper {
 
     public static BookCoupon toBookCouponEntity(CouponRequest couponRequest, CouponPolicy couponPolicy, Book book) {
         return new BookCoupon(couponPolicy,
+                couponRequest.couponQuantity(),
                 couponRequest.availableDuration(),
                 couponRequest.couponTimeStart(),
                 couponRequest.couponTimeEnd(),
@@ -64,6 +68,7 @@ public class CouponMapper {
 
     public static CategoryCoupon toCategoryCouponEntity(CouponRequest couponRequest, CouponPolicy couponPolicy, Category category) {
         return new CategoryCoupon(couponPolicy,
+                couponRequest.couponQuantity(),
                 couponRequest.availableDuration(),
                 couponRequest.couponTimeStart(),
                 couponRequest.couponTimeEnd(),
@@ -71,7 +76,6 @@ public class CouponMapper {
                 couponRequest.couponDescription(),
                 category);
     }
-
     public static MemberCoupon toMemberCouponEntity(Member member, Coupon coupon, int availableDate){
         return MemberCoupon.builder()
                 .member(member)
@@ -85,8 +89,8 @@ public class CouponMapper {
                 memberCoupon.getId(),
                 memberCoupon.getCoupon().getId(),
                 memberCoupon.isCouponUsed(),
-                memberCoupon.getIssuedAt(),
-                memberCoupon.getExpirationAt()
+                memberCoupon.getCouponIssuedAt(),
+                memberCoupon.getCouponExpirationAt()
         );
     }
 

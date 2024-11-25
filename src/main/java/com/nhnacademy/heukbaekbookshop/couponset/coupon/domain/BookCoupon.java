@@ -17,8 +17,8 @@ public class BookCoupon extends Coupon {
     @JoinColumn(name = "book_id")
     private Book book;
 
-    public BookCoupon(CouponPolicy couponPolicy, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription, Book book) {
-        super(couponPolicy, availableDuration, couponTimeStart, couponTimeEnd, couponName, couponDescription);
+    public BookCoupon(CouponPolicy couponPolicy, int couponQuantity, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription, Book book) {
+        super(couponPolicy, couponQuantity, availableDuration, couponTimeStart, couponTimeEnd, couponName, couponDescription);
         this.book=book;
     }
 
