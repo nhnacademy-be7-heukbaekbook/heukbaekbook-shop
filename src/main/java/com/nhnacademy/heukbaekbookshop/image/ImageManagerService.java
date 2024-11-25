@@ -1,6 +1,5 @@
 package com.nhnacademy.heukbaekbookshop.image;
 
-import com.nhnacademy.heukbaekbookshop.image.ImageManagerProperties;
 import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -15,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -23,14 +23,24 @@ public class ImageManagerService {
     private final ImageManagerProperties properties;
 
     public String uploadPhoto(MultipartFile file, ImageType imageType) {
+        // 기본 경로 설정
         String containerPath = "/heukbaekbook/" + imageType.name().toLowerCase();
-        String fileName = file.getOriginalFilename();
-        if (fileName == null || fileName.isEmpty()) {
+
+        // 파일 확장자 추출
+        String originalFileName = file.getOriginalFilename();
+        if (originalFileName == null || originalFileName.isEmpty()) {
             throw new IllegalArgumentException("파일 이름이 유효하지 않습니다.");
         }
+        String extension = getFileExtension(originalFileName);
+        if (extension == null || extension.isEmpty()) {
+            throw new IllegalArgumentException("파일 확장자가 유효하지 않습니다.");
+        }
+
+        // 고유 파일명 생성 (review1, review2 형식)
+        String uniqueFileName = "review" + UUID.randomUUID().toString().replace("-", "").substring(0, 8) + "." + extension;
 
         // URL Encoding
-        String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
+        String encodedFileName = URLEncoder.encode(uniqueFileName, StandardCharsets.UTF_8);
         String uploadUrl = properties.getUrl() + "/images?path=" + containerPath + "/" + encodedFileName + "&overwrite=true";
 
         // HTTP Headers 설정
@@ -46,9 +56,18 @@ public class ImageManagerService {
 
             // 파일 업로드 요청
             restTemplate.execute(uploadUrl, HttpMethod.PUT, requestCallback, null);
-            return properties.getUrl() + containerPath + "/" + fileName;
+            return properties.getUrl() + containerPath + "/" + uniqueFileName;
         } catch (IOException e) {
             throw new RuntimeException("파일 업로드 실패", e);
         }
+    }
+
+    // 파일 확장자 추출 메서드
+    private String getFileExtension(String fileName) {
+        int lastDotIndex = fileName.lastIndexOf(".");
+        if (lastDotIndex > 0 && lastDotIndex < fileName.length() - 1) {
+            return fileName.substring(lastDotIndex + 1).toLowerCase();
+        }
+        return null;
     }
 }
