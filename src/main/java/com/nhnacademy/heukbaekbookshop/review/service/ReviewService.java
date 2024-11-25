@@ -16,6 +16,7 @@ import com.nhnacademy.heukbaekbookshop.order.repository.OrderBookRepository;
 import com.nhnacademy.heukbaekbookshop.order.repository.OrderRepository;
 import com.nhnacademy.heukbaekbookshop.point.history.domain.PointType;
 import com.nhnacademy.heukbaekbookshop.point.history.dto.request.PointHistoryRequest;
+import com.nhnacademy.heukbaekbookshop.point.history.repository.PointHistoryRepository;
 import com.nhnacademy.heukbaekbookshop.point.history.service.PointSaveService;
 import com.nhnacademy.heukbaekbookshop.review.dto.request.ReviewCreateRequest;
 import com.nhnacademy.heukbaekbookshop.review.dto.request.ReviewUpdateRequest;
@@ -29,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,31 +39,28 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final OrderRepository orderRepository;
-    private final OrderBookRepository orderBookRepository;
     private final CustomerRepository customerRepository;
     private final BookRepository bookRepository;
-    private final AuthService authService;
     private final ImageManagerService imageManagerService;
     private final PointSaveService pointSaveService;
+
+    private final PointHistoryRepository pointHistoryRepository;
 
     public ReviewService(ReviewRepository reviewRepository,
                          ReviewImageRepository reviewImageRepository,
                          OrderRepository orderRepository,
-                         OrderBookRepository orderBookRepository,
-                         AuthService authService,
                          ImageManagerService imageManagerService,
                          CustomerRepository customerRepository,
                          BookRepository bookRepository,
-                         PointSaveService pointSaveService) {
+                         PointSaveService pointSaveService, PointHistoryRepository pointHistoryRepository) {
         this.reviewRepository = reviewRepository;
         this.reviewImageRepository = reviewImageRepository;
         this.orderRepository = orderRepository;
-        this.orderBookRepository = orderBookRepository;
-        this.authService = authService;
         this.imageManagerService = imageManagerService;
         this.customerRepository = customerRepository;
         this.bookRepository = bookRepository;
         this.pointSaveService = pointSaveService;
+        this.pointHistoryRepository = pointHistoryRepository;
     }
 
     @Transactional
@@ -82,6 +81,7 @@ public class ReviewService {
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 도서 ID입니다."));
 
         // 리뷰 생성 및 이미지 업로드 처리
+        List<MultipartFile> images = request.images() != null ? request.images() : new ArrayList<>();
         Review review = Review.createReview(
                 customerId,
                 request.bookId(),
@@ -89,7 +89,7 @@ public class ReviewService {
                 request.score(),
                 request.title(),
                 request.content(),
-                request.images(), // 업로드할 이미지 리스트
+                images,
                 file -> imageManagerService.uploadPhoto(file, ImageType.REVIEW) // 업로드 함수 전달
         );
 
@@ -97,8 +97,8 @@ public class ReviewService {
         reviewRepository.save(review);
 
         // 포인트 적립 로직 추가
-        int pointToEarn = request.images().isEmpty() ? 200 : 500; // 이미지 유무에 따라 포인트 차등 지급
-        saveReviewPoints(customerId, pointToEarn);
+        int pointToEarn = images.isEmpty() ? 200 : 500; // 이미지 유무에 따라 포인트 차등 지급
+        saveReviewPoints(customerId, request.orderId(), pointToEarn);
 
         return review;
     }
@@ -162,9 +162,15 @@ public class ReviewService {
         }
     }
 
-    private void saveReviewPoints(Long customerId, int points) {
+    private void saveReviewPoints(Long customerId, Long orderId, int points) {
+        boolean alreadyAdded = pointHistoryRepository.existsByMemberIdAndOrderId(customerId, orderId);
+
+        if (alreadyAdded) {
+            throw new IllegalArgumentException("이미 리뷰 작성으로 포인트가 적립되었습니다.");
+        }
+
         PointHistoryRequest pointRequest = new PointHistoryRequest(
-                null, // 리뷰 작성 시 주문과 연관된 경우가 아니므로 null
+                orderId,
                 "리뷰 작성으로 인한 포인트 적립",
                 BigDecimal.valueOf(points),
                 LocalDateTime.now(),
@@ -211,18 +217,3 @@ public class ReviewService {
         }).collect(Collectors.toList());
     }
 }
-
-
-//
-//    @Transactional(readOnly = true)
-//    public ReviewDetailResponse getReview(Long reviewId) {
-//        Review review = reviewRepository.findById(reviewId)
-//                .orElseThrow(() -> new IllegalArgumentException("Review not found"));
-//
-//        List<String> imageUrls = reviewImageRepository.findAllByReviewId(reviewId)
-//                .stream()
-//                .map(ReviewImage::getUrl)
-//                .collect(Collectors.toList());
-//
-//        return convertToResponse(review, imageUrls);
-//    }

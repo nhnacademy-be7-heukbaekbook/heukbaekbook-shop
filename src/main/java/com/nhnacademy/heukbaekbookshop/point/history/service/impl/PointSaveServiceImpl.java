@@ -3,6 +3,11 @@ package com.nhnacademy.heukbaekbookshop.point.history.service.impl;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
+import com.nhnacademy.heukbaekbookshop.order.domain.Order;
+import com.nhnacademy.heukbaekbookshop.order.domain.Review;
+import com.nhnacademy.heukbaekbookshop.order.domain.ReviewPK;
+import com.nhnacademy.heukbaekbookshop.order.exception.OrderNotFoundException;
+import com.nhnacademy.heukbaekbookshop.order.repository.OrderRepository;
 import com.nhnacademy.heukbaekbookshop.point.history.domain.PointHistory;
 import com.nhnacademy.heukbaekbookshop.point.history.domain.PointType;
 import com.nhnacademy.heukbaekbookshop.point.history.domain.mapper.PointHistoryMapper;
@@ -11,6 +16,7 @@ import com.nhnacademy.heukbaekbookshop.point.history.dto.response.PointHistoryRe
 import com.nhnacademy.heukbaekbookshop.point.history.exception.InsufficientPointsException;
 import com.nhnacademy.heukbaekbookshop.point.history.repository.PointHistoryRepository;
 import com.nhnacademy.heukbaekbookshop.point.history.service.PointSaveService;
+import com.nhnacademy.heukbaekbookshop.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -24,6 +30,8 @@ public class PointSaveServiceImpl implements PointSaveService {
 
     private final PointHistoryRepository pointHistoryRepository;
     private final MemberRepository memberRepository;
+    private final OrderRepository orderRepository;
+
 
 
     @Override
@@ -33,11 +41,11 @@ public class PointSaveServiceImpl implements PointSaveService {
                 .orElseThrow(MemberNotFoundException::new);
 
 //        TODO ORDER
-//        Order order = null;
-//        if (request.orderId() != null) {
-//            order = orderRepository.findById(request.orderId())
-//                    .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + request.orderId()));
-//        }
+        Order order = null;
+        if (pointHistoryRequest.orderId() != null) {
+            order = orderRepository.findById(pointHistoryRequest.orderId())
+                    .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + pointHistoryRequest.orderId()));
+        }
 
         BigDecimal currentBalance = pointHistoryRepository.findFirstByMemberIdOrderByCreatedAtDesc(customerId)
                 .map(PointHistory::getBalance)
@@ -49,7 +57,7 @@ public class PointSaveServiceImpl implements PointSaveService {
             throw new InsufficientPointsException("포인트가 부족합니다.");
         }
 
-        PointHistory pointHistory = PointHistoryMapper.toEntity(pointHistoryRequest, member, null, newBalance);
+        PointHistory pointHistory = PointHistoryMapper.toEntity(pointHistoryRequest, member, order, newBalance);
         PointHistory savedPointHistory = pointHistoryRepository.save(pointHistory);
         return PointHistoryMapper.toResponse(savedPointHistory);
     }

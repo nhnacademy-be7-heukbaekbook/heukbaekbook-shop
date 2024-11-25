@@ -24,7 +24,7 @@ public class ImageManagerService {
 
     public String uploadPhoto(MultipartFile file, ImageType imageType) {
         // 기본 경로 설정
-        String containerPath = "/heukbaekbook/" + imageType.name().toLowerCase();
+        String baseFolder = "/heukbaekbook/";
 
         // 파일 확장자 추출
         String originalFileName = file.getOriginalFilename();
@@ -36,8 +36,9 @@ public class ImageManagerService {
             throw new IllegalArgumentException("파일 확장자가 유효하지 않습니다.");
         }
 
-        // 고유 파일명 생성 (review1, review2 형식)
-        String uniqueFileName = "review" + UUID.randomUUID().toString().replace("-", "").substring(0, 8) + "." + extension;
+        String containerPath = baseFolder + imageType.name().toLowerCase();
+
+        String uniqueFileName = imageType.name().toLowerCase() + UUID.randomUUID().toString().replace("-", "").substring(0, 8) + "." + extension;
 
         // URL Encoding
         String encodedFileName = URLEncoder.encode(uniqueFileName, StandardCharsets.UTF_8);
