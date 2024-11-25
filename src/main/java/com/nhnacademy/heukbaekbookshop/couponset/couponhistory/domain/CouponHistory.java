@@ -1,18 +1,18 @@
-package com.nhnacademy.heukbaekbookshop.couponset.coupon.domain;
+package com.nhnacademy.heukbaekbookshop.couponset.couponhistory.domain;
 
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.Coupon;
+import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.domain.MemberCoupon;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "coupons_histories")
@@ -38,4 +38,9 @@ public class CouponHistory {
     })
     private OrderBook orderBook;
 
+    @ManyToOne
+    @JoinColumn(name = "coupon_id", referencedColumnName = "coupon_id")
+    private Coupon coupon;
 }
+
+
