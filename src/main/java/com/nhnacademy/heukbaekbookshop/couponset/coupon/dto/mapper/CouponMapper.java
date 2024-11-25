@@ -89,8 +89,8 @@ public class CouponMapper {
                 memberCoupon.getId(),
                 memberCoupon.getCoupon().getId(),
                 memberCoupon.isCouponUsed(),
-                memberCoupon.getIssuedAt(),
-                memberCoupon.getExpirationAt()
+                memberCoupon.getCouponIssuedAt(),
+                memberCoupon.getCouponExpirationAt()
         );
     }
 
