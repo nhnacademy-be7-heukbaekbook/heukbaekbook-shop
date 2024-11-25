@@ -13,6 +13,9 @@ import com.nhnacademy.heukbaekbookshop.order.domain.Review;
 import com.nhnacademy.heukbaekbookshop.order.domain.ReviewPK;
 import com.nhnacademy.heukbaekbookshop.order.repository.OrderBookRepository;
 import com.nhnacademy.heukbaekbookshop.order.repository.OrderRepository;
+import com.nhnacademy.heukbaekbookshop.point.history.domain.PointType;
+import com.nhnacademy.heukbaekbookshop.point.history.dto.request.PointHistoryRequest;
+import com.nhnacademy.heukbaekbookshop.point.history.service.PointSaveService;
 import com.nhnacademy.heukbaekbookshop.review.dto.request.ReviewCreateRequest;
 import com.nhnacademy.heukbaekbookshop.review.dto.request.ReviewUpdateRequest;
 import com.nhnacademy.heukbaekbookshop.review.dto.response.ReviewDetailResponse;
@@ -23,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,6 +41,7 @@ public class ReviewService {
     private final BookRepository bookRepository;
     private final AuthService authService;
     private final ImageManagerService imageManagerService;
+    private final PointSaveService pointSaveService;
 
     public ReviewService(ReviewRepository reviewRepository,
                          ReviewImageRepository reviewImageRepository,
@@ -45,7 +50,8 @@ public class ReviewService {
                          AuthService authService,
                          ImageManagerService imageManagerService,
                          CustomerRepository customerRepository,
-                         BookRepository bookRepository) {
+                         BookRepository bookRepository,
+                         PointSaveService pointSaveService) {
         this.reviewRepository = reviewRepository;
         this.reviewImageRepository = reviewImageRepository;
         this.orderRepository = orderRepository;
@@ -54,6 +60,7 @@ public class ReviewService {
         this.imageManagerService = imageManagerService;
         this.customerRepository = customerRepository;
         this.bookRepository = bookRepository;
+        this.pointSaveService = pointSaveService;
     }
 
     @Transactional
@@ -81,7 +88,13 @@ public class ReviewService {
         );
 
         // 리뷰 저장 (연관된 이미지도 함께 저장됨)
-        return reviewRepository.save(review);
+        reviewRepository.save(review);
+
+        // 포인트 적립 로직 추가
+        int pointToEarn = request.images().isEmpty() ? 200 : 500; // 이미지 유무에 따라 포인트 차등 지급
+        saveReviewPoints(customerId, pointToEarn);
+
+        return review;
     }
 
     @Transactional
@@ -99,41 +112,12 @@ public class ReviewService {
         // 리뷰 정보 업데이트
         review.updateReview(request.getScore(), request.getTitle(), request.getContent());
 
-        // 현재 저장된 리뷰 이미지 URL 리스트
-        List<String> currentImageUrls = review.getReviewImages().stream()
-                .map(ReviewImage::getUrl)
-                .collect(Collectors.toList());
-
-        // 요청된 업로드 이미지 URL 리스트
-        List<String> uploadedImageUrls = request.getUploadedImages().stream()
-                .map(image -> imageManagerService.uploadPhoto(image, ImageType.REVIEW)) // 새 이미지를 업로드
-                .collect(Collectors.toList());
-
-        // 삭제해야 할 이미지 처리
-        List<ReviewImage> imagesToDelete = review.getReviewImages().stream()
-                .filter(image -> !uploadedImageUrls.contains(image.getUrl()))
-                .collect(Collectors.toList());
-        for (ReviewImage image : imagesToDelete) {
-            reviewImageRepository.delete(image); // 삭제를 명시적으로 처리
-            review.getReviewImages().remove(image); // 리뷰와 연결 끊기
-        }
-
-        // 추가해야 할 이미지 처리
-        for (String imageUrl : uploadedImageUrls) {
-            if (!currentImageUrls.contains(imageUrl)) {
-                ReviewImage newReviewImage = new ReviewImage();
-                newReviewImage.setUrl(imageUrl);
-                newReviewImage.setReview(review);
-                newReviewImage.setType(ImageType.REVIEW);
-                reviewImageRepository.save(newReviewImage); // 명시적으로 저장
-                review.getReviewImages().add(newReviewImage);
-            }
-        }
+        // 이미지 업데이트 처리
+        processImagesForUpdate(review, request.getUploadedImages());
 
         // 리뷰 저장
         reviewRepository.save(review);
 
-        // 반환할 이미지 URL 리스트
         List<String> finalImageUrls = review.getReviewImages().stream()
                 .map(ReviewImage::getUrl)
                 .collect(Collectors.toList());
@@ -141,6 +125,47 @@ public class ReviewService {
         return convertToResponse(review, finalImageUrls);
     }
 
+    private void processImagesForUpdate(Review review, List<MultipartFile> newImages) {
+        List<String> currentImageUrls = review.getReviewImages().stream()
+                .map(ReviewImage::getUrl)
+                .collect(Collectors.toList());
+
+        List<String> uploadedImageUrls = newImages.stream()
+                .map(image -> imageManagerService.uploadPhoto(image, ImageType.REVIEW))
+                .collect(Collectors.toList());
+
+        // 삭제 및 추가 처리 로직
+        List<ReviewImage> imagesToDelete = review.getReviewImages().stream()
+                .filter(image -> !uploadedImageUrls.contains(image.getUrl()))
+                .collect(Collectors.toList());
+
+        imagesToDelete.forEach(image -> {
+            reviewImageRepository.delete(image);
+            review.getReviewImages().remove(image);
+        });
+
+        for (String imageUrl : uploadedImageUrls) {
+            if (!currentImageUrls.contains(imageUrl)) {
+                ReviewImage newReviewImage = new ReviewImage();
+                newReviewImage.setUrl(imageUrl);
+                newReviewImage.setReview(review);
+                newReviewImage.setType(ImageType.REVIEW);
+                reviewImageRepository.save(newReviewImage);
+                review.getReviewImages().add(newReviewImage);
+            }
+        }
+    }
+
+    private void saveReviewPoints(Long customerId, int points) {
+        PointHistoryRequest pointRequest = new PointHistoryRequest(
+                null, // 리뷰 작성 시 주문과 연관된 경우가 아니므로 null
+                "리뷰 작성으로 인한 포인트 적립",
+                BigDecimal.valueOf(points),
+                LocalDateTime.now(),
+                PointType.EARNED
+        );
+        pointSaveService.createPointHistory(customerId, pointRequest);
+    }
 
     @Transactional(readOnly = true)
     public List<ReviewDetailResponse> getReviewsByBook(Long bookId) {
@@ -167,6 +192,7 @@ public class ReviewService {
         );
     }
 
+    @Transactional(readOnly = true)
     public List<ReviewDetailResponse> getReviewsByCustomer(Long customerId) {
         List<Review> reviews = reviewRepository.findAllByCustomerId(customerId);
 
@@ -179,6 +205,7 @@ public class ReviewService {
         }).collect(Collectors.toList());
     }
 }
+
 
 //
 //    @Transactional(readOnly = true)
