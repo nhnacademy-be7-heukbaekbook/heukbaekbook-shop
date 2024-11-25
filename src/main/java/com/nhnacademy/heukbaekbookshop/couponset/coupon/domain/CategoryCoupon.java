@@ -19,6 +19,7 @@ public class CategoryCoupon extends Coupon {
 
 
     public CategoryCoupon(CouponPolicy couponPolicy,
+                          int couponQuantity,
                           int availableDuration,
                           LocalDateTime couponTimeStart,
                           LocalDateTime couponTimeEnd,
@@ -26,7 +27,7 @@ public class CategoryCoupon extends Coupon {
                           String couponDescription,
                           Category category
     ) {
-        super(couponPolicy, availableDuration, couponTimeStart, couponTimeEnd, couponName, couponDescription);
+        super(couponPolicy, couponQuantity, availableDuration, couponTimeStart, couponTimeEnd, couponName, couponDescription);
         this.category = category;
     }
 

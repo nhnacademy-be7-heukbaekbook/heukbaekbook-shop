@@ -71,7 +71,7 @@ public class CouponServiceImpl implements CouponService {
     @Override
     public Page<CouponResponse> getAllNormalCoupons(Pageable pageable) {
         Page<Coupon> coupons = couponRepository.findAllNormalCoupons(pageable);
-        return CouponMapper.fromPageableEntity(coupons, pageable);
+        return CouponMapper.fromPageableEntity(coupons);
     }
 
     @Override
@@ -87,13 +87,13 @@ public class CouponServiceImpl implements CouponService {
     @Override
     public Page<CouponResponse> getCouponsByType(DiscountType discountType, Pageable pageable) {
         Page<Coupon> coupons = couponRepository.findAllByDiscountType(discountType, pageable);
-        return CouponMapper.fromPageableEntity(coupons, pageable);
+        return CouponMapper.fromPageableEntity(coupons);
     }
 
     @Override
     public Page<CouponResponse> getCouponsByStatus(CouponStatus couponStatus, Pageable pageable) {
         Page<Coupon> coupons = couponRepository.findAllByCouponStatus(couponStatus, pageable);
-        return CouponMapper.fromPageableEntity(coupons, pageable);
+        return CouponMapper.fromPageableEntity(coupons);
     }
 
     @Override
@@ -105,6 +105,7 @@ public class CouponServiceImpl implements CouponService {
         return CouponMapper.fromEntity(
                 coupon.modifyCoupon(
                         couponPolicy,
+                        couponRequest.couponQuantity(),
                         couponRequest.availableDuration(),
                         couponRequest.couponTimeStart(),
                         couponRequest.couponTimeEnd(),

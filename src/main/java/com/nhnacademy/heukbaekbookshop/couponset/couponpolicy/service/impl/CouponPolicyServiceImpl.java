@@ -43,13 +43,13 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
     @Override
     public Page<CouponPolicyResponse> getAllCouponPolicies(Pageable pageable) {
         return CouponPolicyMapper.fromPageableEntity(
-                couponPolicyRepository.findAll(pageable)
+                couponPolicyRepository.findAllByOrderByDiscountTypeAscDiscountAmountAsc(pageable)
         );
     }
 
     @Override
     public List<CouponPolicyResponse> getAllCouponPolicyList() {
-        return CouponPolicyMapper.fromEntityList(couponPolicyRepository.findAll());
+        return CouponPolicyMapper.fromEntityList(couponPolicyRepository.findAllByOrderByDiscountTypeAscDiscountAmountAsc());
     }
 
     @Override

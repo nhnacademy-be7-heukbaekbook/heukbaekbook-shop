@@ -24,6 +24,9 @@ public class Coupon {
     @JoinColumn(name = "coupon_policy_id")
     private CouponPolicy couponPolicy;
 
+    @Column(name = "coupon_quantity")
+    private int couponQuantity;
+
     @NotNull
     @Setter
     @Column(name = "coupon_status")
@@ -54,9 +57,10 @@ public class Coupon {
     private LocalDateTime couponCreatedAt;
 
     @Builder
-    public Coupon(CouponPolicy couponPolicy, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription) {
+    public Coupon(CouponPolicy couponPolicy, int couponQuantity, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription) {
         this.couponPolicy = couponPolicy;
-        this.couponStatus = CouponStatus.ABLE;
+        this.couponQuantity = couponQuantity;
+        this.couponStatus = CouponStatus.PENDING;
         this.availableDuration = availableDuration;
         this.couponTimeStart = couponTimeStart;
         this.couponTimeEnd = couponTimeEnd;
@@ -65,8 +69,9 @@ public class Coupon {
         this.couponCreatedAt = LocalDateTime.now();
     }
 
-    public Coupon modifyCoupon(CouponPolicy couponPolicy, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription) {
+    public Coupon modifyCoupon(CouponPolicy couponPolicy, int couponQuantity, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription) {
         this.couponPolicy = couponPolicy;
+        this.couponQuantity = couponQuantity;
         this.availableDuration = availableDuration;
         this.couponTimeStart = couponTimeStart;
         this.couponTimeEnd = couponTimeEnd;
