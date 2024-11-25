@@ -1,7 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.couponset.coupon.controller;
 
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.BookCoupon;
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CouponStatus;
+
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponStatus;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request.CouponRequest;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.BookCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CategoryCouponResponse;
@@ -146,7 +146,7 @@ public class CouponController {
      */
     @DeleteMapping("/{couponId}")
     public ResponseEntity<Void> changeIssuedCoupon(@PathVariable("couponId") Long couponId) {
-        couponService.changeCouponStatus(couponId, CouponStatus.ISSUED);
+        couponService.changeCouponStatus(couponId, CouponStatus.ABLE);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

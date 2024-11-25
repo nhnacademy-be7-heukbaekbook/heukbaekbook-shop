@@ -33,9 +33,11 @@ public class MemberCoupon {
     @Column(name = "is_coupon_used")
     private boolean isCouponUsed;
 
+    @NotNull
     @Column(name = "coupon_issued_at")
     private LocalDateTime couponIssuedAt;
 
+    @NotNull
     @Column(name = "coupon_expiration_at")
     private LocalDateTime couponExpirationAt;
 

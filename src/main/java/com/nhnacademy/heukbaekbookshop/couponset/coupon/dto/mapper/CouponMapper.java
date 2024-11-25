@@ -17,7 +17,7 @@ import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+
 
 import java.time.LocalDateTime;
 
@@ -35,7 +35,8 @@ public class CouponMapper {
                 coupon.getCouponTimeEnd(),
                 coupon.getCouponName(),
                 coupon.getCouponDescription(),
-                coupon.getCouponCreatedAt()
+                coupon.getCouponCreatedAt(),
+                coupon.getCouponType()
         );
     }
 
@@ -51,6 +52,7 @@ public class CouponMapper {
                 .couponTimeEnd(couponRequest.couponTimeEnd())
                 .couponName(couponRequest.couponName())
                 .couponDescription(couponRequest.couponDescription())
+                .couponType(couponRequest.couponType())
                 .build();
     }
 

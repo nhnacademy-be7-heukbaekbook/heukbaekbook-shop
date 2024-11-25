@@ -7,7 +7,8 @@ import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.category.exception.CategoryNotFoundException;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.Coupon;
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CouponStatus;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponStatus;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponType;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.mapper.CouponMapper;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request.CouponRequest;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.BookCouponResponse;
@@ -45,13 +46,18 @@ public class CouponServiceImpl implements CouponService {
                 .orElseThrow(CouponPolicyNotFoundException::new);
 
         Coupon coupon = null;
-        if (Objects.nonNull(couponRequest.bookId())) {
+        if (couponRequest.couponType().equals(CouponType.BOOK)) {
             Book book = bookRepository.findById(couponRequest.bookId()).orElseThrow(BookNotFoundException::new);
             coupon = CouponMapper.toBookCouponEntity(couponRequest, couponPolicy, book);
-        } else if (Objects.nonNull(couponRequest.categoryId())) {
+        } else if (couponRequest.couponType().equals(CouponType.CATEGORY)) {
             Category category = categoryRepository.findById(couponRequest.categoryId()).orElseThrow(CategoryNotFoundException::new);
             coupon = CouponMapper.toCategoryCouponEntity(couponRequest, couponPolicy, category);
-        } else {
+        } else if(!couponRequest.couponType().equals(CouponType.GENERAL)
+                && couponRepository.existsByCouponType(couponRequest.couponType())){    // WELCOME, BIRTHDAY Coupon
+            // Already existing Coupon Setting CouponStatus DISABLED
+            couponRepository.findByCouponType(couponRequest.couponType()).setCouponStatus(CouponStatus.DISABLE);
+            coupon = CouponMapper.toEntity(couponRequest, couponPolicy);
+        }else{
             coupon = CouponMapper.toEntity(couponRequest, couponPolicy);
         }
 
@@ -122,4 +128,21 @@ public class CouponServiceImpl implements CouponService {
                 .orElseThrow(CouponNotFoundException::new);
         coupon.setCouponStatus(couponStatus);
     }
+
+    @Override
+    @Transactional
+    public void subtractQuantity(Long couponId) {
+        Coupon coupon = couponRepository.findById(couponId)
+                .orElseThrow(CouponNotFoundException::new);
+        coupon.setCouponQuantity(coupon.getCouponQuantity() - 1);
+    }
+
+    @Override
+    public Long getCouponIdByCouponType(CouponType couponType) {
+        return couponRepository.findAvailableCouponIdByCouponType(couponType)
+                .orElseThrow(CouponNotFoundException::new);
+
+    }
+
+
 }
