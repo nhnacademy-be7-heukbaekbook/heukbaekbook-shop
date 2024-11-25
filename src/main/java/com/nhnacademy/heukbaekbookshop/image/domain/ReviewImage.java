@@ -1,5 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.image.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nhnacademy.heukbaekbookshop.order.domain.Review;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -20,5 +21,7 @@ public class ReviewImage extends Image {
             @JoinColumn(name = "book_id", referencedColumnName = "book_id", nullable = false),
             @JoinColumn(name = "order_id", referencedColumnName = "order_id", nullable = false)
     })
+
+    @JsonIgnore
     private Review review;
 }

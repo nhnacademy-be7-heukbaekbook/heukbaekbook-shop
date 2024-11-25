@@ -19,11 +19,11 @@ public record CouponRequest (
         LocalDateTime couponTimeEnd,
 
         @NotNull
-        @Length(max = 20)
+        @Length(max = 100)
         String couponName,
 
         @NotNull
-        @Length(max = 200)
+        @Length(max = 500)
         String couponDescription,
 
         Long bookId,

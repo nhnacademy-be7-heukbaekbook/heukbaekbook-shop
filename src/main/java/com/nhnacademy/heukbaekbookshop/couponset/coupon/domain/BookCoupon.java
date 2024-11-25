@@ -4,7 +4,6 @@ import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
@@ -17,10 +16,6 @@ public class BookCoupon extends Coupon {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
     private Book book;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coupon_id")
-    private Coupon coupon;
 
     public BookCoupon(CouponPolicy couponPolicy, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription, Book book) {
         super(couponPolicy, availableDuration, couponTimeStart, couponTimeEnd, couponName, couponDescription);

@@ -1,6 +1,6 @@
-package com.nhnacademy.heukbaekbookshop.image.domain;
-
-public enum PhotoType {
-    THUMBNAIL,
-    REVIEW
-}
+//package com.nhnacademy.heukbaekbookshop.image.domain;
+//
+//public enum PhotoType {
+//    THUMBNAIL,
+//    REVIEW
+//}

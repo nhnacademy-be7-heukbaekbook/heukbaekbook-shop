@@ -1,4 +1,4 @@
-package com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.service;
+package com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.service.impl;
 
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
@@ -7,11 +7,14 @@ import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyRe
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.mapper.CouponPolicyMapper;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.exception.CouponPolicyNotFoundException;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.repository.CouponPolicyRepository;
+import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.service.CouponPolicyService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 
 @Service
@@ -30,7 +33,7 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 
 
     @Override
-    public CouponPolicyResponse getCouponPolicyById(long policyId) {
+    public CouponPolicyResponse getCouponPolicyById(Long policyId) {
         return CouponPolicyMapper.fromEntity(
                 couponPolicyRepository.findById(policyId)
                         .orElseThrow(CouponPolicyNotFoundException::new)
@@ -45,6 +48,11 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
     }
 
     @Override
+    public List<CouponPolicyResponse> getAllCouponPolicyList() {
+        return CouponPolicyMapper.fromEntityList(couponPolicyRepository.findAll());
+    }
+
+    @Override
     public Page<CouponPolicyResponse> getAllCouponPoliciesByType(DiscountType discountType, Pageable pageable) {
         return CouponPolicyMapper.fromPageableEntity(
                 couponPolicyRepository.findCouponPolicyByDiscountTypeOrderByMinimumPurchaseAmount(discountType, pageable)
@@ -52,7 +60,8 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
     }
 
     @Override
-    public CouponPolicyResponse updateCouponPolicy(long policyId, CouponPolicyRequest couponPolicyRequest) {
+    @Transactional
+    public CouponPolicyResponse updateCouponPolicy(Long policyId, CouponPolicyRequest couponPolicyRequest) {
         CouponPolicy couponPolicy = couponPolicyRepository.findById(policyId)
                 .orElseThrow(CouponPolicyNotFoundException::new);
 
@@ -62,10 +71,12 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
     }
 
     @Override
-    public void deleteCouponPolicy(long policyId) {
-        if(couponPolicyRepository.existsById(policyId)) {
+    @Transactional
+    public void deleteCouponPolicy(Long policyId) {
+        if(!couponPolicyRepository.existsById(policyId)) {
             throw new CouponPolicyNotFoundException();
         }
+
         couponPolicyRepository.deleteById(policyId);
     }
 

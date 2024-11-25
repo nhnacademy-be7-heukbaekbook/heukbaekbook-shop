@@ -9,6 +9,8 @@ import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MemberRespo
 
 public class MemberMapper {
 
+    private MemberMapper() {}
+
     public static Member createMemberEntity(MemberCreateRequest memberCreateRequest, Grade grade, String encodedPassword) {
         return Member.builder()
                 .name(memberCreateRequest.name())

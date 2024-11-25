@@ -1,5 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.review.dto.request;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 /**
@@ -11,5 +13,5 @@ public record ReviewCreateRequest(
         String content,
         String title,
         int score,
-        List<String> images // Base64 인코딩된 이미지 리스트
+        List<MultipartFile> images // Base64 인코딩된 이미지 리스트
 ) {}
