@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * CouponPolicyController(쿠폰 정책) RestController
  *
@@ -60,6 +62,18 @@ public class CouponPolicyController {
     public ResponseEntity<Page<CouponPolicyResponse>> getCouponPolicies(Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(couponPolicyService.getAllCouponPolicies(pageable));
+    }
+
+    /**
+     * 쿠폰 정책 전체 조회 요청 시 사용되는 메서드입니다.
+     * 쿠폰 등록 시 select-box에서 사용됩니다.
+     *
+     * @return 성공시, 응답코드 200 반환합니다.
+     */
+    @GetMapping("/list")
+    public ResponseEntity<List<CouponPolicyResponse>> getCouponPolicyList() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(couponPolicyService.getAllCouponPolicyList());
     }
 
     /**

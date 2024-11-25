@@ -7,7 +7,6 @@ import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryCreateRespo
 import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryDeleteResponse;
 import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryUpdateResponse;
 import com.nhnacademy.heukbaekbookshop.category.service.CategoryService;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -63,4 +62,5 @@ public class CategoryAdminController {
         List<String> responses = categoryService.getCategoryPaths();
         return ResponseEntity.ok(responses);
     }
+
 }

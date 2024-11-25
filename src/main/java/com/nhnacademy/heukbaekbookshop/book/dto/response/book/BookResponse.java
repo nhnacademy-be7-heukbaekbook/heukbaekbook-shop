@@ -10,7 +10,7 @@ public record BookResponse(Long id,
                            String title,
                            String publishedAt,
                            String salePrice,
-                           double discountRate,
+                           BigDecimal discountRate,
                            String thumbnailUrl,
                            List<ContributorSummaryResponse> contributors,
                            PublisherSummaryResponse publisher) {

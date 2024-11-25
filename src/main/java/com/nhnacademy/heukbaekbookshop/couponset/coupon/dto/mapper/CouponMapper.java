@@ -2,13 +2,16 @@ package com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.mapper;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.*;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.BookCoupon;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CategoryCoupon;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.Coupon;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request.CouponRequest;
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponHistoryResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponResponse;
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.MemberCouponResponse;
+import com.nhnacademy.heukbaekbookshop.couponset.couponhistory.domain.CouponHistory;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.mapper.CouponPolicyMapper;
+import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.domain.MemberCoupon;
+import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.dto.response.MemberCouponResponse;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import org.springframework.data.domain.Page;
@@ -16,13 +19,14 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 
+
 public class CouponMapper {
 
     public static CouponResponse fromEntity(Coupon coupon) {
         return new CouponResponse(
                 coupon.getId(),
                 CouponPolicyMapper.fromEntity(coupon.getCouponPolicy()),
-                coupon.getCouponStatus().getValue(),
+                coupon.getCouponStatus(),
                 coupon.getAvailableDuration(),
                 coupon.getCouponTimeStart(),
                 coupon.getCouponTimeEnd(),
@@ -101,3 +105,5 @@ public class CouponMapper {
         return memberCoupons.map(CouponMapper::fromMemberCouponEntity);
     }
 }
+
+

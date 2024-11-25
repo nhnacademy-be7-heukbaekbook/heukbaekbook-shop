@@ -2,8 +2,10 @@ package com.nhnacademy.heukbaekbookshop.book.repository.book.impl;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import com.nhnacademy.heukbaekbookshop.book.domain.BookStatus;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchCondition;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepositoryCustom;
 import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
@@ -27,17 +29,25 @@ public class BookRepositoryImpl implements BookRepositoryCustom {
     }
 
     @Override
-    public List<Book> findAllByIdInAndType(List<Long> bookIds, ImageType type) {
+    public List<Book> findAllByBookSearchCondition(BookSearchCondition condition) {
         return queryFactory
                 .selectFrom(book)
                 .join(book.bookImages, bookImage).fetchJoin()
                 .where(
                         book.status.eq(BookStatus.IN_STOCK),
-                        book.id.in(bookIds),
-                        bookImage.type.eq(type)
+                        bookIdIn(condition.bookIds()),
+                        bookImageTypeEq(condition.imageType())
                 )
                 .orderBy(bookImage.id.asc())
                 .fetch();
+    }
+
+    private BooleanExpression bookIdIn(List<Long> bookIds) {
+        return bookIds == null ? null : book.id.in(bookIds);
+    }
+
+    private BooleanExpression bookImageTypeEq(ImageType type) {
+        return type == null ? null : bookImage.type.eq(type);
     }
 
     @Override
@@ -99,5 +109,14 @@ public class BookRepositoryImpl implements BookRepositoryCustom {
                 .join(book.publisher, publisher).fetchJoin()
                 .where(book.id.eq(bookId))
                 .fetchOne());
+    }
+
+    @Override
+    public void increasePopularityByBookId(Long bookId) {
+        queryFactory
+                .update(book)
+                .set(book.popularity, book.popularity.add(1))
+                .where(book.id.eq(bookId))
+                .execute();
     }
 }

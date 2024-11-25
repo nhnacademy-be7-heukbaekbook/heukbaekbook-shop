@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long>, CategoryRepositoryCustom {
@@ -38,5 +39,18 @@ public interface CategoryRepository extends JpaRepository<Category, Long>, Categ
                    "    SELECT ch.category_id\n" +
                    "    FROM category_hierarchy ch\n", nativeQuery = true)
     List<Long> findSubCategoryIdsByCategoryId(@Param("categoryId") Long categoryId);
+
+    @Query(value = "    WITH RECURSIVE category_hierarchy AS (" +
+            "        SELECT category_id, parent_category_id " +
+            "        FROM categories " +
+            "        WHERE category_id IN (:categoryIds) " +
+            "        UNION ALL " +
+            "        SELECT c.category_id, c.parent_category_id " +
+            "        FROM categories c " +
+            "        INNER JOIN category_hierarchy ch ON c.category_id = ch.parent_category_id " +
+            "    ) " +
+            "    SELECT DISTINCT ch.category_id " +
+            "    FROM category_hierarchy ch", nativeQuery = true)
+    List<Long> findParentCategoryIdsByCategoryIds(@Param("categoryIds") Set<Long> categoryIds);
 
 }
