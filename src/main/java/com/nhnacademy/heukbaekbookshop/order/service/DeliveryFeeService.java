@@ -8,11 +8,14 @@ import com.nhnacademy.heukbaekbookshop.order.dto.response.DeliveryFeeDeleteRespo
 import com.nhnacademy.heukbaekbookshop.order.dto.response.DeliveryFeeUpdateResponse;
 import com.nhnacademy.heukbaekbookshop.order.exception.DeliveryFeeAlreadyExistsException;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.DeliveryFeeDetailResponse;
+import com.nhnacademy.heukbaekbookshop.order.exception.DeliveryFeeNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.exception.DeliveryNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.repository.DeliveryFeeRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 @Service
 public class DeliveryFeeService {
@@ -71,5 +74,10 @@ public class DeliveryFeeService {
     public Page<DeliveryFeeDetailResponse> getDeliveryFees(Pageable pageable) {
         Page<DeliveryFee> deliveryFees = deliveryFeeRepository.findAll(pageable);
         return deliveryFees.map(deliveryFee -> new DeliveryFeeDetailResponse(deliveryFee.getId(), deliveryFee.getName(), deliveryFee.getFee(), deliveryFee.getMinimumOrderAmount()));
+    }
+
+    public BigDecimal getDeliveryFeeByMinimumOrderAmount(BigDecimal minimumOrderAmount) {
+        return deliveryFeeRepository.findByMinimumOrderAmount(minimumOrderAmount)
+                .orElseThrow(() -> new DeliveryFeeNotFoundException("delivery fee not found")).getFee();
     }
 }

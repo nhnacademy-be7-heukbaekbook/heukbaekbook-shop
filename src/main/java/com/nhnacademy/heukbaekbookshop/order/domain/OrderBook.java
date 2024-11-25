@@ -23,12 +23,12 @@ public class OrderBook {
     private Long orderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("bookId")
+//    @MapsId("bookId")
     @JoinColumn(name = "book_id", insertable = false, updatable = false)
     private Book book;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("orderId")
+//    @MapsId("orderId")
     @JoinColumn(name = "order_id", insertable = false, updatable = false)
     private Order order;
 

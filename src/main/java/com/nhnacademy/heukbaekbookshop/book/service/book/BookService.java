@@ -11,11 +11,10 @@ import com.nhnacademy.heukbaekbookshop.book.dto.response.book.*;
 import com.nhnacademy.heukbaekbookshop.book.exception.book.BookAlreadyExistsException;
 import com.nhnacademy.heukbaekbookshop.book.exception.book.BookNotFoundException;
 import com.nhnacademy.heukbaekbookshop.book.exception.book.BookSearchException;
-import com.nhnacademy.heukbaekbookshop.book.repository.book.BookCategoryRepository;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
-import com.nhnacademy.heukbaekbookshop.common.formatter.BookFormatter;
+import com.nhnacademy.heukbaekbookshop.common.service.CommonService;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.*;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
@@ -65,7 +64,7 @@ public class BookService {
     private final RoleRepository roleRepository;
     private final BookImageRepository bookImageRepository;
     private final TagRepository tagRepository;
-    private final BookFormatter bookFormatter;
+    private final CommonService commonService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -126,7 +125,7 @@ public class BookService {
         book.setPublisher(publisher);
         book.setStatus(BookStatus.IN_STOCK);
         book.setStock(request.stock());
-        book.setCategories(new HashSet<>());
+        book.setCategories(new ArrayList<>());
         book.setContributors(new HashSet<>());
 
         bookRepository.save(book);
@@ -567,7 +566,7 @@ public class BookService {
                                 book.getTitle(),
                                 book.isPackable(),
                                 book.getPrice(),
-                                getSalePrice(book.getPrice(), book.getDiscountRate()),
+                                commonService.getSalePrice(book.getPrice(), book.getDiscountRate()),
                                 book.getDiscountRate(),
                                 book.getBookImages().stream()
                                         .map(Image::getUrl)
@@ -600,11 +599,11 @@ public class BookService {
                 book.getTitle(),
                 book.getIndex(),
                 book.getDescription(),
-                bookFormatter.formatDate(book.getPublishedAt()),
+                commonService.formatDate(book.getPublishedAt()),
                 book.getIsbn(),
                 book.isPackable(),
-                bookFormatter.formatPrice(book.getPrice()),
-                bookFormatter.formatPrice(getSalePrice(book.getPrice(), book.getDiscountRate())),
+                commonService.formatPrice(book.getPrice()),
+                commonService.formatPrice(commonService.getSalePrice(book.getPrice(), book.getDiscountRate())),
                 book.getDiscountRate(),
                 book.getPopularity(),
                 book.getStatus().name(),
@@ -668,17 +667,12 @@ public class BookService {
         ));
     }
 
-    private BigDecimal getSalePrice(BigDecimal price, double disCountRate) {
-        BigDecimal discountRate = BigDecimal.valueOf(disCountRate).divide(BigDecimal.valueOf(100));
-        return price.multiply(BigDecimal.ONE.subtract(discountRate)).setScale(2, RoundingMode.HALF_UP);
-    }
-
     private BookResponse createBookResponse(Book book) {
         return new BookResponse (
                 book.getId(),
                 book.getTitle(),
-                bookFormatter.formatDate(book.getPublishedAt()),
-                bookFormatter.formatPrice(getSalePrice(book.getPrice(), book.getDiscountRate())),
+                commonService.formatDate(book.getPublishedAt()),
+                commonService.formatPrice(commonService.getSalePrice(book.getPrice(), book.getDiscountRate())),
                 book.getDiscountRate(),
                 book.getBookImages().stream()
                         .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)

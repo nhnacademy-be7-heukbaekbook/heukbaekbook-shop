@@ -3,11 +3,7 @@ package com.nhnacademy.heukbaekbookshop.order.domain;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
-import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,6 +14,7 @@ import java.util.Set;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "orders")
+@ToString
 public class Order {
 
     @Id
@@ -53,6 +50,11 @@ public class Order {
     private Customer customer;
 
     @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
+    @Setter
+    private Payment payment;
+
+    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
+    @Setter
     private Delivery delivery;
 
     @ManyToOne(fetch = FetchType.LAZY)
