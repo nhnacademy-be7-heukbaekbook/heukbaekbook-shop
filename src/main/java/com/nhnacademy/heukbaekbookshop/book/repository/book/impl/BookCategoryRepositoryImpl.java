@@ -49,12 +49,11 @@ public class BookCategoryRepositoryImpl implements BookCategoryRepositoryCustom 
     }
 
     @Override
-    public List<BookCategory> findBookCategoriesByBookId(Long bookId) {
-        return queryFactory
+    public Optional<BookCategory> findBookCategoriesByBookId(Long bookId) {
+        return Optional.ofNullable(queryFactory
                 .selectFrom(bookCategory)
                 .join(bookCategory.category, category)
                 .where(bookCategory.bookId.eq(bookId))
-                .orderBy(category.id.asc())
-                .fetch();
+                .fetchFirst());
     }
 }

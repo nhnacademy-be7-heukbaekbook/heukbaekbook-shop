@@ -7,6 +7,7 @@ import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentApprovalRespons
 import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentCancelResponse;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentDetailResponse;
 import com.nhnacademy.heukbaekbookshop.order.service.PaymentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/payments")
+@Slf4j
 public class PaymentController {
 
     private final PaymentService paymentService;
@@ -27,6 +29,7 @@ public class PaymentController {
     public ResponseEntity<?> confirmPayment(@RequestBody PaymentApprovalRequest request) {
         try {
             PaymentApprovalResponse response = paymentService.approvePayment(request);
+            log.info("response: {}", response);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

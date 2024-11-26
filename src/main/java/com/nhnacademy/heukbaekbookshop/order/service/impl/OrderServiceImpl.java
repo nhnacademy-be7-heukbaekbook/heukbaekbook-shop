@@ -8,6 +8,7 @@ import com.nhnacademy.heukbaekbookshop.common.service.CommonService;
 import com.nhnacademy.heukbaekbookshop.image.domain.Image;
 import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
+import com.nhnacademy.heukbaekbookshop.memberset.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.repository.CustomerRepository;
 import com.nhnacademy.heukbaekbookshop.order.domain.Delivery;
 import com.nhnacademy.heukbaekbookshop.order.domain.DeliveryFee;
@@ -59,16 +60,20 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public Long createOrder(OrderCreateRequest orderCreateRequest) {
-
         DeliveryFee deliveryFee = deliveryFeeRepository.findByFee(new BigDecimal(orderCreateRequest.deliveryFee().replace(",", "")))
                 .orElseThrow(() -> new DeliveryFeeNotFoundException("delivery fee not found"));
 
-        Customer customer = Customer.createCustomer(
-                orderCreateRequest.customerName(),
-                orderCreateRequest.customerPhoneNumber(),
-                orderCreateRequest.customerEmail());
-
-        Customer savedCustomer = customerRepository.save(customer);
+        Customer customer;
+        if (orderCreateRequest.customerId() != null) {
+            customer = customerRepository.findById(orderCreateRequest.customerId())
+                    .orElseThrow(() -> new CustomerNotFoundException("customer not found"));
+        } else {
+            customer = Customer.createCustomer(
+                    orderCreateRequest.customerName(),
+                    orderCreateRequest.customerPhoneNumber(),
+                    orderCreateRequest.customerEmail());
+            customerRepository.save(customer);
+        }
 
         Order order = Order.createOrder(
                 commonService.convertStringToBigDecimal(orderCreateRequest.totalPrice()),
@@ -76,7 +81,7 @@ public class OrderServiceImpl implements OrderService {
                 orderCreateRequest.customerPhoneNumber(),
                 orderCreateRequest.customerEmail(),
                 orderCreateRequest.tossOrderId(),
-                savedCustomer,
+                customer,
                 deliveryFee
         );
 
@@ -86,7 +91,7 @@ public class OrderServiceImpl implements OrderService {
                 savedOrder,
                 orderCreateRequest.recipient(),
                 orderCreateRequest.recipientPhoneNumber(),
-                orderCreateRequest.postalCode(),
+                Long.valueOf(orderCreateRequest.postalCode()),
                 orderCreateRequest.roadNameAddress(),
                 orderCreateRequest.detailAddress(),
                 null,
