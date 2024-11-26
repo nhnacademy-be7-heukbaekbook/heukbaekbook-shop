@@ -1,6 +1,5 @@
-package com.nhnacademy.heukbaekbookshop.image;
+package com.nhnacademy.heukbaekbookshop.image.service;
 
-import com.nhnacademy.heukbaekbookshop.image.ImageManagerProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

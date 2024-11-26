@@ -1,6 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.order.service;
 
-import com.nhnacademy.heukbaekbookshop.image.ImageManagerService;
+import com.nhnacademy.heukbaekbookshop.image.service.ImageManagerService;
 import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import com.nhnacademy.heukbaekbookshop.image.domain.WrappingPaperImage;
 import com.nhnacademy.heukbaekbookshop.order.domain.WrappingPaper;

@@ -1,4 +1,4 @@
-package com.nhnacademy.heukbaekbookshop.image;
+package com.nhnacademy.heukbaekbookshop.image.service;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

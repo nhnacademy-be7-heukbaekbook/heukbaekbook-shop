@@ -4,11 +4,6 @@ spring:
   config:
     import: optional:configserver:http://localhost:9000
 
-#nhn:
-#  cloud:
-#    tenant-id: fcb81f74e379456b8ca0e091d351a7af
-#    api-user-id: fa38a82e97d646eb8c0bf90b5e3bae18
-#    api-password: gmrqoransrh!!!
 
 cloud:
   nhn:

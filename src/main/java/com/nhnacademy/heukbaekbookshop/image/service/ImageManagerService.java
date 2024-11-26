@@ -1,4 +1,4 @@
-package com.nhnacademy.heukbaekbookshop.image;
+package com.nhnacademy.heukbaekbookshop.image.service;
 
 import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,6 @@ public class ImageManagerService {
         }
 
         String containerPath = baseFolder + imageType.name().toLowerCase();
-
         String uniqueFileName = imageType.name().toLowerCase() + UUID.randomUUID().toString().replace("-", "").substring(0, 8) + "." + extension;
 
         // URL Encoding
@@ -57,7 +56,9 @@ public class ImageManagerService {
 
             // 파일 업로드 요청
             restTemplate.execute(uploadUrl, HttpMethod.PUT, requestCallback, null);
-            return properties.getUrl() + containerPath + "/" + uniqueFileName;
+
+            String publicUrl = "http://image.toast.com/aaaacko" + containerPath + "/" + uniqueFileName;
+            return publicUrl;
         } catch (IOException e) {
             throw new RuntimeException("파일 업로드 실패", e);
         }

@@ -2,8 +2,7 @@ package com.nhnacademy.heukbaekbookshop.review.service;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
-import com.nhnacademy.heukbaekbookshop.common.auth.AuthService;
-import com.nhnacademy.heukbaekbookshop.image.ImageManagerService;
+import com.nhnacademy.heukbaekbookshop.image.service.ImageManagerService;
 import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import com.nhnacademy.heukbaekbookshop.image.domain.ReviewImage;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
@@ -12,7 +11,6 @@ import com.nhnacademy.heukbaekbookshop.order.domain.Order;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderStatus;
 import com.nhnacademy.heukbaekbookshop.order.domain.Review;
 import com.nhnacademy.heukbaekbookshop.order.domain.ReviewPK;
-import com.nhnacademy.heukbaekbookshop.order.repository.OrderBookRepository;
 import com.nhnacademy.heukbaekbookshop.order.repository.OrderRepository;
 import com.nhnacademy.heukbaekbookshop.point.history.domain.PointType;
 import com.nhnacademy.heukbaekbookshop.point.history.dto.request.PointHistoryRequest;
