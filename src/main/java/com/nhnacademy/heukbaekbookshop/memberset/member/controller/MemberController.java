@@ -6,7 +6,9 @@ import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookDetailResponse
 import com.nhnacademy.heukbaekbookshop.book.service.like.LikeService;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberCreateRequest;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberUpdateRequest;
+import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MemberDetailResponse;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MemberResponse;
+import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MyPageResponse;
 import com.nhnacademy.heukbaekbookshop.memberset.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -117,5 +119,19 @@ public class MemberController {
     public ResponseEntity<Boolean> existsEmail(@PathVariable String email) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(memberService.existsEmail(email));
+    }
+
+    @GetMapping("/detail")
+    public MemberDetailResponse getMemberDetail(@RequestHeader(X_USER_ID) Long customerId) {
+        log.info("customerId: {}", customerId);
+
+        return memberService.getMemberDetail(customerId);
+    }
+
+    @GetMapping("/my-page")
+    public MyPageResponse getMyPageResponse(@RequestHeader(X_USER_ID) Long customerId) {
+        log.info("customerId: {}", customerId);
+
+        return memberService.getMyPageResponse(customerId);
     }
 }

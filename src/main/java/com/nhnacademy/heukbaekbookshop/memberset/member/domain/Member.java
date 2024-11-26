@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.memberset.member.domain;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Like;
+import com.nhnacademy.heukbaekbookshop.memberset.address.domain.MemberAddress;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 import com.nhnacademy.heukbaekbookshop.memberset.grade.domain.Grade;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberUpdateRequest;
@@ -10,6 +11,8 @@ import lombok.*;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -51,6 +54,9 @@ public class Member extends Customer {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Like> likes;
+
+    @OneToMany(mappedBy = "member")
+    private List<MemberAddress> memberAddresses = new ArrayList<>();
 
 
     @Builder
