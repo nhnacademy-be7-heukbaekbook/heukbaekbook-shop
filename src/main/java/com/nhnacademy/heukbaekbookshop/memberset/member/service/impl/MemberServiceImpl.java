@@ -20,6 +20,8 @@ import com.nhnacademy.heukbaekbookshop.memberset.grade.repository.GradeRepositor
 import com.nhnacademy.heukbaekbookshop.memberset.address.repository.MemberAddressRepository;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import com.nhnacademy.heukbaekbookshop.memberset.member.service.MemberService;
+import com.nhnacademy.heukbaekbookshop.order.domain.Order;
+import com.nhnacademy.heukbaekbookshop.order.dto.response.OrderBookResponse;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.OrderResponse;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.OrderSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.point.history.event.SignupEvent;
@@ -29,6 +31,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -143,14 +146,16 @@ public class MemberServiceImpl implements MemberService {
                 )
         );
 
-//        member.getOrders().stream()
-//                .map(order -> new OrderSummaryResponse(
-//                        order.getCreatedAt(),
-//                        order.getTossOrderId(),
-//                        order.get
-//                ))
+        List<OrderSummaryResponse> orderSummaryResponses = member.getOrders().stream()
+                .map(order -> new OrderSummaryResponse(
+                        order.getCreatedAt().toLocalDate(),
+                        order.getTossOrderId(),
+                        order.getStatus().name(),
+                        null
+                ))
+                .toList();
 
-        return null;
+        return new MyPageResponse(memberResponse, new OrderResponse(orderSummaryResponses));
     }
 
     @Override
