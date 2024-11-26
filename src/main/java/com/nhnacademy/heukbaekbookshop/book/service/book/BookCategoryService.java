@@ -1,14 +1,15 @@
 package com.nhnacademy.heukbaekbookshop.book.service.book;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.BookCategory;
+import com.nhnacademy.heukbaekbookshop.book.exception.book.BookCategoryNotFoundException;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookCategoryRepository;
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
-import com.nhnacademy.heukbaekbookshop.category.dto.response.CategorySummaryResponse;
+import com.nhnacademy.heukbaekbookshop.category.dto.response.ParentCategoryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,17 +17,23 @@ public class BookCategoryService {
 
     private final BookCategoryRepository bookCategoryRepository;
 
-    public List<CategorySummaryResponse> findBookCategoriesByBookId(Long bookId) {
-        List<BookCategory> bookCategories = bookCategoryRepository.findBookCategoriesByBookId(bookId);
-        return bookCategories.stream()
-                .map(bookCategory -> toCategorySummaryResponse(bookCategory.getCategory()))
-                .collect(Collectors.toList());
+    public List<ParentCategoryResponse> findBookCategoriesByBookId(Long bookId) {
+        BookCategory bookCategory = bookCategoryRepository.findBookCategoriesByBookId(bookId)
+                .orElseThrow(() -> new BookCategoryNotFoundException("bookCategory not found"));
+
+        return getParentCategories(bookCategory.getCategory());
     }
 
-    private CategorySummaryResponse toCategorySummaryResponse(Category category) {
-        List<CategorySummaryResponse> subCategories = category.getSubCategories().stream()
-                .map(this::toCategorySummaryResponse)
-                .collect(Collectors.toList());
-        return new CategorySummaryResponse(category.getId(), category.getName(), subCategories);
+    private List<ParentCategoryResponse> getParentCategories(Category category) {
+        List<ParentCategoryResponse> parentCategoryResponses = new ArrayList<>();
+
+        Category current = category;
+
+        while (current != null) {
+            parentCategoryResponses.add(new ParentCategoryResponse(current.getId(), current.getName()));
+            current = current.getParentCategory();
+        }
+
+        return parentCategoryResponses.reversed();
     }
 }

@@ -80,7 +80,8 @@ public class BookSearchServiceImpl implements BookSearchService {
             );
         });
     }
-//    @Scheduled(initialDelay = 0, fixedDelay = 30 * 10000)
+
+    @Scheduled(initialDelay = 0, fixedDelay = 30 * 10000)
     @Transactional
     public void updateBookIndex() {
         List<Book> allBooks = bookRepository.findAllByStatusNot(BookStatus.DELETED);

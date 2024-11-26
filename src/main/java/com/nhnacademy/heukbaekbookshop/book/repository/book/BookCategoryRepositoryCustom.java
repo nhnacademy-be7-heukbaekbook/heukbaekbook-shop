@@ -12,5 +12,5 @@ public interface BookCategoryRepositoryCustom {
 
     Page<BookCategory> findByCategoryIds(List<Long> categoryIds, Pageable pageable);
 
-    List<BookCategory> findBookCategoriesByBookId(Long bookId);
+    Optional<BookCategory> findBookCategoriesByBookId(Long bookId);
 }

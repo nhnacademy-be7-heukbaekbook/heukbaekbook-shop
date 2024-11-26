@@ -1,11 +1,15 @@
 package com.nhnacademy.heukbaekbookshop.memberset.member.service.impl;
 
 import com.nhnacademy.heukbaekbookshop.memberset.address.domain.MemberAddress;
+import com.nhnacademy.heukbaekbookshop.memberset.address.dto.MemberAddressResponse;
 import com.nhnacademy.heukbaekbookshop.memberset.grade.domain.Grade;
+import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.mapper.MemberMapper;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberCreateRequest;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberUpdateRequest;
+import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MemberDetailResponse;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MemberResponse;
+import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MyPageResponse;
 import com.nhnacademy.heukbaekbookshop.memberset.member.exception.InvalidPasswordException;
 import com.nhnacademy.heukbaekbookshop.memberset.member.exception.MemberAlreadyExistException;
 import com.nhnacademy.heukbaekbookshop.memberset.member.exception.MemberNotFoundException;
@@ -16,6 +20,8 @@ import com.nhnacademy.heukbaekbookshop.memberset.grade.repository.GradeRepositor
 import com.nhnacademy.heukbaekbookshop.memberset.address.repository.MemberAddressRepository;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import com.nhnacademy.heukbaekbookshop.memberset.member.service.MemberService;
+import com.nhnacademy.heukbaekbookshop.order.dto.response.OrderResponse;
+import com.nhnacademy.heukbaekbookshop.order.dto.response.OrderSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.point.history.event.SignupEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -25,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -92,6 +99,58 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean existsEmail(String email) {
         return memberRepository.existsByEmail(email);
+    }
+
+    @Override
+    public MemberDetailResponse getMemberDetail(Long customerId) {
+        Member member = memberRepository.findById(customerId)
+                .orElseThrow(MemberNotFoundException::new);
+
+        return new MemberDetailResponse(
+                member.getId(),
+                member.getName(),
+                member.getPhoneNumber(),
+                member.getEmail(),
+                member.getMemberAddresses().stream()
+                        .map(memberAddress -> new MemberAddressResponse(
+                                memberAddress.getId(),
+                                memberAddress.getPostalCode(),
+                                memberAddress.getRoadNameAddress(),
+                                memberAddress.getDetailAddress(),
+                                memberAddress.getAlias()
+                        )).collect(Collectors.toList())
+        );
+    }
+
+    @Override
+    public MyPageResponse getMyPageResponse(Long customerId) {
+        Member member = memberRepository.searchByCustomerId(customerId)
+                .orElseThrow(MemberNotFoundException::new);
+
+        MemberResponse memberResponse = new MemberResponse(
+                member.getName(),
+                member.getPhoneNumber(),
+                member.getEmail(),
+                member.getLoginId(),
+                member.getBirth(),
+                member.getCreatedAt(),
+                member.getLastLoginAt(),
+                member.getStatus(),
+                new GradeDto(
+                        member.getGrade().getGradeName(),
+                        member.getGrade().getPointPercentage(),
+                        member.getGrade().getPromotionStandard()
+                )
+        );
+
+//        member.getOrders().stream()
+//                .map(order -> new OrderSummaryResponse(
+//                        order.getCreatedAt(),
+//                        order.getTossOrderId(),
+//                        order.get
+//                ))
+
+        return null;
     }
 
     @Override

@@ -44,9 +44,14 @@ public class MemberAddress {
     @Column(name = "address_created_at")
     private LocalDateTime createdAt;
 
+    private void setMember(Member member) {
+        this.member = member;
+        member.getMemberAddresses().add(this);
+    }
+
     @Builder
     public MemberAddress(Member member,Long postalCode, String roadNameAddress, String detailAddress, String alias) {
-        this.member = member;
+        this.setMember(member);
         this.postalCode = postalCode;
         this.roadNameAddress = roadNameAddress;
         this.detailAddress = detailAddress;
