@@ -51,10 +51,7 @@ public class MemberController {
     }
 
     @PostMapping("/oauth")
-    public ResponseEntity<MemberResponse> createOAuthMember(@Valid @RequestBody OAuthMemberCreateRequest oAuthMemberCreateRequest, BindingResult result) {
-        if (result.hasErrors()) {
-
-        }
+    public ResponseEntity<MemberResponse> createOAuthMember(@Valid @RequestBody OAuthMemberCreateRequest oAuthMemberCreateRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(memberService.createOAuthMember(oAuthMemberCreateRequest));
     }
