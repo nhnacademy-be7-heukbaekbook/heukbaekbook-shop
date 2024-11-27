@@ -1,14 +1,15 @@
 package com.nhnacademy.heukbaekbookshop.order.controller;
 
+import com.nhnacademy.heukbaekbookshop.order.dto.request.RefundCreateRequest;
+import com.nhnacademy.heukbaekbookshop.order.dto.response.MyPageRefundDetailResponse;
+import com.nhnacademy.heukbaekbookshop.order.dto.response.RefundCreateResponse;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.RefundDetailResponse;
 import com.nhnacademy.heukbaekbookshop.order.service.RefundService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/refund")
+@RequestMapping("/api/refunds")
 public class RefundController {
 
     private final RefundService refundService;
@@ -23,10 +24,15 @@ public class RefundController {
         return ResponseEntity.ok(refund);
     }
 
-    @GetMapping("/{customer-id}")
-    public ResponseEntity<List<RefundDetailResponse>> getRefunds(@PathVariable(name = "customer-id") Long customerId) {
-        List<RefundDetailResponse> refunds = refundService.getRefunds(customerId);
+    @GetMapping
+    public ResponseEntity<MyPageRefundDetailResponse> getRefunds(@RequestParam String customerId) {
+        MyPageRefundDetailResponse refunds = refundService.getRefunds(customerId);
         return ResponseEntity.ok(refunds);
     }
 
+    @PostMapping
+    public ResponseEntity<RefundCreateResponse> requestRefund(@RequestBody RefundCreateRequest request) {
+        RefundCreateResponse response = refundService.requestRefund(request);
+        return ResponseEntity.ok(response);
+    }
 }

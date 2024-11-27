@@ -1,7 +1,8 @@
 package com.nhnacademy.heukbaekbookshop.order.strategy.impl;
 
 import com.nhnacademy.heukbaekbookshop.order.dto.request.PaymentApprovalRequest;
-import com.nhnacademy.heukbaekbookshop.order.dto.request.PaymentCancelRequest;
+import com.nhnacademy.heukbaekbookshop.order.dto.request.RefundBookRequest;
+import com.nhnacademy.heukbaekbookshop.order.dto.request.RefundCreateRequest;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentGatewayApprovalResponse;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentGatewayCancelResponse;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.TossPaymentApprovalResponse;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -93,9 +95,13 @@ public class TossPaymentStrategy implements PaymentStrategy {
     }
 
     @Override
-    public PaymentGatewayCancelResponse cancelPayment(String paymentKey, PaymentCancelRequest request) {
-        String url = "https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel";
+    public PaymentGatewayCancelResponse cancelPayment(RefundCreateRequest request) {
+        String url = "https://api.tosspayments.com/v1/payments/" + request.paymentKey() + "/cancel";
         Map<String, Object> requestBody = new HashMap<>();
+
+        BigDecimal cancelAmount = getCancelAmount(request);
+
+        requestBody.put("cancelAmount", cancelAmount);
         requestBody.put("cancelReason", request.cancelReason());
 
         TossPaymentCancelResponse tossResponse = executePostRequest(url, requestBody, TossPaymentCancelResponse.class);
@@ -103,7 +109,23 @@ public class TossPaymentStrategy implements PaymentStrategy {
         return new PaymentGatewayCancelResponse(
                 tossResponse.requestedAt(),
                 tossResponse.approvedAt(),
-                "결제 취소 요청이 접수되었습니다."
+                tossResponse.orderId(),
+                tossResponse.cancelAmount(),
+                "TOSS"
         );
     }
+
+    private static BigDecimal getCancelAmount(RefundCreateRequest request) {
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        List<RefundBookRequest> refundBooks = request.refundBooks();
+
+        for (RefundBookRequest refundBook : refundBooks) {
+            BigDecimal price = refundBook.price();
+            int quantity = refundBook.quantity();
+            BigDecimal lineTotal = price.multiply(BigDecimal.valueOf(quantity));
+            totalAmount = totalAmount.add(lineTotal);
+        }
+        return totalAmount;
+    }
+
 }

@@ -1,9 +1,11 @@
 package com.nhnacademy.heukbaekbookshop.order.dto.response;
 
+import java.math.BigDecimal;
+
 public record PaymentGatewayApprovalResponse(
         String paymentKey,
         String requestedAt,
         String approvedAt,
-        int totalAmount,
+        BigDecimal cancelAmount,
         String method
 ) {}
