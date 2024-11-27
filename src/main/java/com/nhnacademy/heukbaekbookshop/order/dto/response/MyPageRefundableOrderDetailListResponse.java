@@ -2,7 +2,9 @@ package com.nhnacademy.heukbaekbookshop.order.dto.response;
 
 import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
 
-public record MyPageRefundableOrderDetailResponse(
+import java.util.List;
+
+public record MyPageRefundableOrderDetailListResponse(
         GradeDto gradeDto,
-        RefundableOrderDetailResponse order
+        List<RefundableOrderDetailResponse> orders
 ) {}
