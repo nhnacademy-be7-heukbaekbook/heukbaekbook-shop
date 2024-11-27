@@ -90,7 +90,7 @@ public class PaymentService {
         if (order.getTotalPrice().equals(gatewayResponse.cancelAmount())) {
             order.setStatus(OrderStatus.CANCELLED);
         } else {
-            order.setStatus(OrderStatus.REFUNDED);
+            order.setStatus(OrderStatus.RETURNED);
         }
 
         orderRepository.save(order);

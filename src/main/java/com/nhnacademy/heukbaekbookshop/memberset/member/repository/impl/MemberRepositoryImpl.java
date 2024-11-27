@@ -24,7 +24,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     public Optional<Member> searchByCustomerId(Long customerId) {
         return Optional.ofNullable(queryFactory
                 .selectFrom(member)
-                .join(member.grade, grade)
+                .join(member.grade, grade).fetchJoin()
                 .where(member.id.eq(customerId))
                 .fetchOne());
     }
