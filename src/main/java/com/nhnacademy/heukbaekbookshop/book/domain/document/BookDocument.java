@@ -29,9 +29,6 @@ public class BookDocument {
     @Field(type = FieldType.Date)
     private Date publishedAt;
 
-//    @Field(type = FieldType.Text)
-//    private String salePrice;
-
     @Field(type = FieldType.Integer)
     private Integer salePrice;
 
@@ -60,17 +57,17 @@ public class BookDocument {
     @Field(type = FieldType.Long)
     private List<Long> categoryId;
 
-    // 나중에 추가
-//    @Field(type = FieldType.Integer)
-//    private int reviewCount;
-//
-//    @Field(type = FieldType.Integer)
-//    private int reviewScore;
+
+    @Field(type = FieldType.Integer)
+    private Integer reviewCount;
+
+    @Field(type = FieldType.Float)
+    private Float reviewScore;
 
 
     public BookDocument(Long id, String title, Date publishedAt, int salePrice, double discountRate,
                         String thumbnailUrl, List<String> author, String description, List<ContributorSummaryResponse> contributors,
-                        PublisherSummaryResponse publisher, Long popularity, List<Long> categoryId) {
+                        PublisherSummaryResponse publisher, Long popularity, List<Long> categoryId, Integer reviewCount, Float reviewScore) {
         this.id = id;
         this.title = title;
         this.publishedAt = publishedAt;
@@ -83,10 +80,9 @@ public class BookDocument {
         this.publisher = publisher;
         this.popularity = popularity;
         this.categoryId = categoryId;
+        this.reviewCount = (reviewCount != null) ? reviewCount : 0;
+        this.reviewScore = (reviewScore != null) ? reviewScore : 0.0f;
     }
-//        this.reviewCount = reviewCount; 나중에 추가
-//        this.reviewScore = reviewScore;
-
 }
 
 

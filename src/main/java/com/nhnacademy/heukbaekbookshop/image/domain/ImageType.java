@@ -2,5 +2,7 @@ package com.nhnacademy.heukbaekbookshop.image.domain;
 
 public enum ImageType {
     THUMBNAIL,
-    DETAIL
+    REVIEW,
+    DETAIL,
+    WRAPPING_PAPER
 }
