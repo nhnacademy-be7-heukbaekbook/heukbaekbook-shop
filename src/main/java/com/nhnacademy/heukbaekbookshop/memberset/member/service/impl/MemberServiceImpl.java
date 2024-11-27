@@ -204,7 +204,8 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.searchByCustomerId(customerId)
                 .orElseThrow(MemberNotFoundException::new);
 
-        MemberResponse memberResponse = MemberMapper.createMemberResponse(member);
+        Grade grade = member.getGrade();
+        GradeDto gradeDto = GradeMapper.createGradeResponse(grade);
 
         Order order = orderRepository.searchByTossOrderId(tossOrderId)
                 .orElseThrow(() -> new OrderNotFoundException(tossOrderId + " order not found"));
@@ -212,7 +213,7 @@ public class MemberServiceImpl implements MemberService {
         OrderDetailResponse orderDetailResponse = OrderDetailResponse.of(order);
 
 
-        return new MyPageOrderDetailResponse(memberResponse, orderDetailResponse);
+        return new MyPageOrderDetailResponse(gradeDto, orderDetailResponse);
     }
 
     @Override
