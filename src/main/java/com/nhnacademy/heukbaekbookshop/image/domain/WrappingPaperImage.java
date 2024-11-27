@@ -15,7 +15,7 @@ import lombok.Setter;
 @Table(name = "wrapping_papers_images")
 public class WrappingPaperImage extends Image {
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wrapping_paper_id")
     private WrappingPaper wrappingPaper;
 }

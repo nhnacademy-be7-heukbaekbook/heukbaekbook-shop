@@ -62,6 +62,8 @@ class BookSearchRepositoryImplTest {
                 Arrays.asList(new ContributorSummaryResponse(1L, "Contributor Name")), // 예시 기여자 리스트
                 new PublisherSummaryResponse(1L, "Publisher Name"), // 예시 출판사
                 1L,
+                null,
+                null,
                 null
         );
 

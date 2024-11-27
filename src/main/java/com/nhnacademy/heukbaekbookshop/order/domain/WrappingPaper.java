@@ -1,5 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.order.domain;
 
+import com.nhnacademy.heukbaekbookshop.image.domain.WrappingPaperImage;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -30,4 +31,7 @@ public class WrappingPaper {
     @NotNull
     @Column(name = "wrapping_paper_price")
     private BigDecimal price;
+
+    @OneToOne(mappedBy = "wrappingPaper", fetch = FetchType.LAZY)
+    private WrappingPaperImage wrappingPaperImage;
 }
