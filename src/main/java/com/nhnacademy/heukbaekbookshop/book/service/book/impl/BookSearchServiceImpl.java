@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 @Service
 @RequiredArgsConstructor
 public class BookSearchServiceImpl implements BookSearchService {
@@ -44,15 +46,13 @@ public class BookSearchServiceImpl implements BookSearchService {
     private final BookDocumentRepository bookDocumentRepository;
     private final CategoryRepository categoryRepository;
     private final ReviewRepository reviewRepository;
-    private final IndexNameProvider indexNameProvider; // IndexNameProvider 주입
+    private final IndexNameProvider indexNameProvider;
     private final ElasticsearchOperations elasticsearchOperations;
 
     @Override
     public Page<BookResponse> searchBooks(Pageable pageable, BookSearchRequest searchRequest) {
-        String indexName = indexNameProvider.resolveIndexName();
-
         Page<BookDocument> bookDocuments = bookSearchRepository.search(
-                indexName,
+                indexNameProvider.resolveIndexName(),
                 pageable,
                 searchRequest.keyword(),
                 SearchCondition.valueOf(searchRequest.searchCondition().toUpperCase()),
@@ -95,33 +95,37 @@ public class BookSearchServiceImpl implements BookSearchService {
     public void updateBookIndex() {
         String indexName = indexNameProvider.resolveIndexName();
 
+        // 동적 인덱스 생성 및 매핑 설정
         if (!elasticsearchOperations.indexOps(IndexCoordinates.of(indexName)).exists()) {
             IndexOperations indexOps = elasticsearchOperations.indexOps(IndexCoordinates.of(indexName));
             indexOps.create();
             indexOps.putMapping(elasticsearchOperations.indexOps(BookDocument.class).createMapping());
         }
-        // 삭제된 책 처리
+
+        List<Book> allBooks = bookRepository.findAllByStatusNot(BookStatus.DELETED);
         List<Book> deletedBooks = bookRepository.findAllByStatus(BookStatus.DELETED);
+
+        // 삭제된 도서 처리
         if (!deletedBooks.isEmpty()) {
             List<Long> deletedBookIds = deletedBooks.stream()
                     .map(Book::getId)
                     .collect(Collectors.toList());
-
-            // 동적 인덱스를 지정하여 삭제
-            bookDocumentRepository.deleteAllByIdInIndex(deletedBookIds, indexName);
+            deletedBookIds.forEach(bookId ->
+                    elasticsearchOperations.delete(String.valueOf(id), IndexCoordinates.of(indexName))
+            );
         }
 
-        // 활성 상태의 모든 책 처리
-        List<Book> allBooks = bookRepository.findAllByStatusNot(BookStatus.DELETED);
+        // 도서 데이터 동적 인덱스에 저장
         List<BookDocument> bookDocuments = allBooks.stream()
                 .map(this::bookToBookDocument)
                 .collect(Collectors.toList());
 
-        // 동적 인덱스를 지정하여 저장
-        bookDocumentRepository.saveAllToIndex(bookDocuments, indexName);
+        bookDocuments.forEach(bookDocument ->
+                elasticsearchOperations.save(bookDocument, IndexCoordinates.of(indexName))
+        );
     }
 
-    private BookDocument bookToBookDocument(Book book) {
+    public BookDocument bookToBookDocument(Book book) {
         Set<Long> categoryIds = book.getCategories().stream()
                 .map(BookCategory::getCategoryId)
                 .collect(Collectors.toSet());

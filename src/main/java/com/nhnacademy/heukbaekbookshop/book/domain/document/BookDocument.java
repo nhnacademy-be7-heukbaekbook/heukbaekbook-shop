@@ -2,20 +2,15 @@ package com.nhnacademy.heukbaekbookshop.book.domain.document;
 
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
-import com.querydsl.codegen.Keywords;
-import jakarta.annotation.PostConstruct;
-import lombok.Data;
 import lombok.Getter;
-import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.Date;
 import java.util.List;
+
 @Getter
 //@Document(indexName = "#{@indexNameProvider.resolveIndexName()}") // IndexNameProvider 사용
 public class BookDocument {
