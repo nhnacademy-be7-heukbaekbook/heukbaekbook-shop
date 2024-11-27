@@ -2,7 +2,6 @@ package com.nhnacademy.heukbaekbookshop.book.repository.book;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchCondition;
-import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
