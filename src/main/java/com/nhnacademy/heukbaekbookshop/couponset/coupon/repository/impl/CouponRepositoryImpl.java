@@ -10,6 +10,7 @@ import com.nhnacademy.heukbaekbookshop.couponset.coupon.repository.CouponReposit
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -33,9 +34,26 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
 
     private final List<CouponStatus> couponStatusOrders = List.of(CouponStatus.ABLE, CouponStatus.DISABLE);
 
-    private OrderSpecifier<?> orderByFieldList(List<CouponStatus> couponStatusOrders) {
-        return Expressions.stringTemplate("FIELD({0}, {1})", coupon.couponStatus, couponStatusOrders).asc();
-    }
+    OrderSpecifier<Integer> orderByCouponStatus = new CaseBuilder()
+            .when(coupon.couponStatus.eq(CouponStatus.ABLE)).then(0)
+            .when(coupon.couponStatus.eq(CouponStatus.DISABLE)).then(1)
+            .otherwise(2)
+            .asc();
+
+    // bookCoupon 엔티티의 경우
+    OrderSpecifier<Integer> orderByBookCouponStatus = new CaseBuilder()
+            .when(bookCoupon.couponStatus.eq(CouponStatus.ABLE)).then(0)
+            .when(bookCoupon.couponStatus.eq(CouponStatus.DISABLE)).then(1)
+            .otherwise(2)
+            .asc();
+
+    // categoryCoupon 엔티티의 경우
+    OrderSpecifier<Integer> orderByCategoryCouponStatus = new CaseBuilder()
+            .when(categoryCoupon.couponStatus.eq(CouponStatus.ABLE)).then(0)
+            .when(categoryCoupon.couponStatus.eq(CouponStatus.DISABLE)).then(1)
+            .otherwise(2)
+            .asc();
+
 
     public CouponRepositoryImpl(EntityManager em) {
         this.queryFactory = new JPAQueryFactory(em);
@@ -54,27 +72,32 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
                 .selectFrom(coupon)
                 .join(coupon.couponPolicy, couponPolicy).fetchJoin()
                 .where(
-                       JPAExpressions.selectFrom(bookCoupon)
+                       JPAExpressions.selectOne()
+                               .from(bookCoupon)
                                .where(bookCoupon.id.eq(coupon.id))
                                .notExists(),
-                        JPAExpressions.selectFrom(categoryCoupon)
+                        JPAExpressions.selectOne()
+                                .from(categoryCoupon)
                                 .where(categoryCoupon.id.eq(coupon.id))
                                 .notExists()
                 )
-                .orderBy(orderByFieldList(couponStatusOrders), coupon.couponCreatedAt.desc(), coupon.couponPolicy.discountAmount.asc())
+                .orderBy(orderByCouponStatus,
+                        coupon.couponCreatedAt.desc(),
+                        coupon.couponPolicy.discountAmount.asc())
                 .fetch();
 
         long total = queryFactory
                 .select(coupon.count())
                 .from(coupon)
                 .where(
-                        JPAExpressions.selectFrom(bookCoupon)
+                        JPAExpressions.selectOne()
+                                .from(bookCoupon)
                                 .where(bookCoupon.id.eq(coupon.id))
                                 .notExists(),
-                        JPAExpressions.selectFrom(categoryCoupon)
+                        JPAExpressions.selectOne()
+                                .from(categoryCoupon)
                                 .where(categoryCoupon.id.eq(coupon.id))
                                 .notExists()
-
                 )
                 .fetchOne();
 
@@ -104,7 +127,7 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
                         bookCoupon.book.title
                 ))
                 .from(bookCoupon)
-                .orderBy(orderByFieldList(couponStatusOrders), coupon.couponCreatedAt.desc(), coupon.couponPolicy.discountAmount.asc())
+                .orderBy(orderByBookCouponStatus, bookCoupon.couponCreatedAt.desc(), bookCoupon.couponPolicy.discountAmount.asc())
                 .fetch();
 
         long total = queryFactory
@@ -124,11 +147,11 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
                         categoryCoupon.couponDescription,
                         categoryCoupon.couponCreatedAt,
                         categoryCoupon.couponStatus,
-                        bookCoupon.couponQuantity,
+                        categoryCoupon.couponQuantity,
                         categoryCoupon.availableDuration,
                         categoryCoupon.couponTimeStart,
                         categoryCoupon.couponTimeEnd,
-                        bookCoupon.couponType,
+                        categoryCoupon.couponType,
                         categoryCoupon.couponPolicy.id,
                         categoryCoupon.couponPolicy.discountType,
                         categoryCoupon.couponPolicy.discountAmount,
@@ -138,7 +161,7 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
                         categoryCoupon.category.name
                         ))
                 .from(categoryCoupon)
-                .orderBy(orderByFieldList(couponStatusOrders), coupon.couponCreatedAt.desc(), coupon.couponPolicy.discountAmount.asc())
+                .orderBy(orderByCategoryCouponStatus, categoryCoupon.couponCreatedAt.desc(), categoryCoupon.couponPolicy.discountAmount.asc())
                 .fetch();
 
         long total = queryFactory
@@ -174,7 +197,7 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
                 .selectFrom(coupon)
                 .join(coupon.couponPolicy, couponPolicy).fetchJoin()
                 .where(coupon.couponPolicy.discountType.eq(discountType))
-                .orderBy(orderByFieldList(couponStatusOrders), coupon.couponCreatedAt.desc(), coupon.couponPolicy.discountAmount.asc())
+                .orderBy(orderByCouponStatus, coupon.couponCreatedAt.desc(), coupon.couponPolicy.discountAmount.asc())
                 .fetch();
 
         long total = queryFactory

@@ -15,7 +15,6 @@ public record CouponPageResponse (
         List<CouponPolicyResponse> couponPolicyList,
         DiscountType [] discountType,
         CouponStatus[] couponstatus,
-        CouponType[] couponType,
-        GradeDto gradeDto
+        CouponType[] couponType
 ){
 }
