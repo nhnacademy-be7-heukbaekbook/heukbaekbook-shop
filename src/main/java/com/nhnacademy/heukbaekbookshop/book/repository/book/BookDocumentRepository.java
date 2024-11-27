@@ -6,7 +6,5 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BookDocumentRepository extends ElasticsearchRepository<BookDocument, Long> {
-    <S extends BookDocument> List<S> saveAll(Iterable<S> entities);
-    void deleteAllById(Iterable<? extends Long> ids);
+public interface BookDocumentRepository extends ElasticsearchRepository<BookDocument, Long>, BookDocumentRepositoryCustom {
 }

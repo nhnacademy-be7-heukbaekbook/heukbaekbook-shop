@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -30,23 +31,25 @@ public class BookSearchRepositoryImpl implements BookSearchRepository {
     }
 
     @Override
-    public Page<BookDocument> search(Pageable pageable, String keyword, SearchCondition searchCondition, SortCondition sortCondition, Long categoryId) {
+    public Page<BookDocument> search(String indexName, Pageable pageable, String keyword, SearchCondition searchCondition, SortCondition sortCondition, Long categoryId) {
         Criteria criteria = new Criteria();
 
+        // 키워드 분리 및 처리
         String[] keywords = keyword.trim().split("\\s+");
 
         for (String word : keywords) {
             if (searchCondition == SearchCondition.ALL) {
+                // 모든 필드에 대해 검색
                 criteria = criteria.or(Criteria.where("title").contains(word).boost(100))
                         .or(Criteria.where("description").contains(word).boost(50))
                         .or(Criteria.where("author").contains(word).boost(75))
                         .or(Criteria.where("tags").contains(word).boost(50));
             } else {
-                // 특정 필드에 대한 각 키워드 검색
+                // 특정 필드에 대한 검색
                 criteria = criteria.or(Criteria.where(searchCondition.name().toLowerCase()).contains(word));
             }
 
-            // 동의어 추가 처리
+            // 동의어 검색 처리
             List<String> synonyms = SynonymUtil.getSynonyms(word);
             for (String synonym : synonyms) {
                 criteria = criteria.or(Criteria.where("title").contains(synonym).boost(100))
@@ -55,22 +58,31 @@ public class BookSearchRepositoryImpl implements BookSearchRepository {
                         .or(Criteria.where(searchCondition.name().toLowerCase()).contains(synonym));
             }
         }
+
+        // 카테고리 필터링 처리
         if (categoryId != null) {
             criteria = criteria.and(Criteria.where("categoryId").in(categoryId));
         }
 
+        // CriteriaQuery 생성
         CriteriaQuery query = new CriteriaQuery(criteria)
                 .setPageable(pageable)
                 .addSort(resolveSort(sortCondition));
 
-        SearchHits<BookDocument> searchHits = elasticsearchOperations.search(query, BookDocument.class);
+        // 동적으로 생성된 인덱스 이름 적용
+        IndexCoordinates indexCoordinates = IndexCoordinates.of(indexName);
 
+        // Elasticsearch 검색 수행
+        SearchHits<BookDocument> searchHits = elasticsearchOperations.search(query, BookDocument.class, indexCoordinates);
+
+        // 결과를 Page 객체로 변환하여 반환
         return PageableExecutionUtils.getPage(
                 searchHits.map(org.springframework.data.elasticsearch.core.SearchHit::getContent).toList(),
                 pageable,
                 searchHits::getTotalHits
         );
     }
+
 
 
 
@@ -85,6 +97,4 @@ public class BookSearchRepositoryImpl implements BookSearchRepository {
             default -> Sort.by(Sort.Order.desc("publishedAt"));
         };
     }
-
-
 }

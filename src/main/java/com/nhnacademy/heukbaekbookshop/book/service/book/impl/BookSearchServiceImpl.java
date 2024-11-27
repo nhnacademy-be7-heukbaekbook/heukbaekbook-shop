@@ -11,6 +11,7 @@ import com.nhnacademy.heukbaekbookshop.book.service.book.BookSearchService;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
 import com.nhnacademy.heukbaekbookshop.common.util.Calculator;
 import com.nhnacademy.heukbaekbookshop.common.util.Formatter;
+import com.nhnacademy.heukbaekbookshop.common.util.IndexNameProvider;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.ContributorRole;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
@@ -22,6 +23,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.IndexOperations;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +34,8 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @Service
 @RequiredArgsConstructor
@@ -40,10 +46,13 @@ public class BookSearchServiceImpl implements BookSearchService {
     private final BookDocumentRepository bookDocumentRepository;
     private final CategoryRepository categoryRepository;
     private final ReviewRepository reviewRepository;
+    private final IndexNameProvider indexNameProvider;
+    private final ElasticsearchOperations elasticsearchOperations;
 
     @Override
     public Page<BookResponse> searchBooks(Pageable pageable, BookSearchRequest searchRequest) {
         Page<BookDocument> bookDocuments = bookSearchRepository.search(
+                indexNameProvider.resolveIndexName(),
                 pageable,
                 searchRequest.keyword(),
                 SearchCondition.valueOf(searchRequest.searchCondition().toUpperCase()),
@@ -84,21 +93,36 @@ public class BookSearchServiceImpl implements BookSearchService {
     @Scheduled(initialDelay = 0, fixedDelay = 30 * 10000)
     @Transactional
     public void updateBookIndex() {
+        String indexName = indexNameProvider.resolveIndexName();
+
+        // 동적 인덱스 생성 및 매핑 설정
+        if (!elasticsearchOperations.indexOps(IndexCoordinates.of(indexName)).exists()) {
+            IndexOperations indexOps = elasticsearchOperations.indexOps(IndexCoordinates.of(indexName));
+            indexOps.create();
+            indexOps.putMapping(elasticsearchOperations.indexOps(BookDocument.class).createMapping());
+        }
+
         List<Book> allBooks = bookRepository.findAllByStatusNot(BookStatus.DELETED);
         List<Book> deletedBooks = bookRepository.findAllByStatus(BookStatus.DELETED);
 
+        // 삭제된 도서 처리
         if (!deletedBooks.isEmpty()) {
             List<Long> deletedBookIds = deletedBooks.stream()
                     .map(Book::getId)
                     .collect(Collectors.toList());
-            bookDocumentRepository.deleteAllById(deletedBookIds);
+            deletedBookIds.forEach(bookId ->
+                    elasticsearchOperations.delete(String.valueOf(id), IndexCoordinates.of(indexName))
+            );
         }
 
+        // 도서 데이터 동적 인덱스에 저장
         List<BookDocument> bookDocuments = allBooks.stream()
                 .map(this::bookToBookDocument)
                 .collect(Collectors.toList());
 
-        bookDocumentRepository.saveAll(bookDocuments);
+        bookDocuments.forEach(bookDocument ->
+                elasticsearchOperations.save(bookDocument, IndexCoordinates.of(indexName))
+        );
     }
 
     public BookDocument bookToBookDocument(Book book) {
