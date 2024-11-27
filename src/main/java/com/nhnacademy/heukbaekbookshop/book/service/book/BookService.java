@@ -14,7 +14,8 @@ import com.nhnacademy.heukbaekbookshop.book.exception.book.BookSearchException;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
-import com.nhnacademy.heukbaekbookshop.common.service.CommonService;
+import com.nhnacademy.heukbaekbookshop.common.util.Calculator;
+import com.nhnacademy.heukbaekbookshop.common.util.Formatter;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.*;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
@@ -64,7 +65,6 @@ public class BookService {
     private final RoleRepository roleRepository;
     private final BookImageRepository bookImageRepository;
     private final TagRepository tagRepository;
-    private final CommonService commonService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -566,7 +566,7 @@ public class BookService {
                                 book.getTitle(),
                                 book.isPackable(),
                                 book.getPrice(),
-                                commonService.getSalePrice(book.getPrice(), book.getDiscountRate()),
+                                Calculator.getSalePrice(book.getPrice(), book.getDiscountRate()),
                                 book.getDiscountRate(),
                                 book.getBookImages().stream()
                                         .map(Image::getUrl)
@@ -599,11 +599,11 @@ public class BookService {
                 book.getTitle(),
                 book.getIndex(),
                 book.getDescription(),
-                commonService.formatDate(book.getPublishedAt()),
+                Formatter.formatDate(book.getPublishedAt()),
                 book.getIsbn(),
                 book.isPackable(),
-                commonService.formatPrice(book.getPrice()),
-                commonService.formatPrice(commonService.getSalePrice(book.getPrice(), book.getDiscountRate())),
+                Formatter.formatPrice(book.getPrice()),
+                Formatter.formatPrice(Calculator.getSalePrice(book.getPrice(), book.getDiscountRate())),
                 book.getDiscountRate(),
                 book.getPopularity(),
                 book.getStatus().name(),
@@ -671,8 +671,8 @@ public class BookService {
         return new BookResponse (
                 book.getId(),
                 book.getTitle(),
-                commonService.formatDate(book.getPublishedAt()),
-                commonService.formatPrice(commonService.getSalePrice(book.getPrice(), book.getDiscountRate())),
+                Formatter.formatDate(book.getPublishedAt()),
+                Formatter.formatPrice(Calculator.getSalePrice(book.getPrice(), book.getDiscountRate())),
                 book.getDiscountRate(),
                 book.getBookImages().stream()
                         .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)

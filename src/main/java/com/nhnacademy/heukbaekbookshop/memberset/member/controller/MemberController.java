@@ -9,6 +9,7 @@ import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberUpdate
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.OAuthMemberCreateRequest;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MemberDetailResponse;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MemberResponse;
+import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MyPageOrderDetailResponse;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MyPageResponse;
 import com.nhnacademy.heukbaekbookshop.memberset.member.service.MemberService;
 import jakarta.validation.Valid;
@@ -141,5 +142,13 @@ public class MemberController {
         log.info("customerId: {}", customerId);
 
         return memberService.getMyPageResponse(customerId);
+    }
+
+    @GetMapping("/orders/{orderId}")
+    public MyPageOrderDetailResponse getMyPageOrderDetailResponse(@RequestHeader(X_USER_ID) Long customerId,
+                                                                  @PathVariable String orderId) {
+        log.info("tossOrderId: {}", orderId);
+
+        return memberService.getMyPageDetailResponse(customerId, orderId);
     }
 }

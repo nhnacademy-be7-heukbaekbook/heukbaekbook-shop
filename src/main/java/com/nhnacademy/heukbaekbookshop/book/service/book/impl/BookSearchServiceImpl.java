@@ -9,8 +9,8 @@ import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookSearchRepository;
 import com.nhnacademy.heukbaekbookshop.book.service.book.BookSearchService;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
-import com.nhnacademy.heukbaekbookshop.common.formatter.BookFormatter;
-import com.nhnacademy.heukbaekbookshop.common.service.CommonService;
+import com.nhnacademy.heukbaekbookshop.common.util.Calculator;
+import com.nhnacademy.heukbaekbookshop.common.util.Formatter;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.ContributorRole;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
@@ -37,8 +37,6 @@ public class BookSearchServiceImpl implements BookSearchService {
     private final BookRepository bookRepository;
     private final BookDocumentRepository bookDocumentRepository;
     private final CategoryRepository categoryRepository;
-    private final BookFormatter bookFormatter;
-    private final CommonService commonService;
 
     @Override
     public Page<BookResponse> searchBooks(Pageable pageable, BookSearchRequest searchRequest) {
@@ -59,8 +57,8 @@ public class BookSearchServiceImpl implements BookSearchService {
             return new BookResponse(
                     book.getId(),
                     book.getTitle(),
-                    bookFormatter.formatDate(book.getPublishedAt()),
-                    commonService.formatPrice(commonService.getSalePrice(book.getPrice(), book.getDiscountRate())), // BigDecimal -> String 변환
+                    Formatter.formatDate(book.getPublishedAt()),
+                    Formatter.formatPrice(Calculator.getSalePrice(book.getPrice(), book.getDiscountRate())), // BigDecimal -> String 변환
                     book.getDiscountRate(),
                     book.getBookImages().stream()
                             .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
