@@ -100,4 +100,5 @@ public class CouponPolicyController {
         couponPolicyService.deleteCouponPolicy(policyId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
 }

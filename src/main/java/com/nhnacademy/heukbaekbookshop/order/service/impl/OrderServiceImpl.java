@@ -4,7 +4,9 @@ import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchCondition;
 import com.nhnacademy.heukbaekbookshop.book.exception.book.BookNotFoundException;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
-import com.nhnacademy.heukbaekbookshop.common.service.CommonService;
+import com.nhnacademy.heukbaekbookshop.common.util.Calculator;
+import com.nhnacademy.heukbaekbookshop.common.util.Converter;
+import com.nhnacademy.heukbaekbookshop.common.util.Formatter;
 import com.nhnacademy.heukbaekbookshop.image.domain.Image;
 import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
@@ -43,8 +45,6 @@ public class OrderServiceImpl implements OrderService {
 
     private final CustomerRepository customerRepository;
 
-    private final CommonService commonService;
-
     private final DeliveryFeeRepository deliveryFeeRepository;
 
     private final BookRepository bookRepository;
@@ -74,7 +74,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Order order = Order.createOrder(
-                commonService.convertStringToBigDecimal(orderCreateRequest.totalPrice()),
+                Converter.convertStringToBigDecimal(orderCreateRequest.totalPrice()),
                 orderCreateRequest.customerName(),
                 orderCreateRequest.customerPhoneNumber(),
                 orderCreateRequest.customerEmail(),
@@ -121,7 +121,7 @@ public class OrderServiceImpl implements OrderService {
                             book,
                             savedOrder,
                             orderBookRequest.quantity(),
-                            commonService.convertStringToBigDecimal(orderBookRequest.salePrice())
+                            Converter.convertStringToBigDecimal(orderBookRequest.salePrice())
                     );
 //                    orderBookRepository.save(orderBook);
                     em.persist(orderBook);
@@ -136,28 +136,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.searchByTossOrderId(tossOrderId)
                 .orElseThrow(() -> new OrderNotFoundException(tossOrderId + " Order not found"));
 
-        BigDecimal totalBookPrice = order.getOrderBooks().stream()
-                .map(orderBook -> orderBook.getPrice().multiply(BigDecimal.valueOf(orderBook.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal deliveryFee = order.getDeliveryFee().getFee();
-        OrderDetailResponse orderDetailResponse = new OrderDetailResponse(
-                order.getCustomerName(),
-                commonService.formatPrice(deliveryFee),
-                commonService.formatPrice(order.getPayment().getPrice()),
-                order.getPayment().getPaymentType().getName(),
-                order.getDelivery().getRecipient(),
-                order.getDelivery().getPostalCode(),
-                order.getDelivery().getRoadNameAddress(),
-                order.getDelivery().getDetailAddress(),
-                commonService.formatPrice(totalBookPrice),
-                commonService.formatPrice(order.getOrderBooks().stream()
-                        .map(orderBook -> orderBook.getBook().getPrice().subtract(orderBook.getPrice()).multiply(BigDecimal.valueOf(orderBook.getQuantity())))
-                        .reduce(BigDecimal.ZERO, BigDecimal::add)),
-                commonService.formatPrice(totalBookPrice.add(deliveryFee)),
-                order.getOrderBooks().stream()
-                        .map(this::mapToOrderBookResponse)
-                        .collect(Collectors.toList())
-        );
+        OrderDetailResponse orderDetailResponse = OrderDetailResponse.of(order);
 
         log.info("orderDetailResponse: {}", orderDetailResponse);
         return orderDetailResponse;
@@ -199,10 +178,10 @@ public class OrderServiceImpl implements OrderService {
 
                     // 배송비
                     BigDecimal deliveryFee = order.getDeliveryFee() != null ? order.getDeliveryFee().getFee() : BigDecimal.ZERO;
-                    String formattedDeliveryFee = commonService.formatPrice(deliveryFee);
+                    String formattedDeliveryFee = Formatter.formatPrice(deliveryFee);
 
                     // 결제 정보
-                    String paymentPrice = order.getPayment() != null ? commonService.formatPrice(order.getPayment().getPrice()) : null;
+                    String paymentPrice = order.getPayment() != null ? Formatter.formatPrice(order.getPayment().getPrice()) : null;
                     String paymentTypeName = order.getPayment() != null ? order.getPayment().getPaymentType().getName() : null;
 
                     // 고객 및 배송 정보
@@ -220,7 +199,7 @@ public class OrderServiceImpl implements OrderService {
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                     // 총 주문 금액 계산
-                    String totalPrice = commonService.formatPrice(totalBookPrice.add(deliveryFee));
+                    String totalPrice = Formatter.formatPrice(totalBookPrice.add(deliveryFee));
 
                     // 주문 도서 목록 변환
                     List<RefundableOrderBookResponse> books = order.getOrderBooks().stream()
@@ -245,8 +224,8 @@ public class OrderServiceImpl implements OrderService {
                             postalCode,
                             roadNameAddress,
                             detailAddress,
-                            commonService.formatPrice(totalBookPrice),
-                            commonService.formatPrice(totalDiscount),
+                            Formatter.formatPrice(totalBookPrice),
+                            Formatter.formatPrice(totalDiscount),
                             totalPrice,
                             books,
                             createdAt,
@@ -261,28 +240,6 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
-
-    private OrderBookResponse mapToOrderBookResponse(OrderBook orderBook) {
-        Book book = orderBook.getBook();
-        String thumbnailUrl = book.getBookImages().stream()
-                .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
-                .map(Image::getUrl)
-                .findFirst()
-                .orElse("no-image");
-
-        BigDecimal salePrice = commonService.getSalePrice(book.getPrice(), book.getDiscountRate());
-
-        return new OrderBookResponse(
-                thumbnailUrl,
-                book.getTitle(),
-                commonService.formatPrice(book.getPrice()),
-                orderBook.getQuantity(),
-                commonService.formatPrice(salePrice),
-                book.getDiscountRate(),
-                commonService.formatPrice(salePrice.multiply(BigDecimal.valueOf(orderBook.getQuantity())))
-        );
-    }
-
     private RefundableOrderBookResponse mapToRefundableOrderBookResponse(OrderBook orderBook) {
         Book book = orderBook.getBook();
         String thumbnailUrl = book.getBookImages().stream()
@@ -291,17 +248,17 @@ public class OrderServiceImpl implements OrderService {
                 .findFirst()
                 .orElse("no-image");
 
-        BigDecimal salePrice = commonService.getSalePrice(book.getPrice(), book.getDiscountRate());
+        BigDecimal salePrice = Calculator.getSalePrice(book.getPrice(), book.getDiscountRate());
 
         return new RefundableOrderBookResponse(
                 book.getId(),
                 thumbnailUrl,
                 book.getTitle(),
-                commonService.formatPrice(book.getPrice()),
+                Formatter.formatPrice(book.getPrice()),
                 orderBook.getQuantity(),
-                commonService.formatPrice(salePrice),
+                Formatter.formatPrice(salePrice),
                 book.getDiscountRate(),
-                commonService.formatPrice(salePrice.multiply(BigDecimal.valueOf(orderBook.getQuantity())))
+                Formatter.formatPrice(salePrice.multiply(BigDecimal.valueOf(orderBook.getQuantity())))
         );
     }
 

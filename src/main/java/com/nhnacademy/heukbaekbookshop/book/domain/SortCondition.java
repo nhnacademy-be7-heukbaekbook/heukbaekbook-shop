@@ -8,8 +8,8 @@ public enum SortCondition {
     NEWEST("book_publication"),
     LOWEST_PRICE("book_price"),
     HIGHEST_PRICE("book_price"),
-    RATING("book_discount_rate"),
-    REVIEW_COUNT(""); // 추가시켜야함
+    RATING("book_rating"),
+    REVIEW_COUNT("book_review_count"); // 추가시켜야함
 
     private final String fieldName;
 

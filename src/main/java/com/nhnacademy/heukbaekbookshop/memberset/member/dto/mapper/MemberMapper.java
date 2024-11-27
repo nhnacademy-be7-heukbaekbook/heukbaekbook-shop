@@ -5,6 +5,7 @@ import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.mapper.GradeMapper;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.memberset.address.domain.MemberAddress;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberCreateRequest;
+import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.OAuthMemberCreateRequest;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MemberResponse;
 
 public class MemberMapper {
@@ -19,6 +20,18 @@ public class MemberMapper {
                 .loginId(memberCreateRequest.loginId())
                 .password(encodedPassword)
                 .birth(memberCreateRequest.birth())
+                .grade(grade)
+                .build();
+    }
+
+    public static Member createOAuthMemberEntity(OAuthMemberCreateRequest oAuthMemberCreateRequest, Grade grade, String encodedPassword) {
+        return Member.builder()
+                .name(oAuthMemberCreateRequest.name())
+                .phoneNumber(oAuthMemberCreateRequest.phoneNumber())
+                .email(oAuthMemberCreateRequest.email())
+                .loginId(oAuthMemberCreateRequest.loginId())
+                .password(encodedPassword)
+                .birth(oAuthMemberCreateRequest.birth())
                 .grade(grade)
                 .build();
     }

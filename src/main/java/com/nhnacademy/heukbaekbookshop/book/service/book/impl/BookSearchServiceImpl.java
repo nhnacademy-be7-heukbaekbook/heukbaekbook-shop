@@ -9,13 +9,15 @@ import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookSearchRepository;
 import com.nhnacademy.heukbaekbookshop.book.service.book.BookSearchService;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
-import com.nhnacademy.heukbaekbookshop.common.formatter.BookFormatter;
-import com.nhnacademy.heukbaekbookshop.common.service.CommonService;
+import com.nhnacademy.heukbaekbookshop.common.util.Calculator;
+import com.nhnacademy.heukbaekbookshop.common.util.Formatter;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.ContributorRole;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.image.domain.Image;
 import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
+import com.nhnacademy.heukbaekbookshop.order.domain.Review;
+import com.nhnacademy.heukbaekbookshop.review.repository.ReviewRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -37,8 +39,7 @@ public class BookSearchServiceImpl implements BookSearchService {
     private final BookRepository bookRepository;
     private final BookDocumentRepository bookDocumentRepository;
     private final CategoryRepository categoryRepository;
-    private final BookFormatter bookFormatter;
-    private final CommonService commonService;
+    private final ReviewRepository reviewRepository;
 
     @Override
     public Page<BookResponse> searchBooks(Pageable pageable, BookSearchRequest searchRequest) {
@@ -59,8 +60,8 @@ public class BookSearchServiceImpl implements BookSearchService {
             return new BookResponse(
                     book.getId(),
                     book.getTitle(),
-                    bookFormatter.formatDate(book.getPublishedAt()),
-                    commonService.formatPrice(commonService.getSalePrice(book.getPrice(), book.getDiscountRate())), // BigDecimal -> String 변환
+                    Formatter.formatDate(book.getPublishedAt()),
+                    Formatter.formatPrice(Calculator.getSalePrice(book.getPrice(), book.getDiscountRate())), // BigDecimal -> String 변환
                     book.getDiscountRate(),
                     book.getBookImages().stream()
                             .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
@@ -80,7 +81,6 @@ public class BookSearchServiceImpl implements BookSearchService {
             );
         });
     }
-
     @Scheduled(initialDelay = 0, fixedDelay = 30 * 10000)
     @Transactional
     public void updateBookIndex() {
@@ -101,12 +101,24 @@ public class BookSearchServiceImpl implements BookSearchService {
         bookDocumentRepository.saveAll(bookDocuments);
     }
 
-    private BookDocument bookToBookDocument(Book book) {
+    public BookDocument bookToBookDocument(Book book) {
         Set<Long> categoryIds = book.getCategories().stream()
                 .map(BookCategory::getCategoryId)
                 .collect(Collectors.toSet());
 
         List<Long> allCategoryIds = categoryRepository.findParentCategoryIdsByCategoryIds(categoryIds);
+
+        List<Review> reviews = reviewRepository.findAllByBookId(book.getId());
+        int reviewCount = (reviews != null) ? reviews.size() : 0;
+        float reviewScore = 0.0f;
+        if (reviews != null && !reviews.isEmpty()) {
+            reviewScore = (float) reviews.stream()
+                    .mapToDouble(Review::getScore)
+                    .average()
+                    .orElse(0.0);
+        }
+
+
 
         return new BookDocument(
                 book.getId(),
@@ -132,7 +144,9 @@ public class BookSearchServiceImpl implements BookSearchService {
                         book.getPublisher().getName()
                 ),
                 book.getPopularity(),
-                allCategoryIds
+                allCategoryIds,
+                reviewCount,
+                reviewScore
         );
     }
 
