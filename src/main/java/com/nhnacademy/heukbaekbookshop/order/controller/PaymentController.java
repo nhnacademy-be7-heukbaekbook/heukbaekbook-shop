@@ -48,7 +48,6 @@ public class PaymentController {
 //        }
 //    }
 
-
     @GetMapping("/{payment-id}")
     public ResponseEntity<PaymentDetailResponse> getPayment(@PathVariable(name = "payment-id") String paymentId) {
         PaymentDetailResponse payment = paymentService.getPayment(paymentId);
