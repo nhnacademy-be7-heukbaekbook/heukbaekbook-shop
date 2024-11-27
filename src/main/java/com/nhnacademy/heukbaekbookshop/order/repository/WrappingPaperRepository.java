@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface WrappingPaperRepository extends JpaRepository<WrappingPaper, Long> {
+public interface WrappingPaperRepository extends JpaRepository<WrappingPaper, Long>, WrappingPaperRepositoryCustom {
 //    List<WrappingPaper> findByIsAvailable(boolean isAvailable);
 }

@@ -39,12 +39,7 @@ public class BookSearchServiceImpl implements BookSearchService {
     private final BookRepository bookRepository;
     private final BookDocumentRepository bookDocumentRepository;
     private final CategoryRepository categoryRepository;
-<<<<<<< HEAD
-    private final BookFormatter bookFormatter;
-    private final CommonService commonService;
     private final ReviewRepository reviewRepository;
-=======
->>>>>>> b3222f5571b60b9a728059e3988879d3fdfd1ca6
 
     @Override
     public Page<BookResponse> searchBooks(Pageable pageable, BookSearchRequest searchRequest) {
@@ -86,10 +81,6 @@ public class BookSearchServiceImpl implements BookSearchService {
             );
         });
     }
-<<<<<<< HEAD
-=======
-
->>>>>>> b3222f5571b60b9a728059e3988879d3fdfd1ca6
     @Scheduled(initialDelay = 0, fixedDelay = 30 * 10000)
     @Transactional
     public void updateBookIndex() {
