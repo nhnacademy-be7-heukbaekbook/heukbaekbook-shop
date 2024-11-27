@@ -2,7 +2,8 @@ package com.nhnacademy.heukbaekbookshop.couponset.coupon.repository.impl;
 
 
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.Coupon;
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CouponStatus;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponStatus;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponType;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.BookCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CategoryCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.repository.CouponRepositoryCustom;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.QBookCoupon.bookCoupon;
 import static com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.QCategoryCoupon.categoryCoupon;
@@ -29,7 +31,7 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
-    private final List<CouponStatus> couponStatusOrders = List.of(CouponStatus.PENDING, CouponStatus.ISSUED);
+    private final List<CouponStatus> couponStatusOrders = List.of(CouponStatus.ABLE, CouponStatus.DISABLE);
 
     private OrderSpecifier<?> orderByFieldList(List<CouponStatus> couponStatusOrders) {
         return Expressions.stringTemplate("FIELD({0}, {1})", coupon.couponStatus, couponStatusOrders).asc();
@@ -92,6 +94,7 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
                         bookCoupon.availableDuration,
                         bookCoupon.couponTimeStart,
                         bookCoupon.couponTimeEnd,
+                        bookCoupon.couponType,
                         bookCoupon.couponPolicy.id,
                         bookCoupon.couponPolicy.discountType,
                         bookCoupon.couponPolicy.discountAmount,
@@ -125,6 +128,7 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
                         categoryCoupon.availableDuration,
                         categoryCoupon.couponTimeStart,
                         categoryCoupon.couponTimeEnd,
+                        bookCoupon.couponType,
                         categoryCoupon.couponPolicy.id,
                         categoryCoupon.couponPolicy.discountType,
                         categoryCoupon.couponPolicy.discountAmount,
@@ -180,5 +184,16 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total);
+    }
+
+    @Override
+    public Optional<Long> findAvailableCouponIdByCouponType(CouponType couponType) {
+        return Optional.ofNullable(queryFactory
+                .select(coupon.id)
+                .from(coupon)
+                .where(coupon.couponType.eq(couponType),
+                        coupon.couponStatus.eq(CouponStatus.ABLE))
+                .fetchOne()
+        );
     }
 }

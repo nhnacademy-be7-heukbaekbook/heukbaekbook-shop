@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request;
 
 
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponType;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 
@@ -27,6 +28,8 @@ public record CouponRequest (
         @NotNull
         @Length(max = 500)
         String couponDescription,
+
+        CouponType couponType,
 
         Long bookId,
 

@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.memberset.member.controller;
 
 
+import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.MemberStatus;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookDetailResponse;
 import com.nhnacademy.heukbaekbookshop.book.service.like.LikeService;
@@ -138,6 +139,11 @@ public class MemberController {
         log.info("customerId: {}", customerId);
 
         return memberService.getMemberDetail(customerId);
+    }
+
+    @GetMapping("/grade")
+    public GradeDto getMemberGrade(@RequestHeader(X_USER_ID) Long customerId) {
+        return memberService.getMembersGrade(customerId);
     }
 
     @GetMapping("/my-page")

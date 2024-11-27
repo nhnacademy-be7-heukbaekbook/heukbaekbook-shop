@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response;
 
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CouponStatus;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponStatus;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponType;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
 
 import java.math.BigDecimal;
@@ -16,6 +17,7 @@ public record CategoryCouponResponse (
         int availableDuration,
         LocalDateTime couponTimeStart,
         LocalDateTime couponTimeEnd,
+        CouponType couponType,
 
         Long policyId,
         DiscountType discountType,

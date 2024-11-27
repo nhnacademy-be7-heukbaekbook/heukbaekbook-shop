@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response;
 
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CouponStatus;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponStatus;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponType;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyResponse;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ public record CouponResponse(
         LocalDateTime couponTimeEnd,
         String couponName,
         String couponDescription,
-        LocalDateTime couponCreatedAt
+        LocalDateTime couponCreatedAt,
+        CouponType couponType
 ) {
 }

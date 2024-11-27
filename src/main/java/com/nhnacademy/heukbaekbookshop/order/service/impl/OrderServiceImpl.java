@@ -12,8 +12,8 @@ import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.repository.CustomerRepository;
-import com.nhnacademy.heukbaekbookshop.memberset.member.dto.mapper.MemberMapper;
-import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MemberResponse;
+import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
+import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.mapper.GradeMapper;
 import com.nhnacademy.heukbaekbookshop.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import com.nhnacademy.heukbaekbookshop.order.domain.*;
@@ -235,8 +235,8 @@ public class OrderServiceImpl implements OrderService {
                 })
                 .collect(Collectors.toList());
 
-        MemberResponse memberResponse = MemberMapper.createMemberResponse(memberRepository.findById(Long.parseLong(userId)).orElseThrow(MemberNotFoundException::new));
-        return new MyPageRefundableOrderDetailResponse(memberResponse, refundableOrderBookResponses);
+        GradeDto gradeDto = GradeMapper.createGradeResponse(memberRepository.findGradeByMemberId(customerId).orElseThrow(MemberNotFoundException::new));
+        return new MyPageRefundableOrderDetailResponse(gradeDto, refundableOrderBookResponses);
 
     }
 

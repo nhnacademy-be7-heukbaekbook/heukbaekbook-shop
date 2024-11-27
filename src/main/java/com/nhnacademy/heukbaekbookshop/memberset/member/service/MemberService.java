@@ -1,5 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.memberset.member.service;
 
+import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.MemberStatus;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberCreateRequest;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberUpdateRequest;
@@ -26,6 +27,8 @@ public interface  MemberService {
     boolean existsEmail(String email);
 
     MemberDetailResponse getMemberDetail(Long customerId);
+
+    GradeDto getMembersGrade(Long customerId);
 
     MyPageResponse getMyPageResponse(Long customerId);
 
