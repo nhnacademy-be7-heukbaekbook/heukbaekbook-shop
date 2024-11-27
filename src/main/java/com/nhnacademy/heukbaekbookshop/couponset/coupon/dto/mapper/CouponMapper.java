@@ -124,8 +124,7 @@ public class CouponMapper {
     public static CouponPageResponse toCouponPageResponse(Page<CouponResponse> normalCoupons,
                                                           Page<BookCouponResponse> bookCoupons,
                                                           Page<CategoryCouponResponse> categoryCoupons,
-                                                          List<CouponPolicyResponse> couponPolicyList,
-                                                          GradeDto gradeDto
+                                                          List<CouponPolicyResponse> couponPolicyList
     ) {
         return new CouponPageResponse(
                 normalCoupons,
@@ -134,8 +133,7 @@ public class CouponMapper {
                 couponPolicyList,
                 DiscountType.values(),
                 CouponStatus.values(),
-                CouponType.values(),
-                gradeDto
+                CouponType.values()
         );
     }
 }

@@ -10,7 +10,7 @@ public record CouponResponse(
         Long couponId,
         CouponPolicyResponse couponPolicyResponse,
         CouponStatus couponStatus,
-        int couponQuantity,
+        Integer couponQuantity,
         int availableDuration,
         LocalDateTime couponTimeStart,
         LocalDateTime couponTimeEnd,

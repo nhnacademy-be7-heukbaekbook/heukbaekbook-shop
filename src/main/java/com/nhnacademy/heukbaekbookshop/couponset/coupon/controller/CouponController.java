@@ -162,7 +162,7 @@ public class CouponController {
      */
     @DeleteMapping("/{couponId}")
     public ResponseEntity<Void> changeIssuedCoupon(@PathVariable("couponId") Long couponId) {
-        couponService.changeCouponStatus(couponId, CouponStatus.ABLE);
+        couponService.changeCouponStatus(couponId, CouponStatus.DISABLE);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

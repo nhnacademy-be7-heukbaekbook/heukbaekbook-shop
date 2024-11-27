@@ -28,7 +28,7 @@ public class Coupon {
 
     @Setter
     @Column(name = "coupon_quantity")
-    private int couponQuantity;
+    private Integer couponQuantity;
 
     @NotNull
     @Setter

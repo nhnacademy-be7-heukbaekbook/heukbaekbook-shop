@@ -152,8 +152,7 @@ public class CouponServiceImpl implements CouponService {
         Page<BookCouponResponse> bookCoupons = couponRepository.findAllBookCoupons(pageable);
         Page<CategoryCouponResponse> categoryCoupons = couponRepository.findAllCategoryCoupons(pageable);
         List<CouponPolicyResponse> couponPolicyList = CouponPolicyMapper.fromEntityList(couponPolicyRepository.findAllByOrderByDiscountTypeAscDiscountAmountAsc());
-        GradeDto gradeDto = GradeMapper.createGradeResponse(memberRepository.findGradeByMemberId(customerId).orElseThrow(MemberNotFoundException::new));
-        return CouponMapper.toCouponPageResponse(normalCoupons,bookCoupons,categoryCoupons,couponPolicyList, gradeDto);
+        return CouponMapper.toCouponPageResponse(normalCoupons,bookCoupons,categoryCoupons,couponPolicyList);
     }
 
     @Override

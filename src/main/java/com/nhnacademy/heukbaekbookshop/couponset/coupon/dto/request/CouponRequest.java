@@ -5,13 +5,15 @@ import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponType;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public record CouponRequest (
         @NotNull
         Long policyId,
 
-        int couponQuantity,
+        Integer couponQuantity,
 
         @NotNull
         int availableDuration,
@@ -34,5 +36,8 @@ public record CouponRequest (
         Long bookId,
 
         Long categoryId
-){
+
+)implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
 }
