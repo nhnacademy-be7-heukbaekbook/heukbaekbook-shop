@@ -6,14 +6,18 @@ import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookDetailResponse
 import com.nhnacademy.heukbaekbookshop.book.service.like.LikeService;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberCreateRequest;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberUpdateRequest;
+import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.OAuthMemberCreateRequest;
+import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MemberDetailResponse;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MemberResponse;
+import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MyPageOrderDetailResponse;
+import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MyPageResponse;
 import com.nhnacademy.heukbaekbookshop.memberset.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -44,6 +48,16 @@ public class MemberController {
     public ResponseEntity<MemberResponse> createMember(@Valid @RequestBody MemberCreateRequest memberCreateRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(memberService.createMember(memberCreateRequest));
+    }
+
+    @PostMapping("/oauth")
+    public ResponseEntity<MemberResponse> createOAuthMember(@Valid @RequestBody OAuthMemberCreateRequest oAuthMemberCreateRequest, BindingResult result) {
+        if (result.hasErrors()) {
+            log.info(result.getAllErrors().toString());
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(memberService.createOAuthMember(oAuthMemberCreateRequest));
     }
 
     /**
@@ -117,5 +131,27 @@ public class MemberController {
     public ResponseEntity<Boolean> existsEmail(@PathVariable String email) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(memberService.existsEmail(email));
+    }
+
+    @GetMapping("/detail")
+    public MemberDetailResponse getMemberDetail(@RequestHeader(X_USER_ID) Long customerId) {
+        log.info("customerId: {}", customerId);
+
+        return memberService.getMemberDetail(customerId);
+    }
+
+    @GetMapping("/my-page")
+    public MyPageResponse getMyPageResponse(@RequestHeader(X_USER_ID) Long customerId) {
+        log.info("customerId: {}", customerId);
+
+        return memberService.getMyPageResponse(customerId);
+    }
+
+    @GetMapping("/orders/{orderId}")
+    public MyPageOrderDetailResponse getMyPageOrderDetailResponse(@RequestHeader(X_USER_ID) Long customerId,
+                                                                  @PathVariable String orderId) {
+        log.info("tossOrderId: {}", orderId);
+
+        return memberService.getMyPageDetailResponse(customerId, orderId);
     }
 }

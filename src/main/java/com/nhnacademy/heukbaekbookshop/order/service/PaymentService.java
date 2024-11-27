@@ -3,24 +3,24 @@ package com.nhnacademy.heukbaekbookshop.order.service;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.repository.CustomerRepository;
 import com.nhnacademy.heukbaekbookshop.order.domain.*;
 import com.nhnacademy.heukbaekbookshop.order.dto.request.PaymentApprovalRequest;
-import com.nhnacademy.heukbaekbookshop.order.dto.request.PaymentCancelRequest;
+import com.nhnacademy.heukbaekbookshop.order.dto.request.RefundBookRequest;
+import com.nhnacademy.heukbaekbookshop.order.dto.request.RefundCreateRequest;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.*;
 import com.nhnacademy.heukbaekbookshop.order.exception.PaymentFailureException;
-import com.nhnacademy.heukbaekbookshop.order.repository.OrderRepository;
-import com.nhnacademy.heukbaekbookshop.order.repository.PaymentRepository;
-import com.nhnacademy.heukbaekbookshop.order.repository.PaymentTypeRepository;
-import com.nhnacademy.heukbaekbookshop.order.repository.RefundRepository;
+import com.nhnacademy.heukbaekbookshop.order.repository.*;
 import com.nhnacademy.heukbaekbookshop.order.strategy.PaymentStrategy;
 import com.nhnacademy.heukbaekbookshop.order.strategy.PaymentStrategyFactory;
+import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class PaymentService {
 
     private final RefundRepository refundRepository;
@@ -29,20 +29,8 @@ public class PaymentService {
     private final OrderRepository orderRepository;
     private final PaymentTypeRepository paymentTypeRepository;
     private final PaymentStrategyFactory paymentStrategyFactory;
-
-    public PaymentService(RefundRepository refundRepository,
-                          CustomerRepository customerRepository,
-                          PaymentRepository paymentRepository,
-                          OrderRepository orderRepository,
-                          PaymentTypeRepository paymentTypeRepository,
-                          PaymentStrategyFactory paymentStrategyFactory) {
-        this.refundRepository = refundRepository;
-        this.customerRepository = customerRepository;
-        this.paymentRepository = paymentRepository;
-        this.orderRepository = orderRepository;
-        this.paymentTypeRepository = paymentTypeRepository;
-        this.paymentStrategyFactory = paymentStrategyFactory;
-    }
+    private final EntityManager entityManager;
+    private final OrderBookRefundRepository orderBookRefundRepository;
 
     public PaymentApprovalResponse approvePayment(PaymentApprovalRequest request) {
         String paymentMethod = request.method();
@@ -67,7 +55,7 @@ public class PaymentService {
                 .paymentType(paymentType)
                 .requestedAt(ZonedDateTime.parse(gatewayResponse.requestedAt()).toLocalDateTime())
                 .approvedAt(ZonedDateTime.parse(gatewayResponse.approvedAt()).toLocalDateTime())
-                .price(BigDecimal.valueOf(gatewayResponse.totalAmount()))
+                .price(gatewayResponse.cancelAmount())
                 .build();
 
 
@@ -89,41 +77,66 @@ public class PaymentService {
         );
     }
 
-    public PaymentCancelResponse cancelPayment(String paymentKey, PaymentCancelRequest request) {
+    public RefundCreateResponse cancelPayment(RefundCreateRequest request) {
         String paymentMethod = request.method();
 
         PaymentStrategy paymentStrategy = paymentStrategyFactory.getStrategy(paymentMethod);
 
-        PaymentGatewayCancelResponse gatewayResponse = paymentStrategy.cancelPayment(paymentKey, request);
+        PaymentGatewayCancelResponse gatewayResponse = paymentStrategy.cancelPayment(request);
 
-        Refund refund = new Refund();
-        refund.setReason(request.cancelReason());
-        refund.setRefundRequestAt(LocalDateTime.parse(gatewayResponse.requestedAt()));
-        refund.setRefundApprovedAt(LocalDateTime.parse(gatewayResponse.approvedAt()));
-        refund.setRefundStatus(RefundStatus.REQUEST);
+        Order order = orderRepository.findByTossOrderId(gatewayResponse.orderId())
+                .orElseThrow(() -> new PaymentFailureException("주문 정보를 찾을 수 없습니다."));
+
+        if (order.getTotalPrice().equals(gatewayResponse.cancelAmount())) {
+            order.setStatus(OrderStatus.CANCELLED);
+        } else {
+            order.setStatus(OrderStatus.RETURNED);
+        }
+
+        orderRepository.save(order);
+
+        Refund refund = Refund.builder()
+                .reason(request.cancelReason())
+                .refundRequestAt(ZonedDateTime.parse(gatewayResponse.requestedAt()).toLocalDateTime())
+                .refundApprovedAt(ZonedDateTime.parse(gatewayResponse.approvedAt()).toLocalDateTime())
+                .refundStatus(RefundStatus.REQUEST)
+                .build();
 
         refundRepository.save(refund);
 
-        return new PaymentCancelResponse(gatewayResponse.message());
+        entityManager.flush();
+
+        for (RefundBookRequest refundBookRequest : request.refundBooks()) {
+            OrderBookRefund orderBookRefund = OrderBookRefund.builder()
+                    .bookId(refundBookRequest.bookId())
+                    .orderId(order.getId())
+                    .refundId(refund.getId())
+                    .quantity(refundBookRequest.quantity())
+                    .build();
+            orderBookRefundRepository.save(orderBookRefund);
+        }
+
+        return new RefundCreateResponse("환불 요청이 접수되었습니다.");
     }
 
     public List<PaymentDetailResponse> getPayments(Long customerId) {
-        if (customerRepository.findById(customerId).isEmpty()) {
+        if (!customerRepository.existsById(customerId)) {
             throw new PaymentFailureException("고객 정보를 찾을 수 없습니다.");
         }
-
         return orderRepository.findByCustomerId(customerId).stream()
-                .flatMap(order -> paymentRepository.findByOrderId(order.getId()).stream())
+                .map(order -> paymentRepository.findByOrderId(order.getId()))
+                .filter(Objects::nonNull)
                 .map(payment -> new PaymentDetailResponse(
                         payment.getId(),
                         payment.getPaymentType().getName(),
                         payment.getRequestedAt().toString(),
-                        payment.getApprovedAt().toString(),
+                        payment.getApprovedAt() != null ? payment.getApprovedAt().toString() : null,
                         payment.getPrice().longValue()))
                 .collect(Collectors.toList());
     }
 
-    public PaymentDetailResponse getPayment(Long paymentId) {
+
+    public PaymentDetailResponse getPayment(String paymentId) {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new PaymentFailureException("결제 정보를 찾을 수 없습니다."));
 

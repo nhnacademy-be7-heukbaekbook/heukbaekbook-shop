@@ -39,6 +39,11 @@ public class Payment {
     @Column(name = "payment_price")
     protected BigDecimal price;
 
+//    private void setOrder(Order order) {
+//        this.order = order;
+//        order.setPayment(this);
+//    }
+
     @Builder
     public Payment(String id, Order order, PaymentType paymentType, LocalDateTime requestedAt, LocalDateTime approvedAt, BigDecimal price) {
         this.id = id;

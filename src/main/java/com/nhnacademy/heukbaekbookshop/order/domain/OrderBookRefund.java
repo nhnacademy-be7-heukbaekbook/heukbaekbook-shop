@@ -3,7 +3,7 @@ package com.nhnacademy.heukbaekbookshop.order.domain;
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +12,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @IdClass(OrderBookRefundPK.class)
 @Table(name = "orders_books_refunds")
 public class OrderBookRefund {
@@ -48,4 +47,14 @@ public class OrderBookRefund {
     @Column(name = "quantity")
     private int quantity;
 
+    @Builder
+    public OrderBookRefund(Long bookId, Long orderId, Long refundId, Book book, Order order, Refund refund, int quantity) {
+        this.bookId = bookId;
+        this.orderId = orderId;
+        this.refundId = refundId;
+        this.book = book;
+        this.order = order;
+        this.refund = refund;
+        this.quantity = quantity;
+    }
 }
