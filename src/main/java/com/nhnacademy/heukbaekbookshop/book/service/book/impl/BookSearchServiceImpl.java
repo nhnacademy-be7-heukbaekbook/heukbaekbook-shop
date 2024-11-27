@@ -101,7 +101,7 @@ public class BookSearchServiceImpl implements BookSearchService {
         bookDocumentRepository.saveAll(bookDocuments);
     }
 
-    private BookDocument bookToBookDocument(Book book) {
+    public BookDocument bookToBookDocument(Book book) {
         Set<Long> categoryIds = book.getCategories().stream()
                 .map(BookCategory::getCategoryId)
                 .collect(Collectors.toSet());

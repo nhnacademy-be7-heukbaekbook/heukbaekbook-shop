@@ -93,4 +93,6 @@ public class MemberAddressController {
     public ResponseEntity<Long> countMemberAddresses(@RequestHeader(X_USER_ID) Long customerId) {
         return ResponseEntity.status(HttpStatus.OK).body(memberAddressService.countByMemberId(customerId));
     }
+
+
 }
