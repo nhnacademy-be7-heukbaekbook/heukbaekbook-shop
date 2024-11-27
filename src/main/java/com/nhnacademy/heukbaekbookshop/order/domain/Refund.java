@@ -2,10 +2,7 @@ package com.nhnacademy.heukbaekbookshop.order.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -43,4 +40,13 @@ public class Refund {
 
     @OneToMany(mappedBy = "refund")
     private Set<OrderBookRefund> orderBookReturns = new HashSet<>();
+
+    @Builder
+    public Refund(Long id, String reason, LocalDateTime refundRequestAt, LocalDateTime refundApprovedAt, RefundStatus refundStatus) {
+        this.id = id;
+        this.reason = reason;
+        this.refundRequestAt = refundRequestAt;
+        this.refundApprovedAt = refundApprovedAt;
+        this.refundStatus = refundStatus;
+    }
 }
