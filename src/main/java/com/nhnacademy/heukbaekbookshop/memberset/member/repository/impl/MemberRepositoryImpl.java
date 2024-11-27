@@ -9,7 +9,8 @@ import jakarta.persistence.EntityManager;
 import java.util.Optional;
 
 import static com.nhnacademy.heukbaekbookshop.memberset.grade.domain.QGrade.*;
-import static com.nhnacademy.heukbaekbookshop.memberset.member.domain.QMember.member;
+import static com.nhnacademy.heukbaekbookshop.memberset.member.domain.QMember.*;
+
 
 public class MemberRepositoryImpl implements MemberRepositoryCustom {
 
@@ -24,6 +25,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         return Optional.ofNullable(queryFactory
                 .selectFrom(member)
                 .join(member.grade, grade)
+                .where(member.id.eq(customerId))
                 .fetchOne());
     }
 }

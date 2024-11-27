@@ -1,9 +1,10 @@
 package com.nhnacademy.heukbaekbookshop.order.dto.response;
 
+import java.time.LocalDate;
+
 public record OrderSummaryResponse(
-        String createdAt,
+        LocalDate createdAt,
         String tossOrderId,
-        String title,
         String status,
         DeliverySummaryResponse deliverySummaryResponse
 ) {
