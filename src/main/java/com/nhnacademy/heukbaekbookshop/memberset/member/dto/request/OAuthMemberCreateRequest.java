@@ -11,7 +11,6 @@ public record OAuthMemberCreateRequest(
         String loginId,
 
         @NotBlank(message = "비밀번호를 입력하여 주십시오.")
-        @Pattern(regexp = "^(?=.*[a-z])(?=.*\\d)(?=.*[~!@#$%^&*()+|=\\-])[A-Za-z\\d~!@#$%^&*()+|=]{8,16}$", message = "올바른 비밀번호 형식이 아닙니다. 비밀번호는 8~16자로 영문 소문자, 숫자, 특수문자가 각각 1개 이상이여야 합니다.")
         String password,
 
         @NotNull(message = "생년월일을 입력하여 주십시오.")

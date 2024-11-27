@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -52,7 +51,11 @@ public class MemberController {
     }
 
     @PostMapping("/oauth")
-    public ResponseEntity<MemberResponse> createOAuthMember(@Valid @RequestBody OAuthMemberCreateRequest oAuthMemberCreateRequest) {
+    public ResponseEntity<MemberResponse> createOAuthMember(@Valid @RequestBody OAuthMemberCreateRequest oAuthMemberCreateRequest, BindingResult result) {
+        if (result.hasErrors()) {
+            log.info(result.getAllErrors().toString());
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(memberService.createOAuthMember(oAuthMemberCreateRequest));
     }
