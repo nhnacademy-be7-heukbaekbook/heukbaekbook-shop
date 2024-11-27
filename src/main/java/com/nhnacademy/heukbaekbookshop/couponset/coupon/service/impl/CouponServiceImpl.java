@@ -13,13 +13,20 @@ import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.mapper.CouponMapper;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request.CouponRequest;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.BookCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CategoryCouponResponse;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponPageResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.exception.CouponNotFoundException;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.service.CouponService;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
+import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyResponse;
+import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.mapper.CouponPolicyMapper;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.exception.CouponPolicyNotFoundException;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.repository.CouponPolicyRepository;
+import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
+import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.mapper.GradeMapper;
+import com.nhnacademy.heukbaekbookshop.memberset.member.exception.MemberNotFoundException;
+import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.repository.CouponRepository;
 import org.springframework.data.domain.Page;
@@ -27,6 +34,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -38,6 +46,7 @@ public class CouponServiceImpl implements CouponService {
     private final CouponPolicyRepository couponPolicyRepository;
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     @Transactional
@@ -135,6 +144,16 @@ public class CouponServiceImpl implements CouponService {
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(CouponNotFoundException::new);
         coupon.setCouponQuantity(coupon.getCouponQuantity() - 1);
+    }
+
+    @Override
+    public CouponPageResponse getCouponPageResponse(Long customerId, Pageable pageable) {
+        Page<CouponResponse> normalCoupons = CouponMapper.fromPageableEntity(couponRepository.findAllNormalCoupons(pageable)) ;
+        Page<BookCouponResponse> bookCoupons = couponRepository.findAllBookCoupons(pageable);
+        Page<CategoryCouponResponse> categoryCoupons = couponRepository.findAllCategoryCoupons(pageable);
+        List<CouponPolicyResponse> couponPolicyList = CouponPolicyMapper.fromEntityList(couponPolicyRepository.findAllByOrderByDiscountTypeAscDiscountAmountAsc());
+        GradeDto gradeDto = GradeMapper.createGradeResponse(memberRepository.findGradeByMemberId(customerId).orElseThrow(MemberNotFoundException::new));
+        return CouponMapper.toCouponPageResponse(normalCoupons,bookCoupons,categoryCoupons,couponPolicyList, gradeDto);
     }
 
     @Override

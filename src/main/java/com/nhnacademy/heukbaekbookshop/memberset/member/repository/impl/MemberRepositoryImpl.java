@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.memberset.member.repository.impl;
 
 
+import com.nhnacademy.heukbaekbookshop.memberset.grade.domain.Grade;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -27,5 +28,17 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .join(member.grade, grade).fetchJoin()
                 .where(member.id.eq(customerId))
                 .fetchOne());
+    }
+
+    // select grade from member where memberId = ?
+    @Override
+    public Optional<Grade> findGradeByMemberId(Long customerId) {
+        return Optional.ofNullable(queryFactory
+                .select(grade)
+                .from(member)
+                .join(member.grade, grade)
+                .where(member.id.eq(customerId))
+                .fetchFirst()
+        );
     }
 }

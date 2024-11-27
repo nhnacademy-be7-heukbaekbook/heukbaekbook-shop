@@ -8,6 +8,7 @@ import com.nhnacademy.heukbaekbookshop.memberset.address.dto.MemberAddressRespon
 import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 import com.nhnacademy.heukbaekbookshop.memberset.grade.domain.Grade;
 import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
+import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.mapper.GradeMapper;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.mapper.MemberMapper;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberCreateRequest;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberUpdateRequest;
@@ -159,7 +160,7 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.searchByCustomerId(customerId)
                 .orElseThrow(MemberNotFoundException::new);
 
-        MemberResponse memberResponse = MemberMapper.createMemberResponse(member);
+        GradeDto gradeDto = GradeMapper.createGradeResponse(member.getGrade());
 
         List<Order> orders = orderRepository.searchByCustomerId(customerId);
 
@@ -167,7 +168,7 @@ public class MemberServiceImpl implements MemberService {
                 .map(this::createOrderSummaryResponse)
                 .collect(Collectors.toList());
 
-        return new MyPageResponse(memberResponse, new OrderResponse(orderSummaryResponses));
+        return new MyPageResponse(gradeDto, new OrderResponse(orderSummaryResponses));
     }
 
     private OrderSummaryResponse createOrderSummaryResponse(Order order) {
@@ -219,6 +220,13 @@ public class MemberServiceImpl implements MemberService {
     public void changeMemberStatus(Long customerId, MemberStatus newStatus) {
         Member member = memberRepository.findById(customerId).orElseThrow(MemberNotFoundException::new);
         member.setStatus(newStatus);
+    }
+
+    @Override
+    public GradeDto getMembersGrade(Long customerId) {
+        return GradeMapper.createGradeResponse(
+                memberRepository.findGradeByMemberId(customerId)
+                        .orElseThrow(MemberNotFoundException::new));
     }
 
 }

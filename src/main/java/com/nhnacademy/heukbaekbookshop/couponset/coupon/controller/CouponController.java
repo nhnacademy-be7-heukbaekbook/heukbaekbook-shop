@@ -5,6 +5,7 @@ import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponStatu
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request.CouponRequest;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.BookCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CategoryCouponResponse;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponPageResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.service.CouponService;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/coupons")
 public class CouponController {
+    public static final String X_USER_ID = "X-USER-ID";
     private final CouponService couponService;
 
     /**
@@ -123,6 +125,20 @@ public class CouponController {
                 .body(couponService.createCoupon(couponRequest)
                 );
     }
+//
+//    @PostMapping("/{bookId}")
+//    public ResponseEntity<CouponResponse> createBookCoupon(@PathVariable Long bookId, @Valid @RequestBody CouponRequest couponRequest) {
+//        return ResponseEntity.status(HttpStatus.CREATED)
+//                .body(couponService.createCoupon(couponRequest)
+//                );
+//    }
+//
+//    @PostMapping("/{categoryId}")
+//    public ResponseEntity<CouponResponse> createCategoryCoupon(@PathVariable Long categoryId, @Valid @RequestBody CouponRequest couponRequest) {
+//        return ResponseEntity.status(HttpStatus.CREATED)
+//                .body(couponService.createCoupon(couponRequest)
+//                );
+//    }
 
     /**
      * 쿠폰 수정 요청 시 사용되는 메서드입니다.
@@ -149,4 +165,11 @@ public class CouponController {
         couponService.changeCouponStatus(couponId, CouponStatus.ABLE);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @GetMapping("/coupon-page")
+    public ResponseEntity<CouponPageResponse> getCouponPage(@RequestHeader(X_USER_ID) Long customerId, Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(couponService.getCouponPageResponse(customerId, pageable));
+    }
+
 }
