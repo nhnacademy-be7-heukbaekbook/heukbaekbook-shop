@@ -7,6 +7,7 @@ import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.mapper.MemberMapper;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberCreateRequest;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberUpdateRequest;
+import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.OAuthMemberCreateRequest;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MemberDetailResponse;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MemberResponse;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MyPageResponse;
@@ -66,6 +67,26 @@ public class MemberServiceImpl implements MemberService {
         memberAddressRepository.save(memberAddress);
 
         eventPublisher.publishEvent(new SignupEvent(member.getId()));
+        return MemberMapper.createMemberResponse(member);
+    }
+
+    @Override
+    @Transactional
+    public MemberResponse createOAuthMember(OAuthMemberCreateRequest oAuthMemberCreateRequest) {
+        if (memberRepository.existsByLoginId(oAuthMemberCreateRequest.loginId())) {
+            throw new MemberAlreadyExistException();
+        }
+        if (memberRepository.existsByEmail(oAuthMemberCreateRequest.email())) {
+            throw new MemberAlreadyExistException();
+        }
+
+        Grade grade = gradeRepository.findById(1L).orElseThrow(NoSuchElementException::new);
+
+        Member member = MemberMapper.createOAuthMemberEntity(oAuthMemberCreateRequest, grade, bCryptPasswordEncoder.encode(oAuthMemberCreateRequest.password()));
+        customerRepository.save(member);
+
+        eventPublisher.publishEvent(new SignupEvent(member.getId()));
+
         return MemberMapper.createMemberResponse(member);
     }
 
