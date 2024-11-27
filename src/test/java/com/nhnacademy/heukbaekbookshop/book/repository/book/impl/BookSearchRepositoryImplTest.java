@@ -12,12 +12,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.*;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -36,9 +36,10 @@ class BookSearchRepositoryImplTest {
     }
 
     @Test
-    void testSearch() {
+    void testSearchWithIndexName() {
         // given
         Pageable pageable = PageRequest.of(0, 10);
+        String indexName = "hbbooks_test";
         String keyword = "test";
         SearchCondition searchCondition = SearchCondition.TITLE;
         SortCondition sortCondition = SortCondition.NEWEST;
@@ -62,12 +63,13 @@ class BookSearchRepositoryImplTest {
                 Arrays.asList(new ContributorSummaryResponse(1L, "Contributor Name")), // 예시 기여자 리스트
                 new PublisherSummaryResponse(1L, "Publisher Name"), // 예시 출판사
                 1L,
+                null,
+                null,
                 null
         );
 
-
         SearchHit<BookDocument> searchHit = new SearchHit<>(
-                "books",
+                indexName,
                 "1",
                 null,
                 1.0f,
@@ -93,11 +95,11 @@ class BookSearchRepositoryImplTest {
                 null
         );
 
-        Mockito.when(elasticsearchOperations.search(any(CriteriaQuery.class), Mockito.eq(BookDocument.class)))
+        Mockito.when(elasticsearchOperations.search(any(CriteriaQuery.class), Mockito.eq(BookDocument.class), Mockito.eq(IndexCoordinates.of(indexName))))
                 .thenReturn(searchHits);
 
         // when
-        Page<BookDocument> result = bookSearchRepository.search(pageable, keyword, searchCondition, sortCondition,null);
+        Page<BookDocument> result = bookSearchRepository.search(indexName, pageable, keyword, searchCondition, sortCondition, null);
 
         // then
         assertThat(result).isNotNull();

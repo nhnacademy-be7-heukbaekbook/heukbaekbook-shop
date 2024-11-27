@@ -11,6 +11,7 @@ import com.nhnacademy.heukbaekbookshop.book.service.book.BookSearchService;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
 import com.nhnacademy.heukbaekbookshop.common.util.Calculator;
 import com.nhnacademy.heukbaekbookshop.common.util.Formatter;
+import com.nhnacademy.heukbaekbookshop.common.util.IndexNameProvider;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.ContributorRole;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
@@ -22,6 +23,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.IndexOperations;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -39,16 +43,16 @@ public class BookSearchServiceImpl implements BookSearchService {
     private final BookRepository bookRepository;
     private final BookDocumentRepository bookDocumentRepository;
     private final CategoryRepository categoryRepository;
-<<<<<<< HEAD
-    private final BookFormatter bookFormatter;
-    private final CommonService commonService;
     private final ReviewRepository reviewRepository;
-=======
->>>>>>> b3222f5571b60b9a728059e3988879d3fdfd1ca6
+    private final IndexNameProvider indexNameProvider; // IndexNameProvider 주입
+    private final ElasticsearchOperations elasticsearchOperations;
 
     @Override
     public Page<BookResponse> searchBooks(Pageable pageable, BookSearchRequest searchRequest) {
+        String indexName = indexNameProvider.resolveIndexName();
+
         Page<BookDocument> bookDocuments = bookSearchRepository.search(
+                indexName,
                 pageable,
                 searchRequest.keyword(),
                 SearchCondition.valueOf(searchRequest.searchCondition().toUpperCase()),
@@ -86,28 +90,35 @@ public class BookSearchServiceImpl implements BookSearchService {
             );
         });
     }
-<<<<<<< HEAD
-=======
-
->>>>>>> b3222f5571b60b9a728059e3988879d3fdfd1ca6
     @Scheduled(initialDelay = 0, fixedDelay = 30 * 10000)
     @Transactional
     public void updateBookIndex() {
-        List<Book> allBooks = bookRepository.findAllByStatusNot(BookStatus.DELETED);
-        List<Book> deletedBooks = bookRepository.findAllByStatus(BookStatus.DELETED);
+        String indexName = indexNameProvider.resolveIndexName();
 
+        if (!elasticsearchOperations.indexOps(IndexCoordinates.of(indexName)).exists()) {
+            IndexOperations indexOps = elasticsearchOperations.indexOps(IndexCoordinates.of(indexName));
+            indexOps.create();
+            indexOps.putMapping(elasticsearchOperations.indexOps(BookDocument.class).createMapping());
+        }
+        // 삭제된 책 처리
+        List<Book> deletedBooks = bookRepository.findAllByStatus(BookStatus.DELETED);
         if (!deletedBooks.isEmpty()) {
             List<Long> deletedBookIds = deletedBooks.stream()
                     .map(Book::getId)
                     .collect(Collectors.toList());
-            bookDocumentRepository.deleteAllById(deletedBookIds);
+
+            // 동적 인덱스를 지정하여 삭제
+            bookDocumentRepository.deleteAllByIdInIndex(deletedBookIds, indexName);
         }
 
+        // 활성 상태의 모든 책 처리
+        List<Book> allBooks = bookRepository.findAllByStatusNot(BookStatus.DELETED);
         List<BookDocument> bookDocuments = allBooks.stream()
                 .map(this::bookToBookDocument)
                 .collect(Collectors.toList());
 
-        bookDocumentRepository.saveAll(bookDocuments);
+        // 동적 인덱스를 지정하여 저장
+        bookDocumentRepository.saveAllToIndex(bookDocuments, indexName);
     }
 
     private BookDocument bookToBookDocument(Book book) {

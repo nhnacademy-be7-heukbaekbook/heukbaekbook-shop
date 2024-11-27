@@ -17,7 +17,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import java.util.Date;
 import java.util.List;
 @Getter
-@Document(indexName = "hbbooks_dev") //배포할때는 hbbooks_prod!!!!!!!!!
+//@Document(indexName = "#{@indexNameProvider.resolveIndexName()}") // IndexNameProvider 사용
 public class BookDocument {
 
     @Id
