@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.order.strategy.impl;
 
 import com.nhnacademy.heukbaekbookshop.order.dto.request.PaymentApprovalRequest;
+import com.nhnacademy.heukbaekbookshop.order.dto.request.PaymentCancelRequest;
 import com.nhnacademy.heukbaekbookshop.order.dto.request.RefundCreateRequest;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentGatewayApprovalResponse;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentGatewayCancelResponse;
@@ -30,14 +31,12 @@ public class PayPalPaymentStrategy implements PaymentStrategy {
     }
 
     @Override
-    public PaymentGatewayCancelResponse cancelPayment(RefundCreateRequest request) {
-        // PayPal 결제 취소 로직 구현
-        return new PaymentGatewayCancelResponse(
-                "2023-10-02T10:00:00",
-                "2023-10-02T10:01:00",
-                "결제 취소 요청이 접수되었습니다.",
-                request.refundBooks().getFirst().price(),
-                "PAYPAL"
-        );
+    public PaymentGatewayCancelResponse refundPayment(RefundCreateRequest request) {
+        return null;
+    }
+
+    @Override
+    public PaymentGatewayCancelResponse cancelPayment(PaymentCancelRequest request) {
+        return null;
     }
 }

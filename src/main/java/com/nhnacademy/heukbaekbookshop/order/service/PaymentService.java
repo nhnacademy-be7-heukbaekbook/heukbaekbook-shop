@@ -3,6 +3,7 @@ package com.nhnacademy.heukbaekbookshop.order.service;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.repository.CustomerRepository;
 import com.nhnacademy.heukbaekbookshop.order.domain.*;
 import com.nhnacademy.heukbaekbookshop.order.dto.request.PaymentApprovalRequest;
+import com.nhnacademy.heukbaekbookshop.order.dto.request.PaymentCancelRequest;
 import com.nhnacademy.heukbaekbookshop.order.dto.request.RefundBookRequest;
 import com.nhnacademy.heukbaekbookshop.order.dto.request.RefundCreateRequest;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.*;
@@ -77,21 +78,17 @@ public class PaymentService {
         );
     }
 
-    public RefundCreateResponse cancelPayment(RefundCreateRequest request) {
+    public RefundCreateResponse refundPayment(RefundCreateRequest request) {
         String paymentMethod = request.method();
 
         PaymentStrategy paymentStrategy = paymentStrategyFactory.getStrategy(paymentMethod);
 
-        PaymentGatewayCancelResponse gatewayResponse = paymentStrategy.cancelPayment(request);
+        PaymentGatewayCancelResponse gatewayResponse = paymentStrategy.refundPayment(request);
 
         Order order = orderRepository.findByTossOrderId(gatewayResponse.orderId())
                 .orElseThrow(() -> new PaymentFailureException("주문 정보를 찾을 수 없습니다."));
 
-        if (order.getTotalPrice().equals(gatewayResponse.cancelAmount())) {
-            order.setStatus(OrderStatus.CANCELLED);
-        } else {
-            order.setStatus(OrderStatus.RETURNED);
-        }
+        order.setStatus(OrderStatus.RETURNED);
 
         orderRepository.save(order);
 
@@ -117,6 +114,23 @@ public class PaymentService {
         }
 
         return new RefundCreateResponse("환불 요청이 접수되었습니다.");
+    }
+
+    public PaymentCancelResponse cancelPayment(PaymentCancelRequest request) {
+        String paymentMethod = request.method();
+
+        PaymentStrategy paymentStrategy = paymentStrategyFactory.getStrategy(paymentMethod);
+
+        PaymentGatewayCancelResponse gatewayResponse = paymentStrategy.cancelPayment(request);
+
+        Order order = orderRepository.findByTossOrderId(gatewayResponse.orderId())
+                .orElseThrow(() -> new PaymentFailureException("주문 정보를 찾을 수 없습니다."));
+
+        order.setStatus(OrderStatus.CANCELED);
+
+        orderRepository.save(order);
+
+        return new PaymentCancelResponse("결제 취소 요청이 접수되었습니다.");
     }
 
     public List<PaymentDetailResponse> getPayments(Long customerId) {

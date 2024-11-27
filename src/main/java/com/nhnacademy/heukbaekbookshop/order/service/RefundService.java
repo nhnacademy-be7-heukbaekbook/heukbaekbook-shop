@@ -109,8 +109,8 @@ public class RefundService {
         return new MyPageRefundDetailResponse(memberResponse, refundDetailResponses);
     }
 
-    public RefundCreateResponse requestRefund(RefundCreateRequest request) {
-        return paymentService.cancelPayment(request);
+    public RefundCreateResponse createRefund(RefundCreateRequest request) {
+        return paymentService.refundPayment(request);
     }
 }
 
