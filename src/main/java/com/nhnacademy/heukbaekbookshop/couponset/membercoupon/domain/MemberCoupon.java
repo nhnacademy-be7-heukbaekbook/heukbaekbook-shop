@@ -38,8 +38,8 @@ public class MemberCoupon {
     private LocalDateTime couponIssuedAt;
 
     @NotNull
-    @Column(name = "coupon_expiration_at")
-    private LocalDateTime couponExpirationAt;
+    @Column(name = "coupon_expiration_date")
+    private LocalDateTime couponExpirationDate;
 
 
     @Builder
@@ -47,7 +47,7 @@ public class MemberCoupon {
         this.member = member;
         this.coupon = coupon;
         this.couponIssuedAt = issuedAt;
-        this.couponExpirationAt = expirationAt;
+        this.couponExpirationDate = expirationAt;
         this.isCouponUsed = false;
     }
 

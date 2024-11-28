@@ -16,11 +16,12 @@ import com.nhnacademy.heukbaekbookshop.memberset.member.exception.MemberNotFound
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import com.nhnacademy.heukbaekbookshop.order.repository.OrderBookRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
