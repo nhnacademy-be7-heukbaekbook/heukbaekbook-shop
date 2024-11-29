@@ -4,6 +4,7 @@ import com.nhnacademy.heukbaekbookshop.point.earn.domain.EventCode;
 import com.nhnacademy.heukbaekbookshop.point.earn.domain.PointEarnType;
 import com.nhnacademy.heukbaekbookshop.point.history.event.OrderEvent;
 import com.nhnacademy.heukbaekbookshop.point.history.event.PointUseEvent;
+import com.nhnacademy.heukbaekbookshop.point.history.event.ReviewEvent;
 import com.nhnacademy.heukbaekbookshop.point.history.event.SignupEvent;
 import com.nhnacademy.heukbaekbookshop.point.earn.dto.response.PointEarnStandardResponse;
 import com.nhnacademy.heukbaekbookshop.point.earn.service.PointEarnStandardService;
@@ -34,6 +35,15 @@ public class PointAccumulationListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleOrderEvent(OrderEvent event) {
         processEarnEvent(EventCode.ORDER, event.orderId(), event.customerId(), event.orderAmount());
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handlerReview(ReviewEvent event) {
+        if (event.hasPhoto()) {
+            processEarnEvent(EventCode.REVIEW_WITH_PHOTO, event.orderId(), event.customerId(), BigDecimal.ZERO);
+        } else {
+            processEarnEvent(EventCode.REVIEW_WITHOUT_PHOTO, event.orderId(), event.customerId(), BigDecimal.ZERO);
+        }
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
