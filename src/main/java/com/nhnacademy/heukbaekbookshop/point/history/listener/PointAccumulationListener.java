@@ -3,6 +3,7 @@ package com.nhnacademy.heukbaekbookshop.point.history.listener;
 import com.nhnacademy.heukbaekbookshop.point.earn.domain.EventCode;
 import com.nhnacademy.heukbaekbookshop.point.earn.domain.PointEarnType;
 import com.nhnacademy.heukbaekbookshop.point.history.event.OrderEvent;
+import com.nhnacademy.heukbaekbookshop.point.history.event.PointUseEvent;
 import com.nhnacademy.heukbaekbookshop.point.history.event.SignupEvent;
 import com.nhnacademy.heukbaekbookshop.point.earn.dto.response.PointEarnStandardResponse;
 import com.nhnacademy.heukbaekbookshop.point.earn.service.PointEarnStandardService;
@@ -27,15 +28,20 @@ public class PointAccumulationListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleSignupEvent(SignupEvent event) {
-        processEvent(EventCode.SIGNUP, null, event.customerId(), BigDecimal.ZERO, PointType.EARNED);
+        processEarnEvent(EventCode.SIGNUP, null, event.customerId(), BigDecimal.ZERO);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleOrderEvent(OrderEvent event) {
-        processEvent(EventCode.ORDER, event.orderId(), event.customerId(), event.orderAmount(), PointType.EARNED);
+        processEarnEvent(EventCode.ORDER, event.orderId(), event.customerId(), event.orderAmount());
     }
 
-    private void processEvent(EventCode eventCode, Long orderId, Long userId, BigDecimal orderAmount, PointType pointType) {
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handlerOrderEvent(PointUseEvent event) {
+        processUseEvent(event.orderId(), event.customerId(), event.usePointAmount());
+    }
+
+    private void processEarnEvent(EventCode eventCode, Long orderId, Long userId, BigDecimal orderAmount) {
         List<PointEarnStandardResponse> standards = pointEarnStandardService.getValidStandardsByEvent(eventCode);
 
         for (PointEarnStandardResponse standard : standards) {
@@ -46,13 +52,25 @@ public class PointAccumulationListener {
                         eventCode.getDisplayName(),
                         points,
                         LocalDateTime.now(),
-                        pointType
+                        PointType.EARNED
                 );
                 pointSaveService.createPointHistory(userId, pointHistoryRequest);
             } catch (Exception e) {
                 // TODO Log
             }
         }
+    }
+
+    private void processUseEvent(Long orderId, Long userId, BigDecimal usePointAmount) {
+        PointHistoryRequest pointHistoryRequest = new PointHistoryRequest(
+                orderId,
+                "포인트 사용",
+                usePointAmount,
+                LocalDateTime.now(),
+                PointType.USED
+        );
+
+        pointSaveService.createPointHistory(userId, pointHistoryRequest);
     }
 
     private BigDecimal calculatePoints(PointEarnStandardResponse standard, BigDecimal orderAmount) {
