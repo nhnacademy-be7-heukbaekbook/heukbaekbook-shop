@@ -26,6 +26,8 @@ public interface CouponService {
 
     CouponPageResponse getCouponPageResponse(Long customerId, Pageable pageable);
 
+    CouponResponse getCouponsByTypeAndStatus(CouponType couponType);
+
     Long getCouponIdByCouponType(CouponType couponType);
 }
 

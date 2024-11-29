@@ -6,6 +6,7 @@ import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyRe
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface CouponPolicyService {
@@ -16,4 +17,5 @@ public interface CouponPolicyService {
     Page<CouponPolicyResponse> getAllCouponPoliciesByType(DiscountType discountType, Pageable pageable);
     CouponPolicyResponse updateCouponPolicy(Long policyId, CouponPolicyRequest policyRequest);
     void deleteCouponPolicy(Long policyId);
+    CouponPolicyResponse getCouponPolicyByDiscountTypeAndDiscountAmount(DiscountType discountType, BigDecimal discountAmount);
 }

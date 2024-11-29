@@ -31,8 +31,8 @@ public class RefundController {
     }
 
     @PostMapping
-    public ResponseEntity<RefundCreateResponse> requestRefund(@RequestBody RefundCreateRequest request) {
-        RefundCreateResponse response = refundService.requestRefund(request);
+    public ResponseEntity<RefundCreateResponse> createRefund(@RequestBody RefundCreateRequest request) {
+        RefundCreateResponse response = refundService.createRefund(request);
         return ResponseEntity.ok(response);
     }
 }

@@ -1,12 +1,10 @@
 package com.nhnacademy.heukbaekbookshop.order.strategy.impl;
 
 import com.nhnacademy.heukbaekbookshop.order.dto.request.PaymentApprovalRequest;
+import com.nhnacademy.heukbaekbookshop.order.dto.request.PaymentCancelRequest;
 import com.nhnacademy.heukbaekbookshop.order.dto.request.RefundBookRequest;
 import com.nhnacademy.heukbaekbookshop.order.dto.request.RefundCreateRequest;
-import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentGatewayApprovalResponse;
-import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentGatewayCancelResponse;
-import com.nhnacademy.heukbaekbookshop.order.dto.response.TossPaymentApprovalResponse;
-import com.nhnacademy.heukbaekbookshop.order.dto.response.TossPaymentCancelResponse;
+import com.nhnacademy.heukbaekbookshop.order.dto.response.*;
 import com.nhnacademy.heukbaekbookshop.order.exception.PaymentFailureException;
 import com.nhnacademy.heukbaekbookshop.order.strategy.PaymentStrategy;
 import org.slf4j.Logger;
@@ -27,6 +25,10 @@ import java.util.Map;
 public class TossPaymentStrategy implements PaymentStrategy {
 
     private static final Logger log = LoggerFactory.getLogger(TossPaymentStrategy.class);
+
+    private static final String TOSS_PAYMENT_CONFIRM_URL = "https://api.tosspayments.com/v1/payments/confirm";
+    private static final String TOSS_PAYMENT_CANCEL_URL_PREFIX = "https://api.tosspayments.com/v1/payments/";
+    private static final String TOSS_PAYMENT_CANCEL_URL_SUFFIX = "/cancel";
 
     @Value("${toss.secret-key}")
     private String secretKey;
@@ -77,13 +79,12 @@ public class TossPaymentStrategy implements PaymentStrategy {
 
     @Override
     public PaymentGatewayApprovalResponse approvePayment(PaymentApprovalRequest request) {
-        String url = "https://api.tosspayments.com/v1/payments/confirm";
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("paymentKey", request.paymentKey());
         requestBody.put("orderId", request.orderId());
         requestBody.put("amount", request.amount());
 
-        TossPaymentApprovalResponse tossResponse = executePostRequest(url, requestBody, TossPaymentApprovalResponse.class);
+        TossPaymentApprovalResponse tossResponse = executePostRequest(TOSS_PAYMENT_CONFIRM_URL, requestBody, TossPaymentApprovalResponse.class);
 
         return new PaymentGatewayApprovalResponse(
                 tossResponse.paymentKey(),
@@ -95,13 +96,31 @@ public class TossPaymentStrategy implements PaymentStrategy {
     }
 
     @Override
-    public PaymentGatewayCancelResponse cancelPayment(RefundCreateRequest request) {
-        String url = "https://api.tosspayments.com/v1/payments/" + request.paymentKey() + "/cancel";
+    public PaymentGatewayCancelResponse refundPayment(RefundCreateRequest request) {
+        String url = TOSS_PAYMENT_CANCEL_URL_PREFIX + request.paymentKey() + TOSS_PAYMENT_CANCEL_URL_SUFFIX;
         Map<String, Object> requestBody = new HashMap<>();
 
         BigDecimal cancelAmount = getCancelAmount(request);
 
         requestBody.put("cancelAmount", cancelAmount);
+        requestBody.put("cancelReason", request.cancelReason());
+
+        TossPaymentCancelResponse tossResponse = executePostRequest(url, requestBody, TossPaymentCancelResponse.class);
+
+        return new PaymentGatewayCancelResponse(
+                tossResponse.requestedAt(),
+                tossResponse.approvedAt(),
+                tossResponse.orderId(),
+                tossResponse.cancelAmount(),
+                "TOSS"
+        );
+    }
+
+    @Override
+    public PaymentGatewayCancelResponse cancelPayment(PaymentCancelRequest request) {
+        String url = TOSS_PAYMENT_CANCEL_URL_PREFIX + request.paymentKey() + TOSS_PAYMENT_CANCEL_URL_SUFFIX;
+        Map<String, Object> requestBody = new HashMap<>();
+
         requestBody.put("cancelReason", request.cancelReason());
 
         TossPaymentCancelResponse tossResponse = executePostRequest(url, requestBody, TossPaymentCancelResponse.class);

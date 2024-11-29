@@ -15,5 +15,6 @@ public record OrderCreateRequest(
         String detailAddress,
         String recipientPhoneNumber,
         String deliveryFee,
+        String usedPoint,
         List<OrderBookRequest> orderBookRequests) {
 }

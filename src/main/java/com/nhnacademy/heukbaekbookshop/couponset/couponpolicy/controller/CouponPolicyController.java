@@ -1,5 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.controller;
 
+import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
+import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyRequest;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.service.CouponPolicyService;
@@ -11,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -99,6 +102,20 @@ public class CouponPolicyController {
     public ResponseEntity<Void> deleteCouponPolicy(@PathVariable Long policyId) {
         couponPolicyService.deleteCouponPolicy(policyId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    /**
+     * Batch 전용(Admin전용)
+     *
+     * @param type discountType
+     * @param amount discountAmount
+     * @return couponPolicyResponse
+     */
+    @GetMapping("/{type}/{amount}")
+    public ResponseEntity<CouponPolicyResponse> getCouponPolicyByTypeAndAmount(@PathVariable String type, @PathVariable BigDecimal amount) {
+        DiscountType discountType = (type.equals(DiscountType.FIXED.name())) ? DiscountType.FIXED : DiscountType.PERCENTAGE;
+        CouponPolicyResponse response = couponPolicyService.getCouponPolicyByDiscountTypeAndDiscountAmount(discountType, amount);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }

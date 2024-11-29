@@ -23,9 +23,6 @@ import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyRe
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.mapper.CouponPolicyMapper;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.exception.CouponPolicyNotFoundException;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.repository.CouponPolicyRepository;
-import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
-import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.mapper.GradeMapper;
-import com.nhnacademy.heukbaekbookshop.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.repository.CouponRepository;
@@ -153,6 +150,12 @@ public class CouponServiceImpl implements CouponService {
         Page<CategoryCouponResponse> categoryCoupons = couponRepository.findAllCategoryCoupons(pageable);
         List<CouponPolicyResponse> couponPolicyList = CouponPolicyMapper.fromEntityList(couponPolicyRepository.findAllByOrderByDiscountTypeAscDiscountAmountAsc());
         return CouponMapper.toCouponPageResponse(normalCoupons,bookCoupons,categoryCoupons,couponPolicyList);
+    }
+
+    @Override
+    public CouponResponse getCouponsByTypeAndStatus(CouponType couponType) {
+        return CouponMapper.fromEntity(
+                couponRepository.findByCouponTypeAndCouponStatus(couponType, CouponStatus.ABLE));
     }
 
     @Override
