@@ -12,6 +12,7 @@ import com.nhnacademy.heukbaekbookshop.point.history.domain.PointType;
 import com.nhnacademy.heukbaekbookshop.point.history.dto.request.PointHistoryRequest;
 import com.nhnacademy.heukbaekbookshop.point.history.service.PointSaveService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -23,6 +24,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class PointAccumulationListener {
     private final PointEarnStandardService pointEarnStandardService;
     private final PointSaveService pointSaveService;
@@ -66,7 +68,7 @@ public class PointAccumulationListener {
                 );
                 pointSaveService.createPointHistory(userId, pointHistoryRequest);
             } catch (Exception e) {
-                // TODO Log
+                log.error("Point 적립 실패, OrderId: {}, MemberId: {}", orderId, userId);
             }
         }
     }
