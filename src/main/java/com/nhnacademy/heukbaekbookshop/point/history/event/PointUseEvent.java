@@ -1,8 +1,10 @@
 package com.nhnacademy.heukbaekbookshop.point.history.event;
 
-public record ReviewEvent(
+import java.math.BigDecimal;
+
+public record PointUseEvent(
         Long customerId,
         Long orderId,
-        boolean hasPhoto
+        BigDecimal usePointAmount
 ) {
 }
