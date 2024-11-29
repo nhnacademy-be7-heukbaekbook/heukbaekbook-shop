@@ -12,23 +12,25 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/coupons/histories")
+@RequestMapping("/api/members/coupons/histories")
 public class CouponHistoryController {
+    public static final String X_USER_ID = "X-USER-ID";
+
     private final CouponHistoryService couponHistoryService;
 
     /**
      * 사용자 쿠폰 사용 내역 조회
      *
-     * @param memberId 회원 ID
+     * @param customerId 회원 ID
      * @param pageable 페이징 정보
      * @return 쿠폰 사용 내역 목록
      */
-    @GetMapping("/members/{memberId}")
+    @GetMapping()
     public ResponseEntity<Page<CouponHistoryResponse>> getCouponHistoriesByUser(
-            @PathVariable Long memberId,
+            @RequestHeader(X_USER_ID) Long customerId,
             Pageable pageable
     ) {
-        Page<CouponHistoryResponse> histories = couponHistoryService.getCouponHistoryByCustomerId(memberId, pageable);
+        Page<CouponHistoryResponse> histories = couponHistoryService.getCouponHistoryByCustomerId(customerId, pageable);
         return ResponseEntity.ok(histories);
     }
 
