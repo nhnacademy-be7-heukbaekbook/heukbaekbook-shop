@@ -1,5 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.couponset.coupon.domain;
 
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponStatus;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponType;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -24,8 +26,9 @@ public class Coupon {
     @JoinColumn(name = "coupon_policy_id")
     private CouponPolicy couponPolicy;
 
+    @Setter
     @Column(name = "coupon_quantity")
-    private int couponQuantity;
+    private Integer couponQuantity;
 
     @NotNull
     @Setter
@@ -56,17 +59,23 @@ public class Coupon {
     @Column(name = "coupon_created_at")
     private LocalDateTime couponCreatedAt;
 
+    @NotNull
+    @Column(name = "coupon_type")
+    @Enumerated(EnumType.STRING)
+    private CouponType couponType;
+
     @Builder
-    public Coupon(CouponPolicy couponPolicy, int couponQuantity, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription) {
+    public Coupon(CouponPolicy couponPolicy, int couponQuantity, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription, CouponType couponType) {
         this.couponPolicy = couponPolicy;
         this.couponQuantity = couponQuantity;
-        this.couponStatus = CouponStatus.PENDING;
+        this.couponStatus = CouponStatus.ABLE;
         this.availableDuration = availableDuration;
         this.couponTimeStart = couponTimeStart;
         this.couponTimeEnd = couponTimeEnd;
         this.couponName = couponName;
         this.couponDescription = couponDescription;
         this.couponCreatedAt = LocalDateTime.now();
+        this.couponType = couponType;
     }
 
     public Coupon modifyCoupon(CouponPolicy couponPolicy, int couponQuantity, int availableDuration, LocalDateTime couponTimeStart, LocalDateTime couponTimeEnd, String couponName, String couponDescription) {

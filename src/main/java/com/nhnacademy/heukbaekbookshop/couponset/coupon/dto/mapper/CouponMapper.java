@@ -5,21 +5,30 @@ import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.BookCoupon;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CategoryCoupon;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.Coupon;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponStatus;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponType;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request.CouponRequest;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.BookCouponResponse;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CategoryCouponResponse;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponPageResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.couponhistory.domain.CouponHistory;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
+import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
+import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.mapper.CouponPolicyMapper;
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.domain.MemberCoupon;
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.dto.response.MemberCouponResponse;
+import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CouponMapper {
@@ -35,7 +44,8 @@ public class CouponMapper {
                 coupon.getCouponTimeEnd(),
                 coupon.getCouponName(),
                 coupon.getCouponDescription(),
-                coupon.getCouponCreatedAt()
+                coupon.getCouponCreatedAt(),
+                coupon.getCouponType()
         );
     }
 
@@ -51,6 +61,7 @@ public class CouponMapper {
                 .couponTimeEnd(couponRequest.couponTimeEnd())
                 .couponName(couponRequest.couponName())
                 .couponDescription(couponRequest.couponDescription())
+                .couponType(couponRequest.couponType())
                 .build();
     }
 
@@ -76,7 +87,8 @@ public class CouponMapper {
                 couponRequest.couponDescription(),
                 category);
     }
-    public static MemberCoupon toMemberCouponEntity(Member member, Coupon coupon, int availableDate){
+
+    public static MemberCoupon toMemberCouponEntity(Member member, Coupon coupon, int availableDate) {
         return MemberCoupon.builder()
                 .member(member)
                 .coupon(coupon)
@@ -107,6 +119,22 @@ public class CouponMapper {
 
     public static Page<MemberCouponResponse> fromMemberCouponPageableEntity(Page<MemberCoupon> memberCoupons) {
         return memberCoupons.map(CouponMapper::fromMemberCouponEntity);
+    }
+
+    public static CouponPageResponse toCouponPageResponse(Page<CouponResponse> normalCoupons,
+                                                          Page<BookCouponResponse> bookCoupons,
+                                                          Page<CategoryCouponResponse> categoryCoupons,
+                                                          List<CouponPolicyResponse> couponPolicyList
+    ) {
+        return new CouponPageResponse(
+                normalCoupons,
+                bookCoupons,
+                categoryCoupons,
+                couponPolicyList,
+                DiscountType.values(),
+                CouponStatus.values(),
+                CouponType.values()
+        );
     }
 }
 

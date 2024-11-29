@@ -1,10 +1,12 @@
 package com.nhnacademy.heukbaekbookshop.couponset.coupon.service;
 
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.BookCoupon;
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CouponStatus;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.Coupon;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponStatus;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponType;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request.CouponRequest;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.BookCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CategoryCouponResponse;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponPageResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,11 @@ public interface CouponService {
     Page<CouponResponse> getCouponsByStatus(CouponStatus couponStatus, Pageable pageable);
     CouponResponse updateCoupon(Long couponId, CouponRequest couponRequest);
     void changeCouponStatus(Long couponId, CouponStatus couponStatus);
+    void subtractQuantity(Long couponId);
+
+    CouponPageResponse getCouponPageResponse(Long customerId, Pageable pageable);
+
+    Long getCouponIdByCouponType(CouponType couponType);
 }
 
 // 전체 - order => created At

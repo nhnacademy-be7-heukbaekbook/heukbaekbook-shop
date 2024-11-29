@@ -71,9 +71,9 @@ public class ReviewService {
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 주문 ID입니다."));
 
         // 주문 상태 확인
-        if (!OrderStatus.DELIVERED.equals(order.getStatus())) {
-            throw new IllegalArgumentException("주문이 배송 완료 상태가 아닙니다. 리뷰를 작성할 수 없습니다.");
-        }
+//        if (!OrderStatus.DELIVERED.equals(order.getStatus())) {
+//            throw new IllegalArgumentException("주문이 배송 완료 상태가 아닙니다. 리뷰를 작성할 수 없습니다.");
+//        }
 
         Book book = bookRepository.findById(request.bookId())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 도서 ID입니다."));
@@ -213,5 +213,11 @@ public class ReviewService {
                     .collect(Collectors.toList());
             return convertToResponse(review, imageUrls);
         }).collect(Collectors.toList());
+    }
+
+    public void deleteReview(Long customerId, Long orderId, Long bookId) {
+        Review review = reviewRepository.findByOrderIdAndBookIdAndCustomerId(orderId, bookId, customerId);
+
+        reviewRepository.delete(review);
     }
 }

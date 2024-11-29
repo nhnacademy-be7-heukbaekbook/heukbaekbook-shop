@@ -8,6 +8,7 @@ import com.nhnacademy.heukbaekbookshop.memberset.address.dto.MemberAddressRespon
 import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 import com.nhnacademy.heukbaekbookshop.memberset.grade.domain.Grade;
 import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
+import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.mapper.GradeMapper;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.mapper.MemberMapper;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberCreateRequest;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberUpdateRequest;
@@ -31,7 +32,10 @@ import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.*;
 import com.nhnacademy.heukbaekbookshop.order.exception.OrderNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.repository.OrderRepository;
+import com.nhnacademy.heukbaekbookshop.point.history.domain.PointHistory;
 import com.nhnacademy.heukbaekbookshop.point.history.event.SignupEvent;
+import com.nhnacademy.heukbaekbookshop.point.history.exception.PointNotFoundException;
+import com.nhnacademy.heukbaekbookshop.point.history.repository.PointHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -55,6 +59,7 @@ public class MemberServiceImpl implements MemberService {
     private final GradeRepository gradeRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final OrderRepository orderRepository;
+    private final PointHistoryRepository pointHistoryRepository;
 
     @Override
     @Transactional
@@ -138,11 +143,15 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findById(customerId)
                 .orElseThrow(MemberNotFoundException::new);
 
+        PointHistory pointHistory = pointHistoryRepository.findFirstByMemberIdOrderByCreatedAtDesc(customerId)
+                .orElseThrow(() -> new PointNotFoundException(customerId + " point history not found"));
+
         return new MemberDetailResponse(
                 member.getId(),
                 member.getName(),
                 member.getPhoneNumber(),
                 member.getEmail(),
+                pointHistory.getAmount(),
                 member.getMemberAddresses().stream()
                         .map(memberAddress -> new MemberAddressResponse(
                                 memberAddress.getId(),
@@ -159,7 +168,7 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.searchByCustomerId(customerId)
                 .orElseThrow(MemberNotFoundException::new);
 
-        MemberResponse memberResponse = MemberMapper.createMemberResponse(member);
+        GradeDto gradeDto = GradeMapper.createGradeResponse(member.getGrade());
 
         List<Order> orders = orderRepository.searchByCustomerId(customerId);
 
@@ -167,7 +176,7 @@ public class MemberServiceImpl implements MemberService {
                 .map(this::createOrderSummaryResponse)
                 .collect(Collectors.toList());
 
-        return new MyPageResponse(memberResponse, new OrderResponse(orderSummaryResponses));
+        return new MyPageResponse(gradeDto, new OrderResponse(orderSummaryResponses));
     }
 
     private OrderSummaryResponse createOrderSummaryResponse(Order order) {
@@ -203,7 +212,8 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.searchByCustomerId(customerId)
                 .orElseThrow(MemberNotFoundException::new);
 
-        MemberResponse memberResponse = MemberMapper.createMemberResponse(member);
+        Grade grade = member.getGrade();
+        GradeDto gradeDto = GradeMapper.createGradeResponse(grade);
 
         Order order = orderRepository.searchByTossOrderId(tossOrderId)
                 .orElseThrow(() -> new OrderNotFoundException(tossOrderId + " order not found"));
@@ -211,7 +221,7 @@ public class MemberServiceImpl implements MemberService {
         OrderDetailResponse orderDetailResponse = OrderDetailResponse.of(order);
 
 
-        return new MyPageOrderDetailResponse(memberResponse, orderDetailResponse);
+        return new MyPageOrderDetailResponse(gradeDto, orderDetailResponse);
     }
 
     @Override
@@ -219,6 +229,13 @@ public class MemberServiceImpl implements MemberService {
     public void changeMemberStatus(Long customerId, MemberStatus newStatus) {
         Member member = memberRepository.findById(customerId).orElseThrow(MemberNotFoundException::new);
         member.setStatus(newStatus);
+    }
+
+    @Override
+    public GradeDto getMembersGrade(Long customerId) {
+        return GradeMapper.createGradeResponse(
+                memberRepository.findGradeByMemberId(customerId)
+                        .orElseThrow(MemberNotFoundException::new));
     }
 
 }

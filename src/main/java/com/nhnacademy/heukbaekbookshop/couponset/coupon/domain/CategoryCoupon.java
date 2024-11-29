@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.couponset.coupon.domain;
 
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponType;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,7 +28,7 @@ public class CategoryCoupon extends Coupon {
                           String couponDescription,
                           Category category
     ) {
-        super(couponPolicy, couponQuantity, availableDuration, couponTimeStart, couponTimeEnd, couponName, couponDescription);
+        super(couponPolicy, couponQuantity, availableDuration, couponTimeStart, couponTimeEnd, couponName, couponDescription, CouponType.CATEGORY);
         this.category = category;
     }
 

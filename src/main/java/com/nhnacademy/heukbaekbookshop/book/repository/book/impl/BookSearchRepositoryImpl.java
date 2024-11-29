@@ -97,6 +97,4 @@ public class BookSearchRepositoryImpl implements BookSearchRepository {
             default -> Sort.by(Sort.Order.desc("publishedAt"));
         };
     }
-
-
 }

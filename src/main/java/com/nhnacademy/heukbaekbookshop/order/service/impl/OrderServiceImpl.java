@@ -12,8 +12,8 @@ import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.repository.CustomerRepository;
-import com.nhnacademy.heukbaekbookshop.memberset.member.dto.mapper.MemberMapper;
-import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MemberResponse;
+import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
+import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.mapper.GradeMapper;
 import com.nhnacademy.heukbaekbookshop.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import com.nhnacademy.heukbaekbookshop.order.domain.*;
@@ -22,6 +22,7 @@ import com.nhnacademy.heukbaekbookshop.order.dto.request.OrderCreateRequest;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.*;
 import com.nhnacademy.heukbaekbookshop.order.exception.DeliveryFeeNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.exception.OrderNotFoundException;
+import com.nhnacademy.heukbaekbookshop.order.exception.WrappingPaperNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.repository.*;
 import com.nhnacademy.heukbaekbookshop.order.service.OrderService;
 import jakarta.persistence.EntityManager;
@@ -54,6 +55,8 @@ public class OrderServiceImpl implements OrderService {
     private final EntityManager em;
     private final PaymentRepository paymentRepository;
     private final MemberRepository memberRepository;
+
+    private final WrappingPaperRepository wrappingPaperRepository;
 
     @Override
     @Transactional
@@ -123,8 +126,16 @@ public class OrderServiceImpl implements OrderService {
                             orderBookRequest.quantity(),
                             Converter.convertStringToBigDecimal(orderBookRequest.salePrice())
                     );
-//                    orderBookRepository.save(orderBook);
                     em.persist(orderBook);
+
+                    if (orderBookRequest.isWrapped()) {
+                        Long wrappingPaperId = orderBookRequest.wrappingPaperId();
+                        WrappingPaper wrappingPaper = wrappingPaperRepository.searchById(wrappingPaperId)
+                                .orElseThrow(() -> new WrappingPaperNotFoundException(wrappingPaperId + " wrapping paper not found"));
+
+                        Packaging packaging = Packaging.createPackaging(book, order, wrappingPaper, wrappingPaper.getPrice());
+                        em.persist(packaging);
+                    }
                 });
 
 
@@ -235,8 +246,8 @@ public class OrderServiceImpl implements OrderService {
                 })
                 .collect(Collectors.toList());
 
-        MemberResponse memberResponse = MemberMapper.createMemberResponse(memberRepository.findById(Long.parseLong(userId)).orElseThrow(MemberNotFoundException::new));
-        return new MyPageRefundableOrderDetailResponse(memberResponse, refundableOrderBookResponses);
+        GradeDto gradeDto = GradeMapper.createGradeResponse(memberRepository.findGradeByMemberId(customerId).orElseThrow(MemberNotFoundException::new));
+        return new MyPageRefundableOrderDetailResponse(gradeDto, refundableOrderBookResponses);
 
     }
 

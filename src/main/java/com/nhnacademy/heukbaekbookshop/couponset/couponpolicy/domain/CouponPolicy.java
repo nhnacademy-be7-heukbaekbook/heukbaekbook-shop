@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "coupons_policies")
 public class CouponPolicy {
 
