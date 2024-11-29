@@ -4,7 +4,7 @@ import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
 
 import java.util.List;
 
-public record MyPageRefundDetailResponse(
+public record MyPageRefundableOrderDetailListResponse(
         GradeDto gradeDto,
-        List<RefundDetailResponse> refunds
+        List<RefundableOrderDetailResponse> orders
 ) {}

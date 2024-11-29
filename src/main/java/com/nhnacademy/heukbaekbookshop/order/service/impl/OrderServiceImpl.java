@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.LongFunction;
 import java.util.stream.Collectors;
 
 @Service
@@ -160,11 +161,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public MyPageRefundableOrderDetailResponse getRefundableOrders(String userId) {
-        Long customerId = Long.parseLong(userId);
+    public MyPageRefundableOrderDetailListResponse getRefundableOrders(String customerId) {
+        Long customerIdL = Long.parseLong(customerId);
         LocalDateTime currentDate = LocalDateTime.now();
 
-        List<Order> orderList = orderRepository.findByCustomerId(customerId);
+        List<Order> orderList = orderRepository.findByCustomerId(customerIdL);
 
         List<Order> refundableOrders = orderList.stream()
                 .filter(order -> {
@@ -252,10 +253,91 @@ public class OrderServiceImpl implements OrderService {
                 })
                 .collect(Collectors.toList());
 
-        GradeDto gradeDto = GradeMapper.createGradeResponse(memberRepository.findGradeByMemberId(customerId).orElseThrow(MemberNotFoundException::new));
-        return new MyPageRefundableOrderDetailResponse(gradeDto, refundableOrderBookResponses);
+        GradeDto gradeDto = GradeMapper.createGradeResponse(memberRepository.findGradeByMemberId(customerIdL).orElseThrow(MemberNotFoundException::new));
+        return new MyPageRefundableOrderDetailListResponse(gradeDto, refundableOrderBookResponses);
 
     }
+
+    @Override
+    public MyPageRefundableOrderDetailResponse getRefundableOrderDetail(String customerId, Long orderId) {
+        Long customerIdL = Long.parseLong(customerId);
+
+        // 주문 조회
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(orderId + " Order not found"));
+
+        // 총 도서 가격 계산
+        BigDecimal totalBookPrice = order.getOrderBooks().stream()
+                .map(orderBook -> orderBook.getPrice().multiply(BigDecimal.valueOf(orderBook.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // 배송비 계산
+        BigDecimal deliveryFee = order.getDeliveryFee() != null ? order.getDeliveryFee().getFee() : BigDecimal.ZERO;
+        String formattedDeliveryFee = Formatter.formatPrice(deliveryFee);
+
+        // 결제 정보
+        String paymentPrice = order.getPayment() != null ? Formatter.formatPrice(order.getPayment().getPrice()) : null;
+        String paymentTypeName = order.getPayment() != null ? order.getPayment().getPaymentType().getName() : null;
+
+        // 고객 및 배송 정보
+        String customerName = order.getCustomerName();
+        String recipient = order.getDelivery() != null ? order.getDelivery().getRecipient() : null;
+        Long postalCode = order.getDelivery() != null ? order.getDelivery().getPostalCode() : null;
+        String roadNameAddress = order.getDelivery() != null ? order.getDelivery().getRoadNameAddress() : null;
+        String detailAddress = order.getDelivery() != null ? order.getDelivery().getDetailAddress() : null;
+
+        // 총 할인 금액 계산
+        BigDecimal totalDiscount = order.getOrderBooks().stream()
+                .map(orderBook -> orderBook.getBook().getPrice()
+                        .subtract(orderBook.getPrice())
+                        .multiply(BigDecimal.valueOf(orderBook.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // 총 주문 금액 계산
+        String totalPrice = Formatter.formatPrice(totalBookPrice.add(deliveryFee));
+
+        // 주문 도서 목록 변환
+        List<RefundableOrderBookResponse> books = order.getOrderBooks().stream()
+                .map(this::mapToRefundableOrderBookResponse)
+                .collect(Collectors.toList());
+
+        // 추가 필드: orderId, createdAt, status
+        Long orderIdValue = order.getId();
+        LocalDateTime createdAt = order.getCreatedAt();
+        String status = order.getStatus().name();
+
+        // Payment 정보 조회
+        Payment payment = paymentRepository.findByOrderId(orderIdValue);
+
+        // 주문 상세 정보 생성
+        RefundableOrderDetailResponse refundableOrderDetailResponse = new RefundableOrderDetailResponse(
+                orderIdValue,
+                customerName,
+                formattedDeliveryFee,
+                paymentPrice,
+                paymentTypeName,
+                recipient,
+                postalCode,
+                roadNameAddress,
+                detailAddress,
+                Formatter.formatPrice(totalBookPrice),
+                Formatter.formatPrice(totalDiscount),
+                totalPrice,
+                books,
+                createdAt,
+                status,
+                payment.getId()
+        );
+
+        // 회원 등급 정보
+        GradeDto gradeDto = GradeMapper.createGradeResponse(
+                memberRepository.findGradeByMemberId(customerIdL)
+                        .orElseThrow(MemberNotFoundException::new)
+        );
+
+        return new MyPageRefundableOrderDetailResponse(gradeDto, refundableOrderDetailResponse);
+    }
+
 
     private RefundableOrderBookResponse mapToRefundableOrderBookResponse(OrderBook orderBook) {
         Book book = orderBook.getBook();

@@ -12,7 +12,7 @@ public enum OrderStatus {
     IN_TRANSIT("배송중"),
     DELIVERED("배송완료"),
     RETURNED("반품완료"),
-    CANCELLED("취소완료");
+    CANCELED("취소완료");
 
     private final String korean; // 한국어 매핑 필드
 }
