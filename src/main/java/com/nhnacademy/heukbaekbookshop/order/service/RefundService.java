@@ -1,6 +1,8 @@
 package com.nhnacademy.heukbaekbookshop.order.service;
 
 import com.nhnacademy.heukbaekbookshop.memberset.customer.exception.CustomerNotFoundException;
+import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
+import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.mapper.GradeMapper;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.mapper.MemberMapper;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MemberResponse;
@@ -104,9 +106,8 @@ public class RefundService {
                 ));
             }
         }
-        MemberResponse memberResponse = MemberMapper.createMemberResponse(memberRepository.findById(Long.parseLong(userId)).orElseThrow(MemberNotFoundException::new));
-
-        return new MyPageRefundDetailResponse(memberResponse, refundDetailResponses);
+        GradeDto gradeDto = GradeMapper.createGradeResponse(memberRepository.findGradeByMemberId(Long.valueOf(userId)).orElseThrow(MemberNotFoundException::new));
+        return new MyPageRefundDetailResponse(gradeDto, refundDetailResponses);
     }
 
     public RefundCreateResponse createRefund(RefundCreateRequest request) {

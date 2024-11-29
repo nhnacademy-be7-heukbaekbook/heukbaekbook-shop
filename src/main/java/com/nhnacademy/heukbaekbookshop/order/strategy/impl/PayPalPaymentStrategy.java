@@ -7,8 +7,6 @@ import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentGatewayApproval
 import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentGatewayCancelResponse;
 import com.nhnacademy.heukbaekbookshop.order.strategy.PaymentStrategy;
 
-import java.math.BigDecimal;
-
 // @Component
 public class PayPalPaymentStrategy implements PaymentStrategy {
 
@@ -21,22 +19,18 @@ public class PayPalPaymentStrategy implements PaymentStrategy {
     @Override
     public PaymentGatewayApprovalResponse approvePayment(PaymentApprovalRequest request) {
         // PayPal 결제 승인 로직 구현
-        return new PaymentGatewayApprovalResponse(
-                "paypalPaymentKey",
-                "2023-10-01T10:00:00",
-                "2023-10-01T10:01:00",
-                BigDecimal.valueOf(request.amount()),
-                "PAYPAL"
-        );
+        return null;
     }
 
     @Override
     public PaymentGatewayCancelResponse refundPayment(RefundCreateRequest request) {
+        // PayPal 환불 처리 로직 구현
         return null;
     }
 
     @Override
     public PaymentGatewayCancelResponse cancelPayment(PaymentCancelRequest request) {
+        // PayPal 결제 취소 로직 구현
         return null;
     }
 }

@@ -33,9 +33,9 @@ public class OrderController {
         return orderService.getOrderDetailResponse(orderId);
     }
 
-    @GetMapping
-    public ResponseEntity<MyPageRefundableOrderDetailListResponse> getRefundableOrders(@RequestParam(name = "user-id") String userId) {
-        MyPageRefundableOrderDetailListResponse orders = orderService.getRefundableOrders(userId);
+    @GetMapping("/refundable-orders")
+    public ResponseEntity<MyPageRefundableOrderDetailListResponse> getRefundableOrders(@RequestParam(name = "customer-id") String customerId) {
+        MyPageRefundableOrderDetailListResponse orders = orderService.getRefundableOrders(customerId);
         return ResponseEntity.ok(orders);
     }
 

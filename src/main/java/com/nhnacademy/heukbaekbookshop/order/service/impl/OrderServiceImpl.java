@@ -155,11 +155,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public MyPageRefundableOrderDetailListResponse getRefundableOrders(String userId) {
-        Long customerId = Long.parseLong(userId);
+    public MyPageRefundableOrderDetailListResponse getRefundableOrders(String customerId) {
+        Long customerIdL = Long.parseLong(customerId);
         LocalDateTime currentDate = LocalDateTime.now();
 
-        List<Order> orderList = orderRepository.findByCustomerId(customerId);
+        List<Order> orderList = orderRepository.findByCustomerId(customerIdL);
 
         List<Order> refundableOrders = orderList.stream()
                 .filter(order -> {
@@ -247,7 +247,7 @@ public class OrderServiceImpl implements OrderService {
                 })
                 .collect(Collectors.toList());
 
-        GradeDto gradeDto = GradeMapper.createGradeResponse(memberRepository.findGradeByMemberId(customerId).orElseThrow(MemberNotFoundException::new));
+        GradeDto gradeDto = GradeMapper.createGradeResponse(memberRepository.findGradeByMemberId(customerIdL).orElseThrow(MemberNotFoundException::new));
         return new MyPageRefundableOrderDetailListResponse(gradeDto, refundableOrderBookResponses);
 
     }
