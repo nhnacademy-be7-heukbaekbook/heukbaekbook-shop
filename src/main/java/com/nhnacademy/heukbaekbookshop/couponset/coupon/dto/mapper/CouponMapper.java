@@ -93,16 +93,18 @@ public class CouponMapper {
                 .member(member)
                 .coupon(coupon)
                 .issuedAt(LocalDateTime.now())
-                .expirationAt(LocalDateTime.now().plusDays(availableDate)).build();
+                .expirationDate(LocalDateTime.now().plusDays(availableDate)).build();
     }
 
     public static MemberCouponResponse fromMemberCouponEntity(MemberCoupon memberCoupon) {
         return new MemberCouponResponse(
                 memberCoupon.getId(),
                 memberCoupon.getCoupon().getId(),
+                memberCoupon.getCoupon().getCouponName(),
+                memberCoupon.getCoupon().getCouponDescription(),
                 memberCoupon.isCouponUsed(),
                 memberCoupon.getCouponIssuedAt(),
-                memberCoupon.getCouponExpirationAt()
+                memberCoupon.getCouponExpirationDate()
         );
     }
 

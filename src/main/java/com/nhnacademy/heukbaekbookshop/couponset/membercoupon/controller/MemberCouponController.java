@@ -51,16 +51,16 @@ public class MemberCouponController {
     /**
      * 회원의 쿠폰 조회
      *
-     * @param memberId 회원 ID
+     * @param customerId 회원 ID
      * @param pageable Pageable 객체
      * @return Page<MemberCouponResponse>
      */
-    @GetMapping("/{memberId}")
+    @GetMapping()
     public ResponseEntity<Page<MemberCouponResponse>> getUserCoupons(
-            @PathVariable Long memberId,
+            @RequestHeader(X_USER_ID) Long customerId,
             Pageable pageable
     ) {
-        Page<MemberCouponResponse> responses = memberCouponService.getUserCoupons(pageable, memberId);
+        Page<MemberCouponResponse> responses = memberCouponService.getUserCoupons(pageable, customerId);
         return ResponseEntity.ok(responses);
     }
 }
