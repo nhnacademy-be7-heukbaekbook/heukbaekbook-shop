@@ -59,7 +59,8 @@ public class PointAccumulationListener {
         if (standard.pointEarnType() == PointEarnType.FIXED) {
             return standard.point();
         } else if (standard.pointEarnType() == PointEarnType.PERCENTAGE) {
-            BigDecimal percentage = standard.point();
+            BigDecimal percentage = standard.point()
+                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
             return orderAmount.multiply(percentage).setScale(0, RoundingMode.DOWN);
         }
         return BigDecimal.ZERO;

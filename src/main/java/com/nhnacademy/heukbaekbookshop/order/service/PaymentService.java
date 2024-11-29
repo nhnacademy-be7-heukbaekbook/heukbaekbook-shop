@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.order.service;
 
 import com.nhnacademy.heukbaekbookshop.memberset.customer.repository.CustomerRepository;
+import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import com.nhnacademy.heukbaekbookshop.order.domain.*;
 import com.nhnacademy.heukbaekbookshop.order.dto.request.PaymentApprovalRequest;
 import com.nhnacademy.heukbaekbookshop.order.dto.request.RefundBookRequest;
@@ -10,10 +11,14 @@ import com.nhnacademy.heukbaekbookshop.order.exception.PaymentFailureException;
 import com.nhnacademy.heukbaekbookshop.order.repository.*;
 import com.nhnacademy.heukbaekbookshop.order.strategy.PaymentStrategy;
 import com.nhnacademy.heukbaekbookshop.order.strategy.PaymentStrategyFactory;
+import com.nhnacademy.heukbaekbookshop.point.history.event.OrderEvent;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -31,7 +36,10 @@ public class PaymentService {
     private final PaymentStrategyFactory paymentStrategyFactory;
     private final EntityManager entityManager;
     private final OrderBookRefundRepository orderBookRefundRepository;
+    private final MemberRepository memberRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
+    @Transactional
     public PaymentApprovalResponse approvePayment(PaymentApprovalRequest request) {
         String paymentMethod = request.method();
 
@@ -62,6 +70,11 @@ public class PaymentService {
         order.setStatus(OrderStatus.PAYMENT_COMPLETED);
 
         paymentRepository.save(payment);
+
+        if (memberRepository.existsById(order.getCustomer().getId())) {
+            BigDecimal productPrice = order.getTotalPrice().subtract(order.getDeliveryFee().getFee());
+            eventPublisher.publishEvent(new OrderEvent(order.getCustomer().getId(), order.getId(), productPrice));
+        }
 
         return new PaymentApprovalResponse(
                 order.getCreatedAt().toString(),
