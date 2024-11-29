@@ -10,6 +10,5 @@ public record MemberCouponResponse(
         Boolean isCouponUsed,
         LocalDateTime couponIssuedAt,
         LocalDateTime couponExpirationDate
-
 ) {
 }

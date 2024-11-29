@@ -14,7 +14,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 
 @Service
@@ -78,6 +81,13 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
         }
 
         couponPolicyRepository.deleteById(policyId);
+    }
+
+    @Override
+    public CouponPolicyResponse getCouponPolicyByDiscountTypeAndDiscountAmount(DiscountType discountType, BigDecimal discountAmount) {
+        CouponPolicy couponPolicy = couponPolicyRepository.findCouponPolicyByDiscountTypeAndDiscountAmount(discountType, discountAmount);
+
+        return Objects.isNull(couponPolicy) ? null : CouponPolicyMapper.fromEntity(couponPolicy);
     }
 
 }

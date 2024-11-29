@@ -22,6 +22,6 @@ public class MemberEventListener {
 
     private void processIssued(CouponType couponType, Long customerId) {
         Long welcomeCouponId = couponService.getCouponIdByCouponType(couponType);
-        memberCouponService.issueCoupon(welcomeCouponId, customerId);
+        memberCouponService.issueCoupon(customerId, welcomeCouponId);
     }
 }

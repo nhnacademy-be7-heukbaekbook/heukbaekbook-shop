@@ -2,6 +2,7 @@ package com.nhnacademy.heukbaekbookshop.couponset.coupon.controller;
 
 
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponStatus;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponType;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request.CouponRequest;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.BookCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CategoryCouponResponse;
@@ -106,12 +107,17 @@ public class CouponController {
      * @param pageable Page 처리 용 pageble 객체입니다.
      * @return 성공시, 응답코드 200 반환합니다.
      */
-    @GetMapping("/type/{type}")
+    @GetMapping("/type/discount/{type}")
     public ResponseEntity<Page<CouponResponse>> getCouponsByType(@PathVariable("type") DiscountType discountType, Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(couponService.getCouponsByType(discountType,pageable)
                 );
     }
+
+//    @GetMapping("/coupon-type/{couponType}")
+//    public ResponseEntity<CouponResponse> getCouponByCouponType(@PathVariable("couponType") CouponType couponType) {
+//
+//    }
 
     /**
      * 쿠폰 생성 요청 시 사용되는 메서드입니다.
