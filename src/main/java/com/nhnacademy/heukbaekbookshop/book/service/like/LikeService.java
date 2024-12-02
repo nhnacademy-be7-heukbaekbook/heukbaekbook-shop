@@ -78,7 +78,7 @@ public class LikeService {
                 book.getTitle(),
                 book.getIndex(),
                 book.getDescription(),
-                book.getPublication().toString(),
+                book.getPublishedAt().toString(),
                 book.getIsbn(),
                 book.getBookImages().stream()
                         .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)

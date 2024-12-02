@@ -1,8 +1,9 @@
 package com.nhnacademy.heukbaekbookshop.book.controller;
 
-import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookCartResponse;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookDetailResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookResponse;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookViewResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.like.LikeCreateResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.like.LikeDeleteResponse;
 import com.nhnacademy.heukbaekbookshop.book.service.book.BookService;
@@ -47,10 +48,11 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
+
     @GetMapping("/summary")
-    public ResponseEntity<List<BookCartResponse>> getBooksSummary(@RequestParam List<Long> bookIds) {
-        List<BookCartResponse> bookCartResponses = bookService.getBooksSummary(bookIds);
-        return ResponseEntity.ok(bookCartResponses);
+    public ResponseEntity<List<BookSummaryResponse>> getBooksSummary(@RequestParam List<Long> bookIds) {
+        List<BookSummaryResponse> bookSummaryResponses = bookService.getBooksSummary(bookIds);
+        return ResponseEntity.ok(bookSummaryResponses);
     }
 
     @GetMapping
@@ -58,5 +60,21 @@ public class BookController {
         log.info("pageable: {}", pageable);
         Page<BookResponse> books = bookService.getBooks(pageable);
         return ResponseEntity.ok(books);
+    }
+
+
+    @GetMapping("/categories/{categoryId}")
+    public ResponseEntity<Page<BookResponse>> getBooksByCategoryId(@PathVariable Long categoryId,
+                                                                   Pageable pageable) {
+        log.info("categoryId: {}", categoryId);
+        Page<BookResponse> books = bookService.getBooksByCategoryId(categoryId, pageable);
+        return ResponseEntity.ok(books);
+    }
+
+    @GetMapping("/detail")
+    public BookViewResponse getBookDetail(@RequestParam Long bookId) {
+        log.info("bookId: {}", bookId);
+        bookService.increasePopularity(bookId);
+        return bookService.getBookDetail(bookId);
     }
 }

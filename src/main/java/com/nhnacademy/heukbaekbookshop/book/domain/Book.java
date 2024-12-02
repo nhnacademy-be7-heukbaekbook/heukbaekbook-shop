@@ -3,17 +3,20 @@ package com.nhnacademy.heukbaekbookshop.book.domain;
 import com.nhnacademy.heukbaekbookshop.cart.domain.Cart;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.BookContributor;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.Publisher;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.BookCoupon;
 import com.nhnacademy.heukbaekbookshop.image.domain.BookImage;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
-import com.nhnacademy.heukbaekbookshop.tag.domain.Tag;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -29,10 +32,6 @@ public class Book {
     @Column(name = "book_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "publisher_id")
-    private Publisher publisher;
-
     @NotNull
     @Length(min = 1, max = 100)
     @Column(name = "book_title")
@@ -47,8 +46,8 @@ public class Book {
     private String description;
 
     @NotNull
-    @Column(name = "book_publication")
-    private Date publication;
+    @Column(name = "book_published_at")
+    private Date publishedAt;
 
     @NotNull
     @Length(min = 13, max = 13)
@@ -69,7 +68,7 @@ public class Book {
 
     @NotNull
     @Column(name = "book_discount_rate")
-    private float discountRate;
+    private BigDecimal discountRate;
 
     @NotNull
     @Column(name = "book_popularity")
@@ -79,6 +78,10 @@ public class Book {
     @Enumerated(EnumType.STRING)
     @Column(name = "book_status")
     private BookStatus status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "publisher_id")
+    private Publisher publisher;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookTag> tags = new HashSet<>();
@@ -90,7 +93,7 @@ public class Book {
     private Set<Cart> carts = new HashSet<>();
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<BookCategory> categories = new HashSet<>();
+    private List<BookCategory> categories = new ArrayList<>();
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderBook> orderBooks = new HashSet<>();
@@ -100,6 +103,9 @@ public class Book {
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookImage> bookImages = new HashSet<>();
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<BookCoupon> bookCoupons = new HashSet<>();
 
     public void addCategory(BookCategory bookCategory) {
         bookCategory.setBook(this);

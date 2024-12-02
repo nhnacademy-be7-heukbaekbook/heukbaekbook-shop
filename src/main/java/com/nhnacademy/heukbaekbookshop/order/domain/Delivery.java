@@ -3,51 +3,37 @@ package com.nhnacademy.heukbaekbookshop.order.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "deliveries")
 public class Delivery {
 
     @Id
-    @Column(name = "order_id")
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @JoinColumn(name = "order_id", insertable = false, updatable = false)
+    @JoinColumn(name = "order_id") // 조인 컬럼 매핑
     private Order order;
 
-    @NotNull
     @Column(name = "delivery_recipient")
     private String recipient;
 
-    @NotNull
-    @Pattern(regexp = "^01[016789]-\\d{3,4}-\\d{4}$", message = "올바른 휴대전화 번호 형식이 아닙니다.")
     @Column(name = "delivery_recipient_phone_number")
     private String phoneNumber;
 
-    @NotNull
     @Column(name = "delivery_postal_code")
     private Long postalCode;
 
-    @NotNull
-    @Length(min = 1, max = 255)
     @Column(name = "delivery_road_name_address")
     private String roadNameAddress;
 
-    @NotNull
-    @Length(min = 1, max = 255)
     @Column(name = "delivery_detail_address")
     private String detailAddress;
 
@@ -56,5 +42,23 @@ public class Delivery {
 
     @Column(name = "delivery_date")
     private LocalDateTime deliveryDate;
+
+    private void setOrder(Order order) {
+        this.order = order;
+        order.setDelivery(this);
+    }
+
+    public static Delivery createDelivery(Order order, String recipient, String phoneNumber, Long postalCode, String roadNameAddress, String detailAddress, LocalDateTime forwardingDate, LocalDateTime deliveryDate) {
+        Delivery delivery = new Delivery();
+        delivery.setOrder(order);
+        delivery.recipient = recipient;
+        delivery.phoneNumber = phoneNumber;
+        delivery.postalCode = postalCode;
+        delivery.roadNameAddress = roadNameAddress;
+        delivery.detailAddress = detailAddress;
+        delivery.forwardingDate = forwardingDate;
+        delivery.deliveryDate = deliveryDate;
+        return delivery;
+    }
 
 }

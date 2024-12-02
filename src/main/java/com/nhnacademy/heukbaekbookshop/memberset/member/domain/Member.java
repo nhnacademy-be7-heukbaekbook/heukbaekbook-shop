@@ -1,7 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.memberset.member.domain;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Like;
-import com.nhnacademy.heukbaekbookshop.cart.domain.Cart;
+import com.nhnacademy.heukbaekbookshop.memberset.address.domain.MemberAddress;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 import com.nhnacademy.heukbaekbookshop.memberset.grade.domain.Grade;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberUpdateRequest;
@@ -11,12 +11,13 @@ import lombok.*;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Getter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "members")
@@ -54,6 +55,9 @@ public class Member extends Customer {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Like> likes;
 
+    @OneToMany(mappedBy = "member")
+    private List<MemberAddress> memberAddresses = new ArrayList<>();
+
 
     @Builder
     private Member(String name, String phoneNumber, String email, String loginId, String password, Date birth, Grade grade){
@@ -66,12 +70,12 @@ public class Member extends Customer {
         this.grade = grade;
     }
 
-    public Member modifyMember(MemberUpdateRequest memberUpdateRequest) {
+    public Member modifyMember(MemberUpdateRequest memberUpdateRequest, String newPassword) {
         super.name = memberUpdateRequest.name();
         super.phoneNumber = memberUpdateRequest.phoneNumber();
         super.email = memberUpdateRequest.email();
-        if (Objects.nonNull(memberUpdateRequest.newPassword())) {
-            this.password = memberUpdateRequest.newPassword();
+        if (Objects.nonNull(newPassword)) {
+            this.password = newPassword;
         }
         this.birth = memberUpdateRequest.birth();
 

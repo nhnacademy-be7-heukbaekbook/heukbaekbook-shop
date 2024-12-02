@@ -1,17 +1,20 @@
 package com.nhnacademy.heukbaekbookshop.memberset.address.service;
 
-import com.nhnacademy.heukbaekbookshop.memberset.address.dto.MemberAddressDto;
+import com.nhnacademy.heukbaekbookshop.memberset.address.dto.MemberAddressRequest;
+import com.nhnacademy.heukbaekbookshop.memberset.address.dto.MemberAddressResponse;
 
 import java.util.List;
 
 public interface MemberAddressService {
-    MemberAddressDto createMemberAddress(Long customerId, MemberAddressDto memberAddressDto);
+    MemberAddressResponse createMemberAddress(Long customerId, MemberAddressRequest memberAddressRequest);
 
-    MemberAddressDto getMemberAddress(Long addressId);
+    MemberAddressResponse getMemberAddress(Long addressId);
 
-    List<MemberAddressDto> getMemberAddressesList(Long customerId);
+    List<MemberAddressResponse> getMemberAddressesList(Long customerId);
 
-    MemberAddressDto updateMemberAddress(Long addressId, MemberAddressDto memberAddressDto);
+    MemberAddressResponse updateMemberAddress(Long addressId, MemberAddressRequest memberAddressRequest);
 
     void deleteMemberAddress(Long addressId);
+
+    Long countByMemberId(Long customerId);
 }

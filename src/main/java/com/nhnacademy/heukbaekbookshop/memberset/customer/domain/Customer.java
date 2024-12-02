@@ -1,9 +1,14 @@
 package com.nhnacademy.heukbaekbookshop.memberset.customer.domain;
 
+import com.nhnacademy.heukbaekbookshop.order.domain.Order;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -29,6 +34,9 @@ public class Customer {
     @NotNull
     @Column(name = "customer_email")
     protected String email;
+
+    @OneToMany(mappedBy = "customer")
+    private List<Order> orders = new ArrayList<>();
 
     public static Customer createCustomer(String name, String phoneNumber, String email) {
         Customer customer = new Customer();

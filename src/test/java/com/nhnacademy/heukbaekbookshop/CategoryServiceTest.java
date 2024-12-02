@@ -3,9 +3,7 @@ package com.nhnacademy.heukbaekbookshop;
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.category.dto.request.CategoryCreateRequest;
 import com.nhnacademy.heukbaekbookshop.category.dto.request.CategoryUpdateRequest;
-import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryCreateResponse;
-import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryDeleteResponse;
-import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryUpdateResponse;
+import com.nhnacademy.heukbaekbookshop.category.dto.response.*;
 import com.nhnacademy.heukbaekbookshop.category.exception.CategoryAlreadyExistsException;
 import com.nhnacademy.heukbaekbookshop.category.exception.CategoryNotFoundException;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
@@ -17,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -200,5 +199,25 @@ public class CategoryServiceTest {
                 .hasMessage("존재하지 않는 카테고리 입니다.");
         verify(categoryRepository).findById(99L);
         verify(categoryRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    public void getParentCategories_Success() {
+        // given
+        Category parent1 = Category.createRootCategory("상위1");
+        Category parent2 = Category.createRootCategory("상위2");
+        Category parent3 = Category.createRootCategory("상위3");
+
+        Category.createSubCategory("하위1", parent1);
+        Category.createSubCategory("하위2", parent1);
+        when(categoryRepository.findTopCategories()).thenReturn(List.of(parent1, parent2, parent3));
+
+
+        // when
+        List<CategorySummaryResponse> parentCategories = categoryService.getTopCategories();
+
+        // then
+        assertThat(parentCategories).isNotNull();
+        assertThat(parentCategories.size()).isEqualTo(3);
     }
 }

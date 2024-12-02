@@ -1,6 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.memberset.address.domain;
 
-import com.nhnacademy.heukbaekbookshop.memberset.address.dto.MemberAddressDto;
+import com.nhnacademy.heukbaekbookshop.memberset.address.dto.MemberAddressRequest;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -44,9 +44,14 @@ public class MemberAddress {
     @Column(name = "address_created_at")
     private LocalDateTime createdAt;
 
+    private void setMember(Member member) {
+        this.member = member;
+        member.getMemberAddresses().add(this);
+    }
+
     @Builder
     public MemberAddress(Member member,Long postalCode, String roadNameAddress, String detailAddress, String alias) {
-        this.member = member;
+        this.setMember(member);
         this.postalCode = postalCode;
         this.roadNameAddress = roadNameAddress;
         this.detailAddress = detailAddress;
@@ -54,11 +59,11 @@ public class MemberAddress {
         this.createdAt = LocalDateTime.now();
     }
 
-    public MemberAddress modifyMemberAddress(MemberAddressDto memberAddressDto) {
-        this.postalCode = memberAddressDto.postalCode();
-        this.roadNameAddress = memberAddressDto.roadNameAddress();
-        this.detailAddress = memberAddressDto.detailAddress();
-        this.alias = memberAddressDto.alias();
+    public MemberAddress modifyMemberAddress(MemberAddressRequest memberAddressRequest) {
+        this.postalCode = memberAddressRequest.postalCode();
+        this.roadNameAddress = memberAddressRequest.roadNameAddress();
+        this.detailAddress = memberAddressRequest.detailAddress();
+        this.alias = memberAddressRequest.alias();
         return this;
     }
 

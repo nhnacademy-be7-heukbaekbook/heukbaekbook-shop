@@ -1,5 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.book.dto.response.book;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public record BookDetailResponse(
@@ -7,14 +8,14 @@ public record BookDetailResponse(
         String title,
         String index,
         String description,
-        String publication,
+        String publishedAt,
         String isbn,
         String thumbnailImageUrl,
         List<String> detailImageUrls,
         boolean isPackable,
         int stock,
         int standardPrice,
-        float discountRate,
+        BigDecimal discountRate,
         String bookStatus,
         String publisher,
         List<String> categories,

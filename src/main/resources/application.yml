@@ -3,3 +3,11 @@ spring:
     name: shop
   config:
     import: optional:configserver:http://localhost:9000
+
+
+cloud:
+  nhn:
+    image-manager:
+      url: https://api-image.nhncloudservice.com/image/v2.0/appkeys/rUN43QEwj1P6jThk
+      app-key: rUN43QEwj1P6jThk
+      secret-id: I1XLVufp

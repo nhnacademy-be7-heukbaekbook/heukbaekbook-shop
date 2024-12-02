@@ -5,6 +5,11 @@ import com.nhnacademy.heukbaekbookshop.contributor.exception.ContributorNotFound
 import com.nhnacademy.heukbaekbookshop.contributor.exception.PublisherAlreadyExistException;
 import com.nhnacademy.heukbaekbookshop.contributor.exception.PublisherNotFoundException;
 import com.nhnacademy.heukbaekbookshop.image.exception.ImageNotFoundException;
+import com.nhnacademy.heukbaekbookshop.order.exception.DeliveryFeeNotFoundException;
+import com.nhnacademy.heukbaekbookshop.order.exception.DeliveryNotFoundException;
+import com.nhnacademy.heukbaekbookshop.order.exception.PaymentFailureException;
+import com.nhnacademy.heukbaekbookshop.order.exception.WrappingPaperNotFoundException;
+import org.hibernate.metamodel.mapping.ordering.ast.OrderByComplianceViolation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,7 +26,15 @@ public class WebControllerAdvice {
 //        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
 //    }
 
-    @ExceptionHandler({ImageNotFoundException.class, ContributorNotFoundException.class, PublisherNotFoundException.class})
+    @ExceptionHandler({
+            ImageNotFoundException.class,
+            ContributorNotFoundException.class,
+            PublisherNotFoundException.class,
+            OrderByComplianceViolation.class,
+            DeliveryNotFoundException.class,
+            DeliveryFeeNotFoundException.class,
+            WrappingPaperNotFoundException.class
+    })
     public ResponseEntity<ErrorResponse> handleNotFoundException(Exception ex) {
         ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), 404, ZonedDateTime.now());
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);

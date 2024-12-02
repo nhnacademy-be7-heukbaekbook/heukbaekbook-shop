@@ -14,8 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/admins/tags")
+@RequestMapping("/api/admin/tags")
 public class TagController {
 
     private final TagService tagService;
@@ -53,5 +55,10 @@ public class TagController {
     public ResponseEntity<Page<TagDetailResponse>> getTags(Pageable pageable) {
         Page<TagDetailResponse> response = tagService.getTags(pageable);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/list")
+    public List<String> getTagList() {
+        return tagService.getTagList();
     }
 }

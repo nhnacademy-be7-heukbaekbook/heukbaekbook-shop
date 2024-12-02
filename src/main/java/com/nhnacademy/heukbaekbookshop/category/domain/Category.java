@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.category.domain;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.BookCategory;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.CategoryCoupon;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -9,7 +10,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -28,6 +31,7 @@ public class Category {
     private Set<Category> subCategories = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @Setter
     @JoinColumn(name = "parent_category_id")
     private Category parentCategory;
 
@@ -37,16 +41,35 @@ public class Category {
     private String name;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<BookCategory> bookCategories = new HashSet<>();
+    private List<BookCategory> bookCategories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<CategoryCoupon> categoryCoupons = new HashSet<>();
 
     public void addBookCategory(BookCategory bookCategory) {
         this.bookCategories.add(bookCategory);
-        bookCategory.setCategory(this);
+    }
+
+    private void setCategory(Category parentCategory) {
+        this.parentCategory = parentCategory;
+        parentCategory.getSubCategories().add(this);
     }
 
     public void removeBookCategory(BookCategory bookCategory) {
         this.bookCategories.remove(bookCategory);
-        bookCategory.setCategory(null);
+    }
+
+    public static Category createRootCategory(String name) {
+        Category category = new Category();
+        category.setName(name);
+        return category;
+    }
+
+    public static Category createSubCategory(String name, Category parentCategory) {
+        Category subCategory = new Category();
+        subCategory.setName(name);
+        subCategory.setParentCategory(parentCategory);
+        return subCategory;
     }
 
     @Builder
