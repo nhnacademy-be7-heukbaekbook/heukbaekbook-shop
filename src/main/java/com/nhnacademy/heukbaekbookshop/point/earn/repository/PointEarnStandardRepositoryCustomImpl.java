@@ -4,6 +4,7 @@ import com.nhnacademy.heukbaekbookshop.point.earn.domain.EventCode;
 import com.nhnacademy.heukbaekbookshop.point.earn.domain.PointEarnStandard;
 import com.nhnacademy.heukbaekbookshop.point.earn.domain.PointEarnStandardStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -13,10 +14,13 @@ import java.util.List;
 import static com.nhnacademy.heukbaekbookshop.point.earn.domain.QPointEarnStandard.pointEarnStandard;
 
 @Repository
-@RequiredArgsConstructor
 public class PointEarnStandardRepositoryCustomImpl implements PointEarnStandardRepositoryCustom {
 
     private final JPAQueryFactory factory;
+
+    public PointEarnStandardRepositoryCustomImpl(EntityManager em) {
+        this.factory = new JPAQueryFactory(em);
+    }
 
     @Override
     public List<PointEarnStandard> findValidStandardsByEventCode(EventCode eventCode, LocalDateTime now) {
