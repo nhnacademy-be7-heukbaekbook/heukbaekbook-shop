@@ -3,6 +3,13 @@ package com.nhnacademy.heukbaekbookshop.cart.repository;
 import com.nhnacademy.heukbaekbookshop.cart.domain.Cart;
 import com.nhnacademy.heukbaekbookshop.cart.domain.CartId;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-public interface CartRepository extends JpaRepository<Cart, CartId> {
+import java.util.List;
+
+public interface CartRepository extends JpaRepository<Cart, CartId>, CartRepositoryCustom {
+
+    List<Cart> findAllByCustomerId(Long customerId);
+
 }

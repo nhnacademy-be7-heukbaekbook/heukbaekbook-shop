@@ -5,6 +5,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MemberNotFoundException extends RuntimeException {
     public MemberNotFoundException(Long customerId) {
-        super("member not found: " + customerId);
+        super(customerId + " member not found");
     }
 }

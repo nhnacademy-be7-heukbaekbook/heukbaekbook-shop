@@ -25,18 +25,16 @@ import com.nhnacademy.heukbaekbookshop.order.exception.OrderNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.exception.WrappingPaperNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.repository.*;
 import com.nhnacademy.heukbaekbookshop.order.service.OrderService;
-import com.nhnacademy.heukbaekbookshop.point.history.event.PointUseEvent;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.function.LongFunction;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,7 +58,6 @@ public class OrderServiceImpl implements OrderService {
     private final MemberRepository memberRepository;
 
     private final WrappingPaperRepository wrappingPaperRepository;
-    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -143,9 +140,6 @@ public class OrderServiceImpl implements OrderService {
                 });
 
 
-        if (memberRepository.existsById(customer.getId())) {
-            processPointUseEvent(orderCreateRequest, savedOrder.getId());
-        }
         return orderId;
     }
 
@@ -338,6 +332,10 @@ public class OrderServiceImpl implements OrderService {
         return new MyPageRefundableOrderDetailResponse(gradeDto, refundableOrderDetailResponse);
     }
 
+    @Override
+    public ResponseEntity<Void> deleteOrder(String tossOrderId) {
+        return orderRepository.deleteByTossOrderId(tossOrderId);
+    }
 
     private RefundableOrderBookResponse mapToRefundableOrderBookResponse(OrderBook orderBook) {
         Book book = orderBook.getBook();
@@ -361,23 +359,4 @@ public class OrderServiceImpl implements OrderService {
         );
     }
 
-    private static BigDecimal convertStringToBigDecimal(String value) {
-        if (value == null || value.isEmpty()) {
-            return BigDecimal.ZERO;
-        }
-        try {
-            String sanitizedValue = value.replaceAll("[^\\d.]", "");
-            return new BigDecimal(sanitizedValue);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid number format: " + value, e);
-        }
-    }
-
-    private void processPointUseEvent(OrderCreateRequest orderCreateRequest, Long orderId) {
-        BigDecimal usedPoint = convertStringToBigDecimal(orderCreateRequest.usedPoint());
-
-        if (usedPoint.compareTo(BigDecimal.ZERO) > 0) {
-            eventPublisher.publishEvent(new PointUseEvent(orderCreateRequest.customerId(), orderId, usedPoint));
-        }
-    }
 }

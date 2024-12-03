@@ -49,11 +49,11 @@ public class Order {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @Setter
     private Payment payment;
 
-    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @Setter
     private Delivery delivery;
 
@@ -61,7 +61,7 @@ public class Order {
     @JoinColumn(name = "delivery_fee_id")
     private DeliveryFee deliveryFee;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<OrderBook> orderBooks = new HashSet<>();
 
     private void setCustomer(Customer customer) {

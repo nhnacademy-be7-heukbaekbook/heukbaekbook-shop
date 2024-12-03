@@ -50,15 +50,6 @@ public class Category {
         this.bookCategories.add(bookCategory);
     }
 
-    private void setCategory(Category parentCategory) {
-        this.parentCategory = parentCategory;
-        parentCategory.getSubCategories().add(this);
-    }
-
-    public void removeBookCategory(BookCategory bookCategory) {
-        this.bookCategories.remove(bookCategory);
-    }
-
     public static Category createRootCategory(String name) {
         Category category = new Category();
         category.setName(name);

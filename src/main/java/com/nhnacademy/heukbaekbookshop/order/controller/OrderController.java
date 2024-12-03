@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
@@ -48,4 +50,11 @@ public class OrderController {
         return ResponseEntity.ok(order);
     }
 
+
+    @DeleteMapping("/{orderId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<Void> deleteOrder(@PathVariable String orderId) {
+        log.info("orderId: {}", orderId);
+        return orderService.deleteOrder(orderId);
+    }
 }

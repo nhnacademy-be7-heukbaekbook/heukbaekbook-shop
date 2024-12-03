@@ -32,49 +32,36 @@ public class Book {
     @Column(name = "book_id")
     private Long id;
 
-    @NotNull
-    @Length(min = 1, max = 100)
     @Column(name = "book_title")
     private String title;
 
-    @NotNull
     @Column(name = "book_index")
     private String index;
 
-    @NotNull
     @Column(name = "book_description")
     private String description;
 
-    @NotNull
     @Column(name = "book_published_at")
     private Date publishedAt;
 
-    @NotNull
-    @Length(min = 13, max = 13)
     @Column(name = "book_isbn")
     private String isbn;
 
-    @NotNull
     @Column(name = "is_packable")
     private boolean isPackable;
 
-    @NotNull
     @Column(name = "book_stock")
     private int stock;
 
-    @NotNull
     @Column(name = "book_price")
     private BigDecimal price;
 
-    @NotNull
     @Column(name = "book_discount_rate")
     private BigDecimal discountRate;
 
-    @NotNull
     @Column(name = "book_popularity")
     private long popularity;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "book_status")
     private BookStatus status;
@@ -106,6 +93,21 @@ public class Book {
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookCoupon> bookCoupons = new HashSet<>();
+
+    public Book(Long id, String title, String index, String description, Date publishedAt, String isbn, boolean isPackable, int stock, BigDecimal price, BigDecimal discountRate, long popularity, BookStatus status) {
+        this.id = id;
+        this.title = title;
+        this.index = index;
+        this.description = description;
+        this.publishedAt = publishedAt;
+        this.isbn = isbn;
+        this.isPackable = isPackable;
+        this.stock = stock;
+        this.price = price;
+        this.discountRate = discountRate;
+        this.popularity = popularity;
+        this.status = status;
+    }
 
     public void addCategory(BookCategory bookCategory) {
         bookCategory.setBook(this);
