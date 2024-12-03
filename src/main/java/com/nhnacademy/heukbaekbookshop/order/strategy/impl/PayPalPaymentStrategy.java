@@ -19,6 +19,7 @@ public class PayPalPaymentStrategy implements PaymentStrategy {
     @Override
     public PaymentGatewayApprovalResponse approvePayment(PaymentApprovalRequest request) {
         // PayPal 결제 승인 로직 구현
+        // request 형식이 달라질 것임으로, 실제로는 구현되지 않음.
         return null;
     }
 
