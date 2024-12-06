@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface CartRepository extends JpaRepository<Cart, CartId>, CartRepositoryCustom {
+public interface CartRepository extends JpaRepository<Cart, CartId> {
 
     List<Cart> findAllByCustomerId(Long customerId);
 
