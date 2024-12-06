@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -561,72 +562,28 @@ public class BookService {
     public List<BookSummaryResponse> getBooksSummary(List<Long> bookIds) {
         List<Book> books = bookRepository.findAllByBookSearchCondition(new BookSearchCondition(bookIds, ImageType.THUMBNAIL));
         return books.stream()
-                .map(book -> new BookSummaryResponse(
-                                book.getId(),
-                                book.getTitle(),
-                                book.isPackable(),
-                                book.getPrice(),
-                                Calculator.getSalePrice(book.getPrice(), book.getDiscountRate()),
-                                book.getDiscountRate(),
-                                book.getBookImages().stream()
-                                        .map(Image::getUrl)
-                                        .findFirst()
-                                        .orElse("no-image")
-                        )
-                )
+                .map(BookSummaryResponse::of)
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Page<BookResponse> getBooks(Pageable pageable) {
         Page<Book> allByPageable = bookRepository.findAllByPageable(pageable);
-        return allByPageable.map(this::createBookResponse);
+        return allByPageable.map(BookResponse::of);
     }
 
     public Page<BookResponse> getBooksByCategoryId(Long categoryId, Pageable pageable) {
         List<Long> categoryIds = categoryRepository.findSubCategoryIdsByCategoryId(categoryId);
         Page<Book> books = bookRepository.findAllByCategoryIds(categoryIds, pageable);
 
-        return books.map(this::createBookResponse);
+        return books.map(BookResponse::of);
     }
 
-    @Transactional
     public BookViewResponse getBookDetail(Long bookId) {
         Book book = bookRepository.findByBookId(bookId)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
 
-        return new BookViewResponse (
-                book.getId(),
-                book.getTitle(),
-                book.getIndex(),
-                book.getDescription(),
-                Formatter.formatDate(book.getPublishedAt()),
-                book.getIsbn(),
-                book.isPackable(),
-                Formatter.formatPrice(book.getPrice()),
-                Formatter.formatPrice(Calculator.getSalePrice(book.getPrice(), book.getDiscountRate())),
-                book.getDiscountRate(),
-                book.getPopularity(),
-                book.getStatus().name(),
-                book.getBookImages().stream()
-                        .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
-                        .map(Image::getUrl)
-                        .findFirst()
-                        .orElse("no-image"),
-                book.getBookImages().stream()
-                        .filter(bookImage -> bookImage.getType() == ImageType.DETAIL)
-                        .map(Image::getUrl)
-                        .collect(Collectors.toList()),
-                book.getContributors().stream()
-                        .map(bookContributor -> new ContributorSummaryResponse(
-                                bookContributor.getContributor().getId(),
-                                bookContributor.getContributor().getName()
-                        ))
-                        .collect(Collectors.toList()),
-                new PublisherSummaryResponse(
-                        book.getPublisher().getId(),
-                        book.getPublisher().getName()
-                )
-        );
+        return BookViewResponse.of(book);
     }
 
     public Page<BookDetailResponse> getBooksDetail(Pageable pageable) {
@@ -665,30 +622,5 @@ public class BookService {
                         .map(bt -> bt.getTag().getName())
                         .collect(Collectors.toList())
         ));
-    }
-
-    private BookResponse createBookResponse(Book book) {
-        return new BookResponse (
-                book.getId(),
-                book.getTitle(),
-                Formatter.formatDate(book.getPublishedAt()),
-                Formatter.formatPrice(Calculator.getSalePrice(book.getPrice(), book.getDiscountRate())),
-                book.getDiscountRate(),
-                book.getBookImages().stream()
-                        .filter(bookImage -> bookImage.getType() == ImageType.THUMBNAIL)
-                        .map(Image::getUrl)
-                        .findFirst()
-                        .orElse("no-image"),
-                book.getContributors().stream()
-                        .map(bookContributor -> new ContributorSummaryResponse(
-                                bookContributor.getContributor().getId(),
-                                bookContributor.getContributor().getName()
-                        ))
-                        .collect(Collectors.toList()),
-                new PublisherSummaryResponse(
-                        book.getPublisher().getId(),
-                        book.getPublisher().getName()
-                )
-        );
     }
 }

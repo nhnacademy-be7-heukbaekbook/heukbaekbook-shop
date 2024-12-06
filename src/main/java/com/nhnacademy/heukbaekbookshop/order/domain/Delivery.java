@@ -19,7 +19,7 @@ public class Delivery {
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @JoinColumn(name = "order_id") // 조인 컬럼 매핑
+    @JoinColumn(name = "order_id", unique = true) // 조인 컬럼 매핑
     private Order order;
 
     @Column(name = "delivery_recipient")

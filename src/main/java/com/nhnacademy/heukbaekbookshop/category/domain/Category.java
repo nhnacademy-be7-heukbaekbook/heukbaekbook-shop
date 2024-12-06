@@ -31,13 +31,13 @@ public class Category {
     private Set<Category> subCategories = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Setter
     @JoinColumn(name = "parent_category_id")
     private Category parentCategory;
 
     @NotNull
     @Length(min = 1, max = 100)
     @Column(name = "category_name")
+    @Setter
     private String name;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -45,6 +45,11 @@ public class Category {
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CategoryCoupon> categoryCoupons = new HashSet<>();
+
+    public void setParentCategory(Category parentCategory) {
+        this.parentCategory = parentCategory;
+        parentCategory.getSubCategories().add(this);
+    }
 
     public void addBookCategory(BookCategory bookCategory) {
         this.bookCategories.add(bookCategory);

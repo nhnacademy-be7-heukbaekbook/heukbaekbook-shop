@@ -95,6 +95,10 @@ public class Book {
     private Set<BookCoupon> bookCoupons = new HashSet<>();
 
     public Book(Long id, String title, String index, String description, Date publishedAt, String isbn, boolean isPackable, int stock, BigDecimal price, BigDecimal discountRate, long popularity, BookStatus status) {
+        this(id, title, index, description, publishedAt, isbn, isPackable, stock, price, discountRate, popularity, status, null);
+    }
+
+    public Book(Long id, String title, String index, String description, Date publishedAt, String isbn, boolean isPackable, int stock, BigDecimal price, BigDecimal discountRate, long popularity, BookStatus status, Publisher publisher) {
         this.id = id;
         this.title = title;
         this.index = index;
@@ -104,9 +108,10 @@ public class Book {
         this.isPackable = isPackable;
         this.stock = stock;
         this.price = price;
-        this.discountRate = discountRate;
-        this.popularity = popularity;
         this.status = status;
+        this.popularity = popularity;
+        this.discountRate = discountRate;
+        this.publisher = publisher;
     }
 
     public void addCategory(BookCategory bookCategory) {

@@ -14,7 +14,6 @@ import java.util.Set;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "orders")
-@ToString
 public class Order {
 
     @Id
@@ -49,11 +48,11 @@ public class Order {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToOne(mappedBy = "order", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @Setter
     private Payment payment;
 
-    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToOne(mappedBy = "order", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @Setter
     private Delivery delivery;
 
@@ -68,7 +67,6 @@ public class Order {
         this.customer = customer;
         customer.getOrders().add(this);
     }
-
 
     public static Order createOrder(BigDecimal totalPrice,
                                     String customerName,
