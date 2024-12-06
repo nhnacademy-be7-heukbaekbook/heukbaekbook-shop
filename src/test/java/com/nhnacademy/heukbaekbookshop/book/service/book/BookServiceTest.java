@@ -3,14 +3,15 @@ package com.nhnacademy.heukbaekbookshop.book.service.book;
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import com.nhnacademy.heukbaekbookshop.book.domain.BookStatus;
 import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchCondition;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookDetailResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookSummaryResponse;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookViewResponse;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.Publisher;
 import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +28,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -154,9 +156,44 @@ class BookServiceTest {
 
     @Test
     void getBookDetail() {
+        //given
+        Publisher publisher = new Publisher(1L, "publisher");
+
+        Category category = Category.createRootCategory("상위카테고리1");
+        Category subCategory = Category.createSubCategory("하위카테고리1", category);
+
+        Book book = new Book(1L, "title", "index", "discription", Date.valueOf(LocalDate.now()), "isbn", false, 10, BigDecimal.valueOf(15000), BigDecimal.valueOf(10.0), 0, BookStatus.IN_STOCK, publisher);
+
+        when(bookRepository.findByBookId(1L)).thenReturn(Optional.of(book));
+
+        //when
+        BookViewResponse bookDetail = bookService.getBookDetail(1L);
+
+        //then
+        assertNotNull(bookDetail);
+        verify(bookRepository, times(1)).findByBookId(1L);
     }
 
     @Test
     void getBooksDetail() {
+        //given
+        Publisher publisher = new Publisher(1L, "publisher");
+
+        Category category = Category.createRootCategory("상위카테고리1");
+        Category subCategory = Category.createSubCategory("하위카테고리1", category);
+
+        Book book = new Book(1L, "title", "index", "discription", Date.valueOf(LocalDate.now()), "isbn", false, 10, BigDecimal.valueOf(15000), BigDecimal.valueOf(10.0), 0, BookStatus.IN_STOCK, publisher);
+
+        PageRequest pageRequest = PageRequest.of(0, 2);
+
+        when(bookRepository.findAllByStatusNot(BookStatus.DELETED, pageRequest)).thenReturn(new PageImpl<>(Arrays.asList(book)));
+
+        //when
+        Page<BookDetailResponse> booksDetail = bookService.getBooksDetail(pageRequest);
+
+        //then
+        assertThat(booksDetail.getContent()).hasSize(1);
+        verify(bookRepository, times(1)).findAllByStatusNot(BookStatus.DELETED, pageRequest);
+
     }
 }

@@ -60,7 +60,7 @@ public class CategoryService {
 
         categoryRepository.save(category);
 
-        Long parentId = (parentCategory != null) ? parentCategory.getId() : null;
+        Long parentId = parentCategory.getId();
         return new CategoryUpdateResponse(parentId, category.getName());
     }
 
