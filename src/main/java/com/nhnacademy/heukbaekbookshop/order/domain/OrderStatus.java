@@ -1,5 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.order.domain;
 
+import com.nhnacademy.heukbaekbookshop.order.exception.OrderStatusNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,4 +16,13 @@ public enum OrderStatus {
     CANCELED("취소완료");
 
     private final String korean; // 한국어 매핑 필드
+
+    public static OrderStatus fromKorean(String korean) {
+        for (OrderStatus status : OrderStatus.values()) {
+            if (status.getKorean().equals(korean)) {
+                return status;
+            }
+        }
+        throw new OrderStatusNotFoundException(korean + " order status not found");
+    }
 }

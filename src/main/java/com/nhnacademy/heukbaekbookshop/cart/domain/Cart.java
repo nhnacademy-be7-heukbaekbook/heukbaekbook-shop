@@ -28,6 +28,7 @@ public class Cart {
     private Member member;
 
     @Column(name = "book_amount")
+    @Setter
     private int amount;
 
     public static Cart createCart(Long bookId, Long customerId, Book book, Member member, int amount) {

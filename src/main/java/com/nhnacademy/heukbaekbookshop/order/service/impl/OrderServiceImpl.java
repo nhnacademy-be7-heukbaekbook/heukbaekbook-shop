@@ -19,24 +19,29 @@ import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberReposit
 import com.nhnacademy.heukbaekbookshop.order.domain.*;
 import com.nhnacademy.heukbaekbookshop.order.dto.request.OrderBookRequest;
 import com.nhnacademy.heukbaekbookshop.order.dto.request.OrderCreateRequest;
+import com.nhnacademy.heukbaekbookshop.order.dto.request.OrderSearchCondition;
+import com.nhnacademy.heukbaekbookshop.order.dto.request.OrderUpdateRequest;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.*;
 import com.nhnacademy.heukbaekbookshop.order.exception.DeliveryFeeNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.exception.OrderNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.exception.WrappingPaperNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.repository.*;
 import com.nhnacademy.heukbaekbookshop.order.service.OrderService;
-import com.nhnacademy.heukbaekbookshop.point.history.event.PointUseEvent;
+import com.nhnacademy.heukbaekbookshop.point.history.domain.PointHistory;
+import com.nhnacademy.heukbaekbookshop.point.history.exception.PointNotFoundException;
+import com.nhnacademy.heukbaekbookshop.point.history.repository.PointHistoryRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.function.LongFunction;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,21 +51,15 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
-
     private final CustomerRepository customerRepository;
-
     private final DeliveryFeeRepository deliveryFeeRepository;
-
     private final BookRepository bookRepository;
-
     private final DeliveryRepository deliveryRepository;
-
     private final EntityManager em;
     private final PaymentRepository paymentRepository;
     private final MemberRepository memberRepository;
-
     private final WrappingPaperRepository wrappingPaperRepository;
-    private final ApplicationEventPublisher eventPublisher;
+    private final PointHistoryRepository pointHistoryRepository;
 
     @Override
     @Transactional
@@ -143,15 +142,12 @@ public class OrderServiceImpl implements OrderService {
                 });
 
 
-        if (memberRepository.existsById(customer.getId())) {
-            processPointUseEvent(orderCreateRequest, savedOrder.getId());
-        }
         return orderId;
     }
 
     @Override
     public OrderDetailResponse getOrderDetailResponse(String tossOrderId) {
-        Order order = orderRepository.searchByTossOrderId(tossOrderId)
+        Order order = orderRepository.searchByOrderSearchCondition(new OrderSearchCondition(tossOrderId, null, null))
                 .orElseThrow(() -> new OrderNotFoundException(tossOrderId + " Order not found"));
 
         OrderDetailResponse orderDetailResponse = OrderDetailResponse.of(order);
@@ -338,6 +334,38 @@ public class OrderServiceImpl implements OrderService {
         return new MyPageRefundableOrderDetailResponse(gradeDto, refundableOrderDetailResponse);
     }
 
+    @Override
+    @Transactional
+    public void deleteOrder(String tossOrderId) {
+        Order order = orderRepository.findByTossOrderId(tossOrderId)
+                .orElseThrow(() -> new OrderNotFoundException(tossOrderId + " Order not found"));
+
+
+        Optional<PointHistory> result = pointHistoryRepository.findByOrderId(order.getId());
+        if (result.isPresent()) {
+            PointHistory pointHistory = result.get();
+            pointHistoryRepository.delete(pointHistory);
+        }
+
+        orderRepository.delete(order);
+    }
+
+    @Override
+    public OrderResponse getOrders(Pageable pageable) {
+        Page<Order> result = orderRepository.searchAllByOrderSearchCondition(new OrderSearchCondition(null, null, null), pageable);
+        
+        return new OrderResponse(result.map(OrderSummaryResponse::of));
+    }
+
+    @Override
+    @Transactional
+    public void updateOrder(String orderId, OrderUpdateRequest orderUpdateRequest) {
+        Order order = orderRepository.findByTossOrderId(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("tossOrderId:" + orderId + " Order not found"));
+
+        OrderStatus orderStatus = OrderStatus.fromKorean(orderUpdateRequest.status());
+        order.setStatus(orderStatus);
+    }
 
     private RefundableOrderBookResponse mapToRefundableOrderBookResponse(OrderBook orderBook) {
         Book book = orderBook.getBook();
@@ -359,25 +387,5 @@ public class OrderServiceImpl implements OrderService {
                 book.getDiscountRate(),
                 Formatter.formatPrice(salePrice.multiply(BigDecimal.valueOf(orderBook.getQuantity())))
         );
-    }
-
-    private static BigDecimal convertStringToBigDecimal(String value) {
-        if (value == null || value.isEmpty()) {
-            return BigDecimal.ZERO;
-        }
-        try {
-            String sanitizedValue = value.replaceAll("[^\\d.]", "");
-            return new BigDecimal(sanitizedValue);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid number format: " + value, e);
-        }
-    }
-
-    private void processPointUseEvent(OrderCreateRequest orderCreateRequest, Long orderId) {
-        BigDecimal usedPoint = convertStringToBigDecimal(orderCreateRequest.usedPoint());
-
-        if (usedPoint.compareTo(BigDecimal.ZERO) > 0) {
-            eventPublisher.publishEvent(new PointUseEvent(orderCreateRequest.customerId(), orderId, usedPoint));
-        }
     }
 }

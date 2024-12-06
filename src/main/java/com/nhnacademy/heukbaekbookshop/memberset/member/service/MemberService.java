@@ -9,6 +9,7 @@ import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MemberDetai
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MemberResponse;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MyPageOrderDetailResponse;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MyPageResponse;
+import org.springframework.data.domain.Pageable;
 
 public interface  MemberService {
 
@@ -30,7 +31,7 @@ public interface  MemberService {
 
     GradeDto getMembersGrade(Long customerId);
 
-    MyPageResponse getMyPageResponse(Long customerId);
+    MyPageResponse getMyPageResponse(Long customerId, Pageable pageable);
 
     MyPageOrderDetailResponse getMyPageDetailResponse(Long customerId, String tossOrderId);
 }

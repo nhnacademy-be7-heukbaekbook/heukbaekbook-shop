@@ -7,19 +7,21 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record OrderDetailResponse(String customerName,
-                                  String deliveryFee,
-                                  String paymentPrice,
-                                  String paymentTypeName,
-                                  String recipient,
-                                  Long postalCode,
-                                  String roadNameAddress,
-                                  String detailAddress,
-                                  String totalBookPrice,
-                                  String totalBookDiscountPrice,
-                                  String totalPrice,
-                                  String status,
-                                  List<OrderBookResponse> books) {
+public record OrderDetailResponse(
+        String tossOrderId,
+        String customerName,
+        String deliveryFee,
+        String paymentPrice,
+        String paymentTypeName,
+        String recipient,
+        Long postalCode,
+        String roadNameAddress,
+        String detailAddress,
+        String totalBookPrice,
+        String totalBookDiscountPrice,
+        String totalPrice,
+        String status,
+        List<OrderBookResponse> books) {
 
     public static OrderDetailResponse of(Order order) {
         BigDecimal totalBookPrice = calculateTotalBookPrice(order);
@@ -27,6 +29,7 @@ public record OrderDetailResponse(String customerName,
         BigDecimal totalPriceWithDelivery = totalBookPrice.add(order.getDeliveryFee().getFee());
 
         return new OrderDetailResponse(
+                order.getTossOrderId(),
                 order.getCustomerName(),
                 Formatter.formatPrice(order.getDeliveryFee().getFee()),
                 Formatter.formatPrice(order.getPayment().getPrice()),
