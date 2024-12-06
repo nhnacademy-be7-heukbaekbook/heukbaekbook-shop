@@ -1,26 +1,17 @@
 package com.nhnacademy.heukbaekbookshop.book.repository.book;
 
-import com.netflix.discovery.converters.Auto;
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
-import com.nhnacademy.heukbaekbookshop.book.domain.BookStatus;
 import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchCondition;
 import com.nhnacademy.heukbaekbookshop.book.exception.book.BookNotFoundException;
 import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.context.event.annotation.BeforeTestMethod;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.sql.Date;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 

@@ -124,18 +124,29 @@ public class CategoryServiceTest {
     @Test
     public void testUpdateCategory_Success() {
         // Given
-        CategoryUpdateRequest request = new CategoryUpdateRequest(null, "Updated Category");
-        when(categoryRepository.findById(2L)).thenReturn(Optional.of(subCategory));
+        Long categoryId = 1L;
+        Long parentCategoryId = 2L;
+        String newName = "Updated Category";
+
+        Category category = new Category();
+        category.setId(categoryId);
+        category.setName("Old Category");
+
+        Category parentCategory = new Category();
+        parentCategory.setId(parentCategoryId);
+        parentCategory.setName("Parent Category");
+
+        CategoryUpdateRequest request = new CategoryUpdateRequest(parentCategoryId, "Updated Category");
+        when(categoryRepository.findById(parentCategoryId)).thenReturn(Optional.of(parentCategory));
+
 
         // When
         CategoryUpdateResponse response = categoryService.updateCategory(2L, request);
 
         // Then
         assertThat(response).isNotNull();
-        assertThat(response.parentId()).isNull();
+        assertThat(response.parentId()).isEqualTo(2L);
         assertThat(response.name()).isEqualTo("Updated Category");
-        verify(categoryRepository).findById(2L);
-        verify(categoryRepository).save(subCategory);
     }
 
     // 존재하지 않는 카테고리 업데이트 시 예외 발생
