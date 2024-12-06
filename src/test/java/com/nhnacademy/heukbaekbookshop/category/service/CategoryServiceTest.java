@@ -2,222 +2,225 @@ package com.nhnacademy.heukbaekbookshop.category.service;
 
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.category.dto.request.CategoryCreateRequest;
-import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryCreateResponse;
-import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryDetailResponse;
+import com.nhnacademy.heukbaekbookshop.category.dto.request.CategoryUpdateRequest;
+import com.nhnacademy.heukbaekbookshop.category.dto.response.*;
 import com.nhnacademy.heukbaekbookshop.category.exception.CategoryAlreadyExistsException;
 import com.nhnacademy.heukbaekbookshop.category.exception.CategoryNotFoundException;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class CategoryServiceTest {
-
-    @InjectMocks
-    private CategoryService categoryService;
+@ExtendWith(MockitoExtension.class)
+public class CategoryServiceTest {
 
     @Mock
     private CategoryRepository categoryRepository;
 
+    @InjectMocks
+    private CategoryService categoryService;
+
+    private Category parentCategory;
+    private Category subCategory;
+
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+    public void setUp() {
+        parentCategory = new Category(null, "Parent Category");
+        parentCategory.setId(1L);
+
+        subCategory = new Category(parentCategory, "Sub Category");
+        subCategory.setId(2L);
     }
 
+    // 상위 카테고리 없이 카테고리 등록 성공
     @Test
-    void testRegisterCategory_SuccessWithoutParent() {
+    public void testRegisterCategory_SuccessWithoutParent() {
         // Given
-        CategoryCreateRequest request = new CategoryCreateRequest(null, "Fiction");
-        when(categoryRepository.findByParentCategory_IdAndName(null, "Fiction")).thenReturn(Optional.empty());
+        CategoryCreateRequest request = new CategoryCreateRequest(null, "New Category");
+        when(categoryRepository.findByParentCategory_IdAndName(null, "New Category"))
+                .thenReturn(Optional.empty());
+
+        Category newCategory = new Category(null, "New Category");
+        newCategory.setId(3L);
+        when(categoryRepository.save(any(Category.class))).thenReturn(newCategory);
 
         // When
         CategoryCreateResponse response = categoryService.registerCategory(request);
 
         // Then
         assertThat(response).isNotNull();
-        assertThat(response.name()).isEqualTo("Fiction");
         assertThat(response.parentId()).isNull();
-
-        verify(categoryRepository, times(1)).save(any(Category.class));
-        verify(categoryRepository, times(1)).findByParentCategory_IdAndName(null, "Fiction");
+        assertThat(response.name()).isEqualTo("New Category");
+        verify(categoryRepository).findByParentCategory_IdAndName(null, "New Category");
+        verify(categoryRepository).save(any(Category.class));
     }
 
+    // 상위 카테고리와 함께 카테고리 등록 성공
     @Test
-    void testRegisterCategory_SuccessWithParent() {
+    public void testRegisterCategory_SuccessWithParent() {
         // Given
-        Category parentCategory = new Category();
-        parentCategory.setId(1L);
-        parentCategory.setName("Parent Category");
-
-        CategoryCreateRequest request = new CategoryCreateRequest(1L, "Child Category");
-
+        CategoryCreateRequest request = new CategoryCreateRequest(1L, "New Sub Category");
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(parentCategory));
-        when(categoryRepository.findByParentCategory_IdAndName(1L, "Child Category")).thenReturn(Optional.empty());
+        when(categoryRepository.findByParentCategory_IdAndName(1L, "New Sub Category"))
+                .thenReturn(Optional.empty());
+
+        Category newCategory = new Category(parentCategory, "New Sub Category");
+        newCategory.setId(4L);
+        when(categoryRepository.save(any(Category.class))).thenReturn(newCategory);
 
         // When
         CategoryCreateResponse response = categoryService.registerCategory(request);
 
         // Then
         assertThat(response).isNotNull();
-        assertThat(response.name()).isEqualTo("Child Category");
         assertThat(response.parentId()).isEqualTo(1L);
-
-        verify(categoryRepository, times(1)).save(any(Category.class));
-        verify(categoryRepository, times(1)).findById(1L);
-        verify(categoryRepository, times(1)).findByParentCategory_IdAndName(1L, "Child Category");
+        assertThat(response.name()).isEqualTo("New Sub Category");
+        verify(categoryRepository).findById(1L);
+        verify(categoryRepository).findByParentCategory_IdAndName(1L, "New Sub Category");
+        verify(categoryRepository).save(any(Category.class));
     }
 
+    // 이미 존재하는 카테고리 등록 시 예외 발생
     @Test
-    void testRegisterCategory_Failure_ParentNotFound() {
+    public void testRegisterCategory_CategoryAlreadyExists() {
         // Given
-        CategoryCreateRequest request = new CategoryCreateRequest(1L, "Child Category");
+        CategoryCreateRequest request = new CategoryCreateRequest(null, "Existing Category");
+        when(categoryRepository.findByParentCategory_IdAndName(null, "Existing Category"))
+                .thenReturn(Optional.of(new Category(null, "Existing Category")));
 
-        when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
-
-        // When / Then
-        assertThatThrownBy(() -> categoryService.registerCategory(request))
-                .isInstanceOf(CategoryNotFoundException.class)
-                .hasMessageContaining("부모 카테고리가 존재하지 않습니다.");
-
-        verify(categoryRepository, times(1)).findById(1L);
-        verify(categoryRepository, never()).save(any(Category.class));
-    }
-
-    @Test
-    void testRegisterCategory_Failure_CategoryAlreadyExists() {
-        // Given
-        Category parentCategory = new Category();
-        parentCategory.setId(1L);
-        parentCategory.setName("Parent Category");
-
-        CategoryCreateRequest request = new CategoryCreateRequest(1L, "Existing Category");
-
-        when(categoryRepository.findById(1L)).thenReturn(Optional.of(parentCategory));
-        when(categoryRepository.findByParentCategory_IdAndName(1L, "Existing Category"))
-                .thenReturn(Optional.of(new Category()));
-
-        // When / Then
+        // When & Then
         assertThatThrownBy(() -> categoryService.registerCategory(request))
                 .isInstanceOf(CategoryAlreadyExistsException.class)
-                .hasMessageContaining("이미 존재하는 카테고리입니다.");
-
-        verify(categoryRepository, times(1)).findById(1L);
-        verify(categoryRepository, times(1)).findByParentCategory_IdAndName(1L, "Existing Category");
+                .hasMessage("이미 존재하는 카테고리입니다.");
+        verify(categoryRepository).findByParentCategory_IdAndName(null, "Existing Category");
         verify(categoryRepository, never()).save(any(Category.class));
     }
 
+    // 존재하지 않는 부모 카테고리로 카테고리 등록 시 예외 발생
     @Test
-    void testGetCategory_SuccessWithParent() {
+    public void testRegisterCategory_ParentCategoryNotFound() {
         // Given
-        Long categoryId = 1L;
-        Category parentCategory = new Category();
-        parentCategory.setId(2L);
-        parentCategory.setName("Parent Category");
+        CategoryCreateRequest request = new CategoryCreateRequest(99L, "New Category");
+        when(categoryRepository.findById(99L)).thenReturn(Optional.empty());
 
-        Category category = new Category();
-        category.setId(categoryId);
-        category.setName("Child Category");
-        category.setParentCategory(parentCategory);
+        // When & Then
+        assertThatThrownBy(() -> categoryService.registerCategory(request))
+                .isInstanceOf(CategoryNotFoundException.class)
+                .hasMessage("부모 카테고리가 존재하지 않습니다.");
+        verify(categoryRepository).findById(99L);
+        verify(categoryRepository, never()).save(any(Category.class));
+    }
 
-        when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
+    // 카테고리 업데이트 성공
+    @Test
+    public void testUpdateCategory_Success() {
+        // Given
+        CategoryUpdateRequest request = new CategoryUpdateRequest(null, "Updated Category");
+        when(categoryRepository.findById(2L)).thenReturn(Optional.of(subCategory));
 
         // When
-        CategoryDetailResponse response = categoryService.getCategory(categoryId);
+        CategoryUpdateResponse response = categoryService.updateCategory(2L, request);
 
         // Then
         assertThat(response).isNotNull();
-        assertThat(response.id()).isEqualTo(categoryId);
-        assertThat(response.parentId()).isEqualTo(2L);
-        assertThat(response.name()).isEqualTo("Child Category");
+        assertThat(response.parentId()).isNull();
+        assertThat(response.name()).isEqualTo("Updated Category");
+        verify(categoryRepository).findById(2L);
+        verify(categoryRepository).save(subCategory);
+    }
 
-        verify(categoryRepository, times(1)).findById(categoryId);
+    // 존재하지 않는 카테고리 업데이트 시 예외 발생
+    @Test
+    public void testUpdateCategory_CategoryNotFound() {
+        // Given
+        CategoryUpdateRequest request = new CategoryUpdateRequest(null, "Updated Category");
+        when(categoryRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThatThrownBy(() -> categoryService.updateCategory(99L, request))
+                .isInstanceOf(CategoryNotFoundException.class)
+                .hasMessage("존재하지 않는 카테고리입니다.");
+        verify(categoryRepository).findById(99L);
+        verify(categoryRepository, never()).save(any(Category.class));
+    }
+
+    // 존재하지 않는 부모 카테고리로 업데이트 시 예외 발생
+    @Test
+    public void testUpdateCategory_ParentCategoryNotFound() {
+        // Given
+        CategoryUpdateRequest request = new CategoryUpdateRequest(99L, "Updated Category");
+        when(categoryRepository.findById(2L)).thenReturn(Optional.of(subCategory));
+        when(categoryRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThatThrownBy(() -> categoryService.updateCategory(2L, request))
+                .isInstanceOf(CategoryNotFoundException.class)
+                .hasMessage("부모 카테고리가 존재하지 않습니다.");
+        verify(categoryRepository).findById(2L);
+        verify(categoryRepository).findById(99L);
+        verify(categoryRepository, never()).save(any(Category.class));
+    }
+
+    // 카테고리 삭제 성공
+    @Test
+    public void testDeleteCategory_Success() {
+        // Given
+        when(categoryRepository.findById(2L)).thenReturn(Optional.of(subCategory));
+
+        // When
+        CategoryDeleteResponse response = categoryService.deleteCategory(2L);
+
+        // Then
+        assertThat(response).isNotNull();
+        assertThat(response.message()).isEqualTo("카테고리가 정상적으로 삭제되었습니다.");
+        verify(categoryRepository).findById(2L);
+        verify(categoryRepository).deleteById(2L);
+    }
+
+    // 존재하지 않는 카테고리 삭제 시 예외 발생
+    @Test
+    public void testDeleteCategory_CategoryNotFound() {
+        // Given
+        when(categoryRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThatThrownBy(() -> categoryService.deleteCategory(99L))
+                .isInstanceOf(CategoryNotFoundException.class)
+                .hasMessage("존재하지 않는 카테고리 입니다.");
+        verify(categoryRepository).findById(99L);
+        verify(categoryRepository, never()).deleteById(anyLong());
     }
 
     @Test
-    void testGetCategories_Success() {
-        // Given
-        Pageable pageable = PageRequest.of(0, 10);
+    public void getParentCategories_Success() {
+        // given
+        Category parent1 = Category.createRootCategory("최상위1");
+        Category parent2 = Category.createRootCategory("최상위2");
+        Category parent3 = Category.createRootCategory("최상위3");
 
-        Category parentCategory = new Category();
-        parentCategory.setId(1L);
-        parentCategory.setName("Parent Category");
+        Category category1 = Category.createSubCategory("상위1", parent1);
+        Category category2 = Category.createSubCategory("상위2", parent2);
+        Category category3 = Category.createSubCategory("상위3", parent3);
 
-        Category childCategory = new Category();
-        childCategory.setId(2L);
-        childCategory.setName("Child Category");
-        childCategory.setParentCategory(parentCategory);
+        Category.createSubCategory("하위1", category1);
+        Category.createSubCategory("하위2", category1);
+        when(categoryRepository.findTopCategories()).thenReturn(List.of(parent1, parent2, parent3));
 
-        Page<Category> mockPage = new PageImpl<>(List.of(parentCategory, childCategory));
-        when(categoryRepository.findAllBy(pageable)).thenReturn(mockPage);
 
-        // When
-        Page<CategoryDetailResponse> responsePage = categoryService.getCategories(pageable);
+        // when
+        List<CategorySummaryResponse> parentCategories = categoryService.getTopCategories();
 
-        // Then
-        assertThat(responsePage).isNotNull();
-        assertThat(responsePage.getTotalElements()).isEqualTo(2);
-
-        CategoryDetailResponse parentResponse = responsePage.getContent().get(0);
-        assertThat(parentResponse.id()).isEqualTo(1L);
-        assertThat(parentResponse.parentId()).isNull();
-        assertThat(parentResponse.name()).isEqualTo("Parent Category");
-
-        CategoryDetailResponse childResponse = responsePage.getContent().get(1);
-        assertThat(childResponse.id()).isEqualTo(2L);
-        assertThat(childResponse.parentId()).isEqualTo(1L);
-        assertThat(childResponse.name()).isEqualTo("Child Category");
-
-        verify(categoryRepository, times(1)).findAllBy(pageable);
-    }
-
-    @Test
-    void testGetCategoryPaths() {
-        // Given
-        Category rootCategory = new Category();
-        rootCategory.setId(1L);
-        rootCategory.setName("Root Category");
-
-        Category subCategory1 = new Category();
-        subCategory1.setId(2L);
-        subCategory1.setName("Sub Category 1");
-        subCategory1.setParentCategory(rootCategory);
-
-        Category subCategory2 = new Category();
-        subCategory2.setId(3L);
-        subCategory2.setName("Sub Category 2");
-        subCategory2.setParentCategory(subCategory1);
-
-        Category isolatedCategory = new Category();
-        isolatedCategory.setId(4L);
-        isolatedCategory.setName("Isolated Category");
-
-        when(categoryRepository.findAll()).thenReturn(List.of(rootCategory, subCategory1, subCategory2, isolatedCategory));
-
-        // When
-        List<String> result = categoryService.getCategoryPaths();
-
-        // Then
-        assertThat(result).containsExactlyInAnyOrder(
-                "Root Category",
-                "Root Category>Sub Category 1",
-                "Root Category>Sub Category 1>Sub Category 2",
-                "Isolated Category"
-        );
-
-        verify(categoryRepository, times(1)).findAll();
+        // then
+        assertThat(parentCategories).isNotNull();
+        assertThat(parentCategories.size()).isEqualTo(3);
     }
 }
-

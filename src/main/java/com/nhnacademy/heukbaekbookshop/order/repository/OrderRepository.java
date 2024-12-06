@@ -10,5 +10,4 @@ import java.util.Optional;
 public interface OrderRepository extends JpaRepository<Order, Long>, OrderRepositoryCustom {
     List<Order> findByCustomerId(Long customerId);
     Optional<Order> findByTossOrderId(String s);
-    ResponseEntity<Void> deleteByTossOrderId(String tossOrderId);
 }

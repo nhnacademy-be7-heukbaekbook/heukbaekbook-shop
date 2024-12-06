@@ -7,6 +7,7 @@ import com.nhnacademy.heukbaekbookshop.book.repository.book.BookCategoryReposito
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.category.dto.response.ParentCategoryResponse;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -33,7 +34,8 @@ class BookCategoryServiceTest {
     }
 
     @Test
-    void testFindBookCategoriesByBookId_Success() {
+    @DisplayName("책 카테고리 조회 성공")
+    void testFindBookCategoriesByBookId_success() {
         // Given
         Long bookId = 1L;
         Category category = new Category();
@@ -68,7 +70,8 @@ class BookCategoryServiceTest {
 
 
     @Test
-    void testFindBookCategoriesByBookId_NotFound() {
+    @DisplayName("책 카테고리 조회 실패")
+    void testFindBookCategoriesByBookId_fail() {
         // Given
         Long bookId = 1L;
         when(bookCategoryRepository.findBookCategoriesByBookId(bookId)).thenReturn(Optional.empty());
