@@ -7,13 +7,14 @@ import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import com.nhnacademy.heukbaekbookshop.image.domain.ReviewImage;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.repository.CustomerRepository;
+import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import com.nhnacademy.heukbaekbookshop.order.domain.Order;
-import com.nhnacademy.heukbaekbookshop.order.domain.OrderStatus;
 import com.nhnacademy.heukbaekbookshop.order.domain.Review;
 import com.nhnacademy.heukbaekbookshop.order.domain.ReviewPK;
 import com.nhnacademy.heukbaekbookshop.order.repository.OrderRepository;
 import com.nhnacademy.heukbaekbookshop.point.history.domain.PointType;
 import com.nhnacademy.heukbaekbookshop.point.history.dto.request.PointHistoryRequest;
+import com.nhnacademy.heukbaekbookshop.point.history.event.ReviewEvent;
 import com.nhnacademy.heukbaekbookshop.point.history.repository.PointHistoryRepository;
 import com.nhnacademy.heukbaekbookshop.point.history.service.PointSaveService;
 import com.nhnacademy.heukbaekbookshop.review.dto.request.ReviewCreateRequest;
@@ -21,6 +22,8 @@ import com.nhnacademy.heukbaekbookshop.review.dto.request.ReviewUpdateRequest;
 import com.nhnacademy.heukbaekbookshop.review.dto.response.ReviewDetailResponse;
 import com.nhnacademy.heukbaekbookshop.review.repository.ReviewImageRepository;
 import com.nhnacademy.heukbaekbookshop.review.repository.ReviewRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -33,6 +36,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
@@ -43,23 +47,10 @@ public class ReviewService {
     private final PointSaveService pointSaveService;
 
     private final PointHistoryRepository pointHistoryRepository;
+    private final MemberRepository memberRepository;
 
-    public ReviewService(ReviewRepository reviewRepository,
-                         ReviewImageRepository reviewImageRepository,
-                         OrderRepository orderRepository,
-                         ImageManagerService imageManagerService,
-                         CustomerRepository customerRepository,
-                         BookRepository bookRepository,
-                         PointSaveService pointSaveService, PointHistoryRepository pointHistoryRepository) {
-        this.reviewRepository = reviewRepository;
-        this.reviewImageRepository = reviewImageRepository;
-        this.orderRepository = orderRepository;
-        this.imageManagerService = imageManagerService;
-        this.customerRepository = customerRepository;
-        this.bookRepository = bookRepository;
-        this.pointSaveService = pointSaveService;
-        this.pointHistoryRepository = pointHistoryRepository;
-    }
+    private final ApplicationEventPublisher eventPublisher;
+
 
     @Transactional
     public Review createReview(Long customerId, ReviewCreateRequest request) {
@@ -94,10 +85,13 @@ public class ReviewService {
         // 리뷰 저장 (연관된 이미지도 함께 저장됨)
         reviewRepository.save(review);
 
-        // 포인트 적립 로직 추가
-        int pointToEarn = images.isEmpty() ? 200 : 500; // 이미지 유무에 따라 포인트 차등 지급
-        saveReviewPoints(customerId, request.orderId(), pointToEarn);
-
+        if (memberRepository.existsById(customerId)) {
+            eventPublisher.publishEvent(new ReviewEvent(
+                    customerId,
+                    order.getId(),
+                    !images.isEmpty()
+            ));
+        }
         return review;
     }
 
@@ -220,4 +214,23 @@ public class ReviewService {
 
         reviewRepository.delete(review);
     }
+    
+    public boolean hasReview(Long customerId, Long orderId, Long bookId) {
+        Review review = reviewRepository.findByOrderIdAndBookIdAndCustomerId(orderId, bookId, customerId);
+        return review != null;
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewDetailResponse> getReviewsByOrder(Long orderId) {
+        List<Review> reviews = reviewRepository.findAllByOrderId(orderId);
+
+        return reviews.stream().map(review -> {
+            List<String> imageUrls = reviewImageRepository.findAllByReview(review)
+                    .stream()
+                    .map(ReviewImage::getUrl)
+                    .collect(Collectors.toList());
+            return convertToResponse(review, imageUrls);
+        }).collect(Collectors.toList());
+    }
+
 }

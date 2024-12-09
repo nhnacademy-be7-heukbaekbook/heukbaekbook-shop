@@ -1,12 +1,11 @@
 package com.nhnacademy.heukbaekbookshop.order.strategy.impl;
 
 import com.nhnacademy.heukbaekbookshop.order.dto.request.PaymentApprovalRequest;
+import com.nhnacademy.heukbaekbookshop.order.dto.request.PaymentCancelRequest;
 import com.nhnacademy.heukbaekbookshop.order.dto.request.RefundCreateRequest;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentGatewayApprovalResponse;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentGatewayCancelResponse;
 import com.nhnacademy.heukbaekbookshop.order.strategy.PaymentStrategy;
-
-import java.math.BigDecimal;
 
 // @Component
 public class PayPalPaymentStrategy implements PaymentStrategy {
@@ -20,24 +19,18 @@ public class PayPalPaymentStrategy implements PaymentStrategy {
     @Override
     public PaymentGatewayApprovalResponse approvePayment(PaymentApprovalRequest request) {
         // PayPal 결제 승인 로직 구현
-        return new PaymentGatewayApprovalResponse(
-                "paypalPaymentKey",
-                "2023-10-01T10:00:00",
-                "2023-10-01T10:01:00",
-                BigDecimal.valueOf(request.amount()),
-                "PAYPAL"
-        );
+        return null;
     }
 
     @Override
-    public PaymentGatewayCancelResponse cancelPayment(RefundCreateRequest request) {
+    public PaymentGatewayCancelResponse refundPayment(RefundCreateRequest request) {
+        // PayPal 환불 처리 로직 구현
+        return null;
+    }
+
+    @Override
+    public PaymentGatewayCancelResponse cancelPayment(PaymentCancelRequest request) {
         // PayPal 결제 취소 로직 구현
-        return new PaymentGatewayCancelResponse(
-                "2023-10-02T10:00:00",
-                "2023-10-02T10:01:00",
-                "결제 취소 요청이 접수되었습니다.",
-                request.refundBooks().getFirst().price(),
-                "PAYPAL"
-        );
+        return null;
     }
 }

@@ -151,7 +151,7 @@ public class MemberServiceImpl implements MemberService {
                 member.getName(),
                 member.getPhoneNumber(),
                 member.getEmail(),
-                pointHistory.getAmount(),
+                pointHistory.getBalance(),
                 member.getMemberAddresses().stream()
                         .map(memberAddress -> new MemberAddressResponse(
                                 memberAddress.getId(),

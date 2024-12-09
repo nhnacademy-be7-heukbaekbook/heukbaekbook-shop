@@ -25,7 +25,7 @@ public class MemberCoupon {
     @JoinColumn(name = "customer_id")
     private Member member;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "coupon_id")
     private Coupon coupon;
 
@@ -33,21 +33,19 @@ public class MemberCoupon {
     @Column(name = "is_coupon_used")
     private boolean isCouponUsed;
 
-    @NotNull
     @Column(name = "coupon_issued_at")
     private LocalDateTime couponIssuedAt;
 
-    @NotNull
-    @Column(name = "coupon_expiration_at")
-    private LocalDateTime couponExpirationAt;
+    @Column(name = "coupon_expiration_date")
+    private LocalDateTime couponExpirationDate;
 
 
     @Builder
-    private MemberCoupon(Member member, Coupon coupon, LocalDateTime issuedAt, LocalDateTime expirationAt) {
+    private MemberCoupon(Member member, Coupon coupon, LocalDateTime issuedAt, LocalDateTime expirationDate) {
         this.member = member;
         this.coupon = coupon;
         this.couponIssuedAt = issuedAt;
-        this.couponExpirationAt = expirationAt;
+        this.couponExpirationDate = expirationDate;
         this.isCouponUsed = false;
     }
 

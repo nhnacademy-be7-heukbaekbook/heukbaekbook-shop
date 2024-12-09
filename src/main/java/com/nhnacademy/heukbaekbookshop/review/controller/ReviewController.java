@@ -43,6 +43,7 @@ public class ReviewController {
             @RequestParam("score") int score,
             @RequestBody(required = false) List<ReviewImageRequest> images) {
         log.info("들어옴");
+
         List<MultipartFile> multipartFiles = ReviewImageConverter.convertReviewImageRequestsToMultipartFiles(images);
         Order order = orderRepository.findByTossOrderId(orderId)
                 .orElseThrow(() -> new PaymentFailureException("주문 정보를 찾을 수 없습니다."));
@@ -89,6 +90,26 @@ public class ReviewController {
             @PathVariable Long orderId,
             @PathVariable Long bookId) {
         reviewService.deleteReview(customerId, orderId, bookId);
+    }
+
+    @GetMapping("/{orderId}/{bookId}")
+    public Boolean getReviewStatus(
+            @RequestHeader(value = "X-USER-ID") Long customerId,
+            @PathVariable Long orderId,
+            @PathVariable Long bookId) {
+        return reviewService.hasReview(customerId, orderId, bookId);
+    }
+
+
+
+    @GetMapping("/order/{orderId}")
+    public ResponseEntity<List<ReviewDetailResponse>> getReviewsByOrder(@PathVariable String orderId) {
+
+        Order order = orderRepository.findByTossOrderId(orderId)
+                .orElseThrow(() -> new PaymentFailureException("주문 정보를 찾을 수 없습니다."));
+
+        List<ReviewDetailResponse> reviews = reviewService.getReviewsByOrder(order.getId());
+        return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
 }
