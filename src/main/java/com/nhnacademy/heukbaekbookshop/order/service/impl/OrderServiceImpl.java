@@ -340,14 +340,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findByTossOrderId(tossOrderId)
                 .orElseThrow(() -> new OrderNotFoundException(tossOrderId + " Order not found"));
 
-
-        Optional<PointHistory> result = pointHistoryRepository.findByOrderId(order.getId());
-        if (result.isPresent()) {
-            PointHistory pointHistory = result.get();
-            pointHistoryRepository.delete(pointHistory);
-        }
-
-        orderRepository.delete(order);
+        order.setStatus(OrderStatus.CANCELED);
     }
 
     @Override

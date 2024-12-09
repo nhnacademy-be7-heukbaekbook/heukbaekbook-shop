@@ -14,11 +14,7 @@ import com.nhnacademy.heukbaekbookshop.book.exception.book.BookSearchException;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
-import com.nhnacademy.heukbaekbookshop.common.util.Calculator;
-import com.nhnacademy.heukbaekbookshop.common.util.Formatter;
 import com.nhnacademy.heukbaekbookshop.contributor.domain.*;
-import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSummaryResponse;
-import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.contributor.repository.ContributorRepository;
 import com.nhnacademy.heukbaekbookshop.contributor.repository.PublisherRepository;
 import com.nhnacademy.heukbaekbookshop.contributor.repository.RoleRepository;
@@ -566,7 +562,6 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Page<BookResponse> getBooks(Pageable pageable) {
         Page<Book> allByPageable = bookRepository.findAllByPageable(pageable);
         return allByPageable.map(BookResponse::of);
