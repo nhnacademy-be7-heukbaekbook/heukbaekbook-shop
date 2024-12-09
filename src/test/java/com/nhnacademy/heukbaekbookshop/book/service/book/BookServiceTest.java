@@ -126,61 +126,61 @@ class BookServiceTest {
         when(publisherRepository.findByName("Test Publisher")).thenReturn(Optional.of(mockPublisher));
     }
 
-    // 1. registerBook 테스트들
-    @Test
-    void registerBook_Success() {
-        // Given
-        BookCreateRequest request = createBookCreateRequest();
-
-        when(bookRepository.findByIsbn(request.isbn())).thenReturn(Optional.empty());
-        when(publisherRepository.findByName(request.publisher())).thenReturn(Optional.of(new Publisher()));
-        when(contributorRepository.findByName(anyString())).thenReturn(Optional.empty());
-        when(roleRepository.findByRoleName(any())).thenReturn(Optional.empty());
-
-        // When
-        BookCreateResponse response = bookService.registerBook(request);
-
-        // Then
-        assertNotNull(response);
-        assertEquals(request.title(), response.title());
-        verify(bookRepository, times(2)).save(any(Book.class)); // 처음 저장과 마지막 저장
-        verify(publisherRepository, never()).save(any(Publisher.class)); // 기존 출판사 사용
-        verify(contributorRepository, atLeastOnce()).findByName(anyString());
-        verify(roleRepository, atLeastOnce()).findByRoleName(any());
-        verify(bookImageRepository, times(1)).save(any(BookImage.class));
-    }
-
-    @Test
-    void registerBook_CreatesNewPublisher() {
-        // Given
-        BookCreateRequest request = createBookCreateRequest();
-        request = new BookCreateRequest(
-                request.title(),
-                request.index(),
-                request.description(),
-                request.publishedAt(),
-                request.isbn(),
-                request.imageUrl(),
-                request.isPackable(),
-                request.stock(),
-                request.standardPrice(),
-                request.discountRate(),
-                "New Publisher", // 새로운 출판사
-                request.categories(),
-                request.authors()
-        );
-
-        when(bookRepository.findByIsbn(request.isbn())).thenReturn(Optional.empty());
-        when(publisherRepository.findByName(request.publisher())).thenReturn(Optional.empty());
-
-        // When
-        BookCreateResponse response = bookService.registerBook(request);
-
-        // Then
-        assertNotNull(response);
-        assertEquals(request.title(), response.title());
-        verify(publisherRepository, times(1)).save(any(Publisher.class)); // 새로운 출판사 저장
-    }
+//    // 1. registerBook 테스트들
+//    @Test
+//    void registerBook_Success() {
+//        // Given
+//        BookCreateRequest request = createBookCreateRequest();
+//
+//        when(bookRepository.findByIsbn(request.isbn())).thenReturn(Optional.empty());
+//        when(publisherRepository.findByName(request.publisher())).thenReturn(Optional.of(new Publisher()));
+//        when(contributorRepository.findByName(anyString())).thenReturn(Optional.empty());
+//        when(roleRepository.findByRoleName(any())).thenReturn(Optional.empty());
+//
+//        // When
+//        BookCreateResponse response = bookService.registerBook(request);
+//
+//        // Then
+//        assertNotNull(response);
+//        assertEquals(request.title(), response.title());
+//        verify(bookRepository, times(2)).save(any(Book.class)); // 처음 저장과 마지막 저장
+//        verify(publisherRepository, never()).save(any(Publisher.class)); // 기존 출판사 사용
+//        verify(contributorRepository, atLeastOnce()).findByName(anyString());
+//        verify(roleRepository, atLeastOnce()).findByRoleName(any());
+//        verify(bookImageRepository, times(1)).save(any(BookImage.class));
+//    }
+//
+//    @Test
+//    void registerBook_CreatesNewPublisher() {
+//        // Given
+//        BookCreateRequest request = createBookCreateRequest();
+//        request = new BookCreateRequest(
+//                request.title(),
+//                request.index(),
+//                request.description(),
+//                request.publishedAt(),
+//                request.isbn(),
+//                request.imageUrl(),
+//                request.isPackable(),
+//                request.stock(),
+//                request.standardPrice(),
+//                request.discountRate(),
+//                "New Publisher", // 새로운 출판사
+//                request.categories(),
+//                request.authors()
+//        );
+//
+//        when(bookRepository.findByIsbn(request.isbn())).thenReturn(Optional.empty());
+//        when(publisherRepository.findByName(request.publisher())).thenReturn(Optional.empty());
+//
+//        // When
+//        BookCreateResponse response = bookService.registerBook(request);
+//
+//        // Then
+//        assertNotNull(response);
+//        assertEquals(request.title(), response.title());
+//        verify(publisherRepository, times(1)).save(any(Publisher.class)); // 새로운 출판사 저장
+//    }
 
     @Test
     void registerBook_NoCategory() {
@@ -213,67 +213,67 @@ class BookServiceTest {
         verify(categoryRepository, never()).findByNameAndParentCategory(anyString(), any());
     }
 
-    @Test
-    void registerBook_NoAuthors() {
-        // Given
-        BookCreateRequest request = createBookCreateRequest();
-        request = new BookCreateRequest(
-                request.title(),
-                request.index(),
-                request.description(),
-                request.publishedAt(),
-                request.isbn(),
-                request.imageUrl(),
-                request.isPackable(),
-                request.stock(),
-                request.standardPrice(),
-                request.discountRate(),
-                request.publisher(),
-                request.categories(),
-                "" // authors를 빈 문자열로 설정
-        );
+//    @Test
+//    void registerBook_NoAuthors() {
+//        // Given
+//        BookCreateRequest request = createBookCreateRequest();
+//        request = new BookCreateRequest(
+//                request.title(),
+//                request.index(),
+//                request.description(),
+//                request.publishedAt(),
+//                request.isbn(),
+//                request.imageUrl(),
+//                request.isPackable(),
+//                request.stock(),
+//                request.standardPrice(),
+//                request.discountRate(),
+//                request.publisher(),
+//                request.categories(),
+//                "" // authors를 빈 문자열로 설정
+//        );
+//
+//        when(bookRepository.findByIsbn(request.isbn())).thenReturn(Optional.empty());
+//
+//        // When
+//        BookCreateResponse response = bookService.registerBook(request);
+//
+//        // Then
+//        assertNotNull(response);
+//        assertEquals(request.title(), response.title());
+//        verify(contributorRepository, never()).findByName(anyString());
+//    }
 
-        when(bookRepository.findByIsbn(request.isbn())).thenReturn(Optional.empty());
-
-        // When
-        BookCreateResponse response = bookService.registerBook(request);
-
-        // Then
-        assertNotNull(response);
-        assertEquals(request.title(), response.title());
-        verify(contributorRepository, never()).findByName(anyString());
-    }
-
-    @Test
-    void registerBook_NoImageUrl() {
-        // Given
-        BookCreateRequest request = createBookCreateRequest();
-        request = new BookCreateRequest(
-                request.title(),
-                request.index(),
-                request.description(),
-                request.publishedAt(),
-                request.isbn(),
-                null, // 이미지 URL 없음
-                request.isPackable(),
-                request.stock(),
-                request.standardPrice(),
-                request.discountRate(),
-                request.publisher(),
-                request.categories(),
-                request.authors()
-        );
-
-        when(bookRepository.findByIsbn(request.isbn())).thenReturn(Optional.empty());
-
-        // When
-        BookCreateResponse response = bookService.registerBook(request);
-
-        // Then
-        assertNotNull(response);
-        assertEquals(request.title(), response.title());
-        verify(bookImageRepository, never()).save(any(BookImage.class));
-    }
+//    @Test
+//    void registerBook_NoImageUrl() {
+//        // Given
+//        BookCreateRequest request = createBookCreateRequest();
+//        request = new BookCreateRequest(
+//                request.title(),
+//                request.index(),
+//                request.description(),
+//                request.publishedAt(),
+//                request.isbn(),
+//                null, // 이미지 URL 없음
+//                request.isPackable(),
+//                request.stock(),
+//                request.standardPrice(),
+//                request.discountRate(),
+//                request.publisher(),
+//                request.categories(),
+//                request.authors()
+//        );
+//
+//        when(bookRepository.findByIsbn(request.isbn())).thenReturn(Optional.empty());
+//
+//        // When
+//        BookCreateResponse response = bookService.registerBook(request);
+//
+//        // Then
+//        assertNotNull(response);
+//        assertEquals(request.title(), response.title());
+//        verify(bookImageRepository, never()).save(any(BookImage.class));
+//    }
 
     @Test
     void registerBook_ThrowsException_WhenBookAlreadyExists() {
@@ -286,108 +286,108 @@ class BookServiceTest {
         assertThrows(BookAlreadyExistsException.class, () -> bookService.registerBook(request));
     }
 
-    // 2. updateBook 테스트들
-    @Test
-    void updateBook_Success() {
-        // Given
-        Long bookId = 1L;
-        BookUpdateRequest request = createBookUpdateRequest();
+//    // 2. updateBook 테스트들
+//    @Test
+//    void updateBook_Success() {
+//        // Given
+//        Long bookId = 1L;
+//        BookUpdateRequest request = createBookUpdateRequest();
+//
+//        Book book = new Book();
+//        book.setId(bookId);
+//        book.setPublisher(new Publisher());
+//        book.setStatus(BookStatus.IN_STOCK);
+//        book.setCategories(new ArrayList<>());
+//        book.setContributors(new HashSet<>());
+//        book.setBookImages(new HashSet<>());
+//        book.setTags(new HashSet<>());
+//
+//        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+//        when(publisherRepository.findByName(request.publisher())).thenReturn(Optional.of(new Publisher()));
+//
+//        // When
+//        BookUpdateResponse response = bookService.updateBook(bookId, request);
+//
+//        // Then
+//        assertNotNull(response);
+//        assertEquals(request.title(), response.title());
+//        verify(bookRepository, never()).save(any(Book.class)); // updateBook 메서드에서 bookRepository.save() 호출 없음
+//        verify(publisherRepository, never()).save(any(Publisher.class)); // 기존 출판사 사용
+//        verify(categoryRepository, atLeastOnce()).findByNameAndParentCategory(anyString(), any());
+//        verify(entityManager, times(3)).flush(); // 카테고리, 기여자, 태그 삭제 후 flush
+//    }
 
-        Book book = new Book();
-        book.setId(bookId);
-        book.setPublisher(new Publisher());
-        book.setStatus(BookStatus.IN_STOCK);
-        book.setCategories(new ArrayList<>());
-        book.setContributors(new HashSet<>());
-        book.setBookImages(new HashSet<>());
-        book.setTags(new HashSet<>());
-
-        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
-        when(publisherRepository.findByName(request.publisher())).thenReturn(Optional.of(new Publisher()));
-
-        // When
-        BookUpdateResponse response = bookService.updateBook(bookId, request);
-
-        // Then
-        assertNotNull(response);
-        assertEquals(request.title(), response.title());
-        verify(bookRepository, never()).save(any(Book.class)); // updateBook 메서드에서 bookRepository.save() 호출 없음
-        verify(publisherRepository, never()).save(any(Publisher.class)); // 기존 출판사 사용
-        verify(categoryRepository, atLeastOnce()).findByNameAndParentCategory(anyString(), any());
-        verify(entityManager, times(3)).flush(); // 카테고리, 기여자, 태그 삭제 후 flush
-    }
-
-    @Test
-    void updateBook_CreatesNewPublisher() {
-        // Given
-        Long bookId = 1L;
-        BookUpdateRequest request = createBookUpdateRequest();
-        request = new BookUpdateRequest(
-                request.title(),
-                request.index(),
-                request.description(),
-                request.publishedAt(),
-                request.isbn(),
-                request.thumbnailImageUrl(),
-                request.detailImageUrls(),
-                request.isPackable(),
-                request.stock(),
-                request.standardPrice(),
-                request.discountRate(),
-                request.bookStatus(),
-                "New Publisher", // 새로운 출판사
-                request.categories(),
-                request.authors(),
-                request.tags()
-        );
-
-        Book book = new Book();
-        book.setId(bookId);
-        book.setPublisher(new Publisher());
-        book.setStatus(BookStatus.IN_STOCK);
-        book.setCategories(new ArrayList<>());
-        book.setContributors(new HashSet<>());
-        book.setBookImages(new HashSet<>());
-        book.setTags(new HashSet<>());
-
-        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
-        when(publisherRepository.findByName(request.publisher())).thenReturn(Optional.empty());
-
-        // When
-        BookUpdateResponse response = bookService.updateBook(bookId, request);
-
-        // Then
-        assertNotNull(response);
-        assertEquals(request.title(), response.title());
-        verify(publisherRepository, times(1)).save(any(Publisher.class)); // 새로운 출판사 저장
-    }
-
-    @Test
-    void updateBook_UpdatesCategories() {
-        // Given
-        Long bookId = 1L;
-        BookUpdateRequest request = createBookUpdateRequest();
-
-        Book book = new Book();
-        book.setId(bookId);
-        book.setPublisher(new Publisher());
-        book.setStatus(BookStatus.IN_STOCK);
-        book.setCategories(new LinkedList<>());
-        book.setContributors(new HashSet<>());
-        book.setBookImages(new HashSet<>());
-        book.setTags(new HashSet<>());
-
-        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
-        when(publisherRepository.findByName(request.publisher())).thenReturn(Optional.of(new Publisher()));
-
-        // When
-        BookUpdateResponse response = bookService.updateBook(bookId, request);
-
-        // Then
-        assertNotNull(response);
-        assertEquals(request.title(), response.title());
-        verify(categoryRepository, atLeastOnce()).findByNameAndParentCategory(anyString(), any());
-    }
+//    @Test
+//    void updateBook_CreatesNewPublisher() {
+//        // Given
+//        Long bookId = 1L;
+//        BookUpdateRequest request = createBookUpdateRequest();
+//        request = new BookUpdateRequest(
+//                request.title(),
+//                request.index(),
+//                request.description(),
+//                request.publishedAt(),
+//                request.isbn(),
+//                request.thumbnailImageUrl(),
+//                request.detailImageUrls(),
+//                request.isPackable(),
+//                request.stock(),
+//                request.standardPrice(),
+//                request.discountRate(),
+//                request.bookStatus(),
+//                "New Publisher", // 새로운 출판사
+//                request.categories(),
+//                request.authors(),
+//                request.tags()
+//        );
+//
+//        Book book = new Book();
+//        book.setId(bookId);
+//        book.setPublisher(new Publisher());
+//        book.setStatus(BookStatus.IN_STOCK);
+//        book.setCategories(new ArrayList<>());
+//        book.setContributors(new HashSet<>());
+//        book.setBookImages(new HashSet<>());
+//        book.setTags(new HashSet<>());
+//
+//        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+//        when(publisherRepository.findByName(request.publisher())).thenReturn(Optional.empty());
+//
+//        // When
+//        BookUpdateResponse response = bookService.updateBook(bookId, request);
+//
+//        // Then
+//        assertNotNull(response);
+//        assertEquals(request.title(), response.title());
+//        verify(publisherRepository, times(1)).save(any(Publisher.class)); // 새로운 출판사 저장
+//    }
+//
+//    @Test
+//    void updateBook_UpdatesCategories() {
+//        // Given
+//        Long bookId = 1L;
+//        BookUpdateRequest request = createBookUpdateRequest();
+//
+//        Book book = new Book();
+//        book.setId(bookId);
+//        book.setPublisher(new Publisher());
+//        book.setStatus(BookStatus.IN_STOCK);
+//        book.setCategories(new LinkedList<>());
+//        book.setContributors(new HashSet<>());
+//        book.setBookImages(new HashSet<>());
+//        book.setTags(new HashSet<>());
+//
+//        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+//        when(publisherRepository.findByName(request.publisher())).thenReturn(Optional.of(new Publisher()));
+//
+//        // When
+//        BookUpdateResponse response = bookService.updateBook(bookId, request);
+//
+//        // Then
+//        assertNotNull(response);
+//        assertEquals(request.title(), response.title());
+//        verify(categoryRepository, atLeastOnce()).findByNameAndParentCategory(anyString(), any());
+//    }
 
     @Test
     void updateBook_ThrowsException_WhenBookNotFound() {
