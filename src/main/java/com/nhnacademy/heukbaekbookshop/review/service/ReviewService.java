@@ -9,7 +9,6 @@ import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.repository.CustomerRepository;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import com.nhnacademy.heukbaekbookshop.order.domain.Order;
-import com.nhnacademy.heukbaekbookshop.order.domain.OrderStatus;
 import com.nhnacademy.heukbaekbookshop.order.domain.Review;
 import com.nhnacademy.heukbaekbookshop.order.domain.ReviewPK;
 import com.nhnacademy.heukbaekbookshop.order.repository.OrderRepository;
@@ -63,9 +62,9 @@ public class ReviewService {
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 주문 ID입니다."));
 
         // 주문 상태 확인
-        if (!OrderStatus.DELIVERED.equals(order.getStatus())) {
-            throw new IllegalArgumentException("주문이 배송 완료 상태가 아닙니다. 리뷰를 작성할 수 없습니다.");
-        }
+//        if (!OrderStatus.DELIVERED.equals(order.getStatus())) {
+//            throw new IllegalArgumentException("주문이 배송 완료 상태가 아닙니다. 리뷰를 작성할 수 없습니다.");
+//        }
 
         Book book = bookRepository.findById(request.bookId())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 도서 ID입니다."));
@@ -209,4 +208,29 @@ public class ReviewService {
             return convertToResponse(review, imageUrls);
         }).collect(Collectors.toList());
     }
+
+    public void deleteReview(Long customerId, Long orderId, Long bookId) {
+        Review review = reviewRepository.findByOrderIdAndBookIdAndCustomerId(orderId, bookId, customerId);
+
+        reviewRepository.delete(review);
+    }
+    
+    public boolean hasReview(Long customerId, Long orderId, Long bookId) {
+        Review review = reviewRepository.findByOrderIdAndBookIdAndCustomerId(orderId, bookId, customerId);
+        return review != null;
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewDetailResponse> getReviewsByOrder(Long orderId) {
+        List<Review> reviews = reviewRepository.findAllByOrderId(orderId);
+
+        return reviews.stream().map(review -> {
+            List<String> imageUrls = reviewImageRepository.findAllByReview(review)
+                    .stream()
+                    .map(ReviewImage::getUrl)
+                    .collect(Collectors.toList());
+            return convertToResponse(review, imageUrls);
+        }).collect(Collectors.toList());
+    }
+
 }
