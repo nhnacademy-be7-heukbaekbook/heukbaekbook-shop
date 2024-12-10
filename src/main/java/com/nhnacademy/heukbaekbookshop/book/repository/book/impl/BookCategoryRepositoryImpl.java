@@ -26,33 +26,10 @@ public class BookCategoryRepositoryImpl implements BookCategoryRepositoryCustom 
     }
 
     @Override
-    public Page<BookCategory> findByCategoryIds(List<Long> categoryIds, Pageable pageable) {
-        List<BookCategory> bookCategories = queryFactory
-                .selectFrom(bookCategory)
-                .join(bookCategory.book, book).fetchJoin()
-                .join(book.publisher, publisher).fetchJoin()
-                .where(
-                        bookCategory.categoryId.in(categoryIds),
-                        book.status.eq(BookStatus.IN_STOCK)
-                )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        Long total = queryFactory
-                .select(bookCategory.count())
-                .from(bookCategory)
-                .where(bookCategory.categoryId.in(categoryIds))
-                .fetchOne();
-
-        return new PageImpl<>(bookCategories, pageable, total);
-    }
-
-    @Override
     public Optional<BookCategory> findBookCategoriesByBookId(Long bookId) {
         return Optional.ofNullable(queryFactory
                 .selectFrom(bookCategory)
-                .join(bookCategory.category, category)
+                .join(bookCategory.category, category).fetchJoin()
                 .where(bookCategory.bookId.eq(bookId))
                 .fetchFirst());
     }

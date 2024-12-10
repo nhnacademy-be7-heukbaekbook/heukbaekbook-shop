@@ -1,8 +1,9 @@
 package com.nhnacademy.heukbaekbookshop.order.dto.response;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+
 
 public record OrderResponse(
-        List<OrderSummaryResponse> orderSummaryResponseList
+        Page<OrderSummaryResponse> orderSummaryResponsePage
 ) {
 }

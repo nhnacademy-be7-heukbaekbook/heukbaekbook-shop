@@ -1,167 +1,225 @@
-//package com.nhnacademy.heukbaekbookshop.book.service.book.impl;
-//
-//import com.nhnacademy.heukbaekbookshop.book.domain.*;
-//import com.nhnacademy.heukbaekbookshop.book.domain.document.BookDocument;
-//import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchRequest;
-//import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookResponse;
-//import com.nhnacademy.heukbaekbookshop.book.repository.book.BookDocumentRepository;
-//import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
-//import com.nhnacademy.heukbaekbookshop.book.repository.book.BookSearchRepository;
-//import com.nhnacademy.heukbaekbookshop.book.service.book.BookSearchService;
-//import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
-//import com.nhnacademy.heukbaekbookshop.common.formatter.BookFormatter;
-//import com.nhnacademy.heukbaekbookshop.common.service.CommonService;
-//import com.nhnacademy.heukbaekbookshop.contributor.domain.BookContributor;
-//import com.nhnacademy.heukbaekbookshop.contributor.domain.Contributor;
-//import com.nhnacademy.heukbaekbookshop.contributor.domain.ContributorRole;
-//import com.nhnacademy.heukbaekbookshop.contributor.domain.Publisher;
-//import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSummaryResponse;
-//import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
-//import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.MockitoAnnotations;
-//import org.springframework.data.domain.Page;
-//import org.springframework.data.domain.PageImpl;
-//import org.springframework.data.domain.Pageable;
-//
-//import java.math.BigDecimal;
-//import java.text.ParseException;
-//import java.text.SimpleDateFormat;
-//import java.util.*;
-//import java.sql.Date;
-//
-//
-//import static org.assertj.core.api.Assertions.assertThat;
-//import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.mockito.Mockito.*;
-//
-//class BookSearchServiceImplTest {
-//
-//    @InjectMocks
-//    private BookSearchServiceImpl bookSearchService;
-//
-//    @Mock
-//    private BookSearchRepository bookSearchRepository;
-//
-//    @Mock
-//    private BookRepository bookRepository;
-//
-//    @Mock
-//    private BookDocumentRepository bookDocumentRepository;
-//
-//    @Mock
-//    private CategoryRepository categoryRepository;
-//
-//    @Mock
-//    private BookFormatter bookFormatter;
-//
-//    @Mock
-//    private CommonService commonService;
-//
-//    @BeforeEach
-//    void setUp() {
-//        MockitoAnnotations.openMocks(this);
-//    }
-//
-//    Date publishedAt = Date.valueOf("2023-11-24");
-//
-//    @Test
-//    void testSearchBooks() {
-//        // Given
-//        Pageable pageable = Pageable.ofSize(10).withPage(0);
-//        BookSearchRequest searchRequest = new BookSearchRequest("keyword", "ALL", "POPULARITY", 1L);
-//
-//        BookDocument mockDocument = new BookDocument(
-//                1L,
-//                "Book Title",
-//                publishedAt,
-//                8000,
-//                0.2,
-//                "thumbnailUrl",
-//                List.of("Author 1", "Author 2"),
-//                "description",
-//                List.of(),
-//                null,
-//                100L,
-//                List.of(1L)
-//        );
-//        Page<BookDocument> mockDocuments = new PageImpl<>(List.of(mockDocument));
-//
-//        Book mockBook = new Book();
-//        mockBook.setId(1L);
-//        mockBook.setTitle("Book Title");
-//        mockBook.setPublishedAt(new java.sql.Date(publishedAt.getTime()));
-//        mockBook.setPrice(BigDecimal.valueOf(10000));
-//        mockBook.setDiscountRate(BigDecimal.valueOf(20));
-//        mockBook.setPopularity(100L);
-//        mockBook.setPackable(true);
-//        mockBook.setBookImages(Set.of());
-//        mockBook.setPublisher(new Publisher(1L, "Publisher Name"));
-//
-//        when(bookSearchRepository.search(any(Pageable.class), anyString(), any(SearchCondition.class), any(SortCondition.class), anyLong()))
-//                .thenReturn(mockDocuments);
-//        when(bookRepository.findById(1L)).thenReturn(Optional.of(mockBook));
-//        when(commonService.getSalePrice(any(BigDecimal.class), any(BigDecimal.class))).thenReturn(BigDecimal.valueOf(8000));
-//        when(commonService.formatPrice(any(BigDecimal.class))).thenReturn("8,000원");
-//        when(bookFormatter.formatDate(any())).thenReturn("2024년 01월");
-//
-//        // When
-//        Page<BookResponse> result = bookSearchService.searchBooks(pageable, searchRequest);
-//
-//        // Then
-//        assertThat(result).isNotNull();
-//        assertThat(result.getTotalElements()).isEqualTo(1);
-//
-//        BookResponse bookResponse = result.getContent().get(0);
-//        assertThat(bookResponse.id()).isEqualTo(1L);
-//        assertThat(bookResponse.title()).isEqualTo("Book Title");
-//        assertThat(bookResponse.salePrice()).isEqualTo("8,000원");
-//        assertThat(bookResponse.thumbnailUrl()).isEqualTo("no-image");
-//
-//        verify(bookSearchRepository, times(1)).search(any(Pageable.class), anyString(), any(SearchCondition.class), any(SortCondition.class), anyLong());
-//        verify(bookRepository, times(1)).findById(1L);
-//        verify(commonService, times(1)).getSalePrice(any(BigDecimal.class), any(BigDecimal.class));
-//        verify(bookFormatter, times(1)).formatDate(any());
-//    }
-//
-//    @Test
-//    void testUpdateBookIndex() throws ParseException {
-//        // Given
-//        List<Book> allBooks = List.of(
-//                new Book(1L, "Title 1", "Index 1", "Description 1", publishedAt,
-//                        "1234567890123", true, 100, BigDecimal.valueOf(20000), BigDecimal.valueOf(10),
-//                        100L, BookStatus.IN_STOCK, new Publisher(), new HashSet<>(), new HashSet<>(), new HashSet<>(),
-//                        new ArrayList<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>()),
-//                new Book(2L, "Title 2", "Index 2", "Description 2", publishedAt,
-//                        "1234567890124", true, 50, BigDecimal.valueOf(30000), BigDecimal.valueOf(15),
-//                        200L, BookStatus.IN_STOCK, new Publisher(), new HashSet<>(), new HashSet<>(), new HashSet<>(),
-//                        new ArrayList<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>())
-//        );
-//
-//        List<Book> deletedBooks = List.of(
-//                new Book(3L, "Title 3", "Index 3", "Description 3", publishedAt,
-//                        "1234567890125", true, 0, BigDecimal.valueOf(15000), BigDecimal.valueOf(5),
-//                        50L, BookStatus.DELETED, new Publisher(), new HashSet<>(), new HashSet<>(), new HashSet<>(),
-//                        new ArrayList<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>())
-//        );
-//
-//        when(bookRepository.findAllByStatusNot(BookStatus.DELETED)).thenReturn(allBooks);
-//        when(bookRepository.findAllByStatus(BookStatus.DELETED)).thenReturn(deletedBooks);
-//
-//        doNothing().when(bookDocumentRepository).deleteAllById(anyList());
-//        doReturn(List.of(1L, 2L, 3L)).when(categoryRepository).findParentCategoryIdsByCategoryIds(anySet());
-//
-//        // When
-//        bookSearchService.updateBookIndex();
-//
-//        // Then
-//        verify(bookRepository, times(1)).findAllByStatusNot(BookStatus.DELETED);
-//        verify(bookRepository, times(1)).findAllByStatus(BookStatus.DELETED);
-//        verify(bookDocumentRepository, times(1)).deleteAllById(List.of(3L));
-//        verify(bookDocumentRepository, times(1)).saveAll(anyList());
-//    }
-//}
+package com.nhnacademy.heukbaekbookshop.book.service.book.impl;
+
+import com.nhnacademy.heukbaekbookshop.book.domain.*;
+import com.nhnacademy.heukbaekbookshop.book.domain.document.BookDocument;
+import com.nhnacademy.heukbaekbookshop.book.dto.request.book.BookSearchRequest;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookResponse;
+import com.nhnacademy.heukbaekbookshop.book.repository.book.BookDocumentRepository;
+import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
+import com.nhnacademy.heukbaekbookshop.book.repository.book.BookSearchRepository;
+import com.nhnacademy.heukbaekbookshop.category.domain.Category;
+import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
+import com.nhnacademy.heukbaekbookshop.common.util.IndexNameProvider;
+import com.nhnacademy.heukbaekbookshop.contributor.domain.*;
+import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSummaryResponse;
+import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
+import com.nhnacademy.heukbaekbookshop.image.domain.BookImage;
+import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
+import com.nhnacademy.heukbaekbookshop.review.repository.ReviewRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.IndexOperations;
+import org.springframework.data.elasticsearch.core.document.Document;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+class BookSearchServiceImplTest {
+
+    @Mock
+    private BookSearchRepository bookSearchRepository;
+
+    @Mock
+    private BookRepository bookRepository;
+
+    @Mock
+    private BookDocumentRepository bookDocumentRepository;
+
+    @Mock
+    private CategoryRepository categoryRepository;
+
+    @Mock
+    private ReviewRepository reviewRepository;
+
+    @Mock
+    private IndexNameProvider indexNameProvider;
+
+    @Mock
+    private ElasticsearchOperations elasticsearchOperations;
+
+    @InjectMocks
+    private BookSearchServiceImpl bookSearchService;
+
+    @Captor
+    private ArgumentCaptor<BookDocument> bookDocumentCaptor;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    // searchBooks 메서드에 대한 테스트
+    @Test
+    void searchBooks_Success() {
+        // Given
+        Pageable pageable = PageRequest.of(0, 10);
+        BookSearchRequest searchRequest = new BookSearchRequest(
+                "Test Keyword",
+                "title",
+                "popularity",
+                null
+        );
+
+        String indexName = "test-index";
+        when(indexNameProvider.resolveIndexName()).thenReturn(indexName);
+
+        BookDocument bookDocument = createTestBookDocument(1L, "Test Book");
+        Page<BookDocument> bookDocumentPage = new PageImpl<>(List.of(bookDocument));
+
+        when(bookSearchRepository.search(
+                eq(indexName),
+                eq(pageable),
+                eq("Test Keyword"),
+                eq(SearchCondition.TITLE),
+                eq(SortCondition.POPULARITY),
+                eq(null)
+        )).thenReturn(bookDocumentPage);
+
+        Book book = createTestBook(1L, "Test Book");
+        when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+
+        // When
+        Page<BookResponse> responses = bookSearchService.searchBooks(pageable, searchRequest);
+
+        // Then
+        assertNotNull(responses);
+        assertEquals(1, responses.getContent().size());
+
+        BookResponse response = responses.getContent().get(0);
+        assertEquals("Test Book", response.title());
+        assertEquals("Test Publisher", response.publisher().name());
+    }
+
+    @Test
+    void searchBooks_BookNotFound() {
+        // Given
+        Pageable pageable = PageRequest.of(0, 10);
+        BookSearchRequest searchRequest = new BookSearchRequest(
+                "Test Keyword",
+                "title",
+                "popularity",
+                null
+        );
+
+        String indexName = "test-index";
+        when(indexNameProvider.resolveIndexName()).thenReturn(indexName);
+
+        BookDocument bookDocument = createTestBookDocument(1L, "Test Book");
+        Page<BookDocument> bookDocumentPage = new PageImpl<>(List.of(bookDocument));
+
+        when(bookSearchRepository.search(
+                eq(indexName),
+                eq(pageable),
+                eq("Test Keyword"),
+                eq(SearchCondition.TITLE),
+                eq(SortCondition.POPULARITY),
+                eq(null)
+        )).thenReturn(bookDocumentPage);
+
+        when(bookRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // When & Then
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            bookSearchService.searchBooks(pageable, searchRequest);
+        });
+        assertTrue(exception.getMessage().contains("Book not found with ID: 1"));
+    }
+
+    // 필요한 헬퍼 메서드들
+    private BookDocument createTestBookDocument(Long id, String title) {
+        return new BookDocument(
+                id,
+                title,
+                Date.valueOf("2023-01-01"),
+                10000,
+                0.1,
+                "http://example.com/image.jpg",
+                List.of("Author 1"),
+                "Test Description",
+                List.of(new ContributorSummaryResponse(1L, "Author 1")),
+                new PublisherSummaryResponse(1L, "Test Publisher"),
+                100L,
+                List.of(1L, 2L),
+                10,
+                4.5f
+        );
+    }
+
+    private Book createTestBook(Long id, String title) {
+        Book book = new Book();
+        book.setId(id);
+        book.setTitle(title);
+        book.setPublishedAt(Date.valueOf("2023-01-01"));
+        book.setPrice(BigDecimal.valueOf(10000));
+        book.setDiscountRate(BigDecimal.valueOf(0.1));
+        book.setStatus(BookStatus.IN_STOCK);
+        book.setPopularity(100);
+
+        // Publisher 설정
+        Publisher publisher = new Publisher();
+        publisher.setId(1L);
+        publisher.setName("Test Publisher");
+        book.setPublisher(publisher);
+
+        // BookImage 설정
+        BookImage thumbnailImage = new BookImage();
+        thumbnailImage.setId(1L);
+        thumbnailImage.setUrl("http://example.com/image.jpg");
+        thumbnailImage.setType(ImageType.THUMBNAIL);
+
+        book.setBookImages(new HashSet<>(List.of(thumbnailImage)));
+
+        // Contributor 설정
+        Contributor contributor = new Contributor();
+        contributor.setId(1L);
+        contributor.setName("Author 1");
+
+        Role role = new Role();
+        role.setId(1L);
+        role.setRoleName(ContributorRole.AUTHOR);
+
+        BookContributor bookContributor = new BookContributor();
+        bookContributor.setBook(book);
+        bookContributor.setContributor(contributor);
+        bookContributor.setRole(role);
+
+        book.setContributors(new HashSet<>(List.of(bookContributor)));
+
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("Test Category");
+
+        // Categories 설정
+        BookCategory bookCategory = new BookCategory(book, category);
+
+        book.setCategories(List.of(bookCategory));
+
+        ReflectionTestUtils.setField(book, "id", id);
+
+        return book;
+    }
+}

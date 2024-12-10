@@ -1,6 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.cart.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.heukbaekbookshop.cart.dto.CartBookSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.cart.dto.CartCreateRequest;
 import com.nhnacademy.heukbaekbookshop.cart.service.CartService;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,8 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -55,5 +56,25 @@ class CartControllerTest {
                 .andExpect(status().isCreated()); // 응답 상태 코드 확인
 
         verify(cartService).createCart(customerId, cartCreateRequests); // 서비스 호출 검증
+    }
+
+    @Test
+    void getCartBooks() throws Exception {
+        //given
+        Long customerId = 1L;
+
+        List<CartBookSummaryResponse> cartBookSummaryResponses = List.of(
+                new CartBookSummaryResponse(1L, 1),
+                new CartBookSummaryResponse(2L, 2)
+        );
+
+        when(cartService.getCartBooks(customerId)).thenReturn(cartBookSummaryResponses);
+
+        //when & then
+        mockMvc.perform(get("/api/carts")
+                .header("X-USER-ID", customerId))
+                .andExpect(status().isOk());
+
+        verify(cartService).getCartBooks(customerId);
     }
 }

@@ -15,6 +15,7 @@ import com.nhnacademy.heukbaekbookshop.order.strategy.PaymentStrategyFactory;
 import com.nhnacademy.heukbaekbookshop.point.history.event.OrderEvent;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentService {
 
     private final RefundRepository refundRepository;
@@ -67,10 +69,10 @@ public class PaymentService {
                 .price(gatewayResponse.cancelAmount())
                 .build();
 
+        Payment savedPayment = paymentRepository.save(payment);
 
+        order.setPayment(savedPayment);
         order.setStatus(OrderStatus.PAYMENT_COMPLETED);
-
-        paymentRepository.save(payment);
 
         if (memberRepository.existsById(order.getCustomer().getId())) {
             BigDecimal productPrice = order.getTotalPrice().subtract(order.getDeliveryFee().getFee());
