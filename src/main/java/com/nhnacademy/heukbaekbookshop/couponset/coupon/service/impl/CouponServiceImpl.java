@@ -23,7 +23,6 @@ import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyRe
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.mapper.CouponPolicyMapper;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.exception.CouponPolicyNotFoundException;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.repository.CouponPolicyRepository;
-import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.repository.CouponRepository;
 import org.springframework.data.domain.Page;
@@ -32,7 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +41,7 @@ public class CouponServiceImpl implements CouponService {
     private final CouponPolicyRepository couponPolicyRepository;
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
-    private final MemberRepository memberRepository;
+    private final CouponRedisService couponRedisService;
 
     @Override
     @Transactional
@@ -67,9 +65,15 @@ public class CouponServiceImpl implements CouponService {
             coupon = CouponMapper.toEntity(couponRequest, couponPolicy);
         }
 
-        return CouponMapper.fromEntity(
+        CouponResponse couponResponse = CouponMapper.fromEntity(
                 couponRepository.save(coupon)
         );
+
+        if (couponRequest.couponQuantity() > 0) {
+            couponRedisService.saveCouponToRedis(couponResponse);
+        }
+
+        return couponResponse;
     }
 
     @Override
@@ -114,7 +118,7 @@ public class CouponServiceImpl implements CouponService {
         Coupon coupon = couponRepository.findById(couponId).orElseThrow(CouponNotFoundException::new);
         CouponPolicy couponPolicy = couponPolicyRepository.findById(couponRequest.policyId()).orElseThrow(CouponPolicyNotFoundException::new);
 
-        return CouponMapper.fromEntity(
+        CouponResponse couponResponse = CouponMapper.fromEntity(
                 coupon.modifyCoupon(
                         couponPolicy,
                         couponRequest.couponQuantity(),
@@ -125,6 +129,12 @@ public class CouponServiceImpl implements CouponService {
                         couponRequest.couponDescription()
                 )
         );
+
+        if (couponRequest.couponQuantity() > 0) {
+            couponRedisService.saveCouponToRedis(couponResponse);
+        }
+
+        return couponResponse;
     }
 
     @Override
@@ -133,6 +143,10 @@ public class CouponServiceImpl implements CouponService {
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(CouponNotFoundException::new);
         coupon.setCouponStatus(couponStatus);
+
+        if (couponStatus == CouponStatus.DISABLE) {
+            couponRedisService.deleteCouponFromRedis(couponId);
+        }
     }
 
     @Override
