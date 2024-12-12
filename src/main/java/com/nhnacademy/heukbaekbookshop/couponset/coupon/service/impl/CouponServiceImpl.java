@@ -85,6 +85,15 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
+    public List<CouponResponse> getDownloadableCoupons(Long bookId) {
+        List<Coupon> downloadableCoupons = couponRepository.findDownloadableCouponsByBookId(bookId);
+
+        return downloadableCoupons.stream()
+                .map(CouponMapper::fromEntity)
+                .toList();
+    }
+
+    @Override
     public Page<CouponResponse> getAllNormalCoupons(Pageable pageable) {
         Page<Coupon> coupons = couponRepository.findAllNormalCoupons(pageable);
         return CouponMapper.fromPageableEntity(coupons);
