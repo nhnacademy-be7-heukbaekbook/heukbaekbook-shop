@@ -48,7 +48,9 @@ public class Category {
 
     public void setParentCategory(Category parentCategory) {
         this.parentCategory = parentCategory;
-        parentCategory.getSubCategories().add(this);
+        if (parentCategory != null) {
+            parentCategory.getSubCategories().add(this);
+        }
     }
 
     public void addBookCategory(BookCategory bookCategory) {
