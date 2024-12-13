@@ -9,8 +9,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookCategoryRepositoryCustom {
-
-    Page<BookCategory> findByCategoryIds(List<Long> categoryIds, Pageable pageable);
-
     Optional<BookCategory> findBookCategoriesByBookId(Long bookId);
 }

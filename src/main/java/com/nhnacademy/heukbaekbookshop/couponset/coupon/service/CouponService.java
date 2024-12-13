@@ -12,9 +12,12 @@ import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountTyp
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface CouponService {
     CouponResponse createCoupon(CouponRequest couponRequest);
     CouponResponse getCoupon(Long couponId);
+    List<CouponResponse> getDownloadableCoupons(Long bookId);
     Page<CouponResponse> getAllNormalCoupons(Pageable pageable);
     Page<BookCouponResponse> getAllBookCoupons(Pageable pageable);
     Page<CategoryCouponResponse> getAllCategoryCoupons(Pageable pageable);
@@ -25,6 +28,8 @@ public interface CouponService {
     void subtractQuantity(Long couponId);
 
     CouponPageResponse getCouponPageResponse(Long customerId, Pageable pageable);
+
+    CouponResponse getCouponsByTypeAndStatus(CouponType couponType);
 
     Long getCouponIdByCouponType(CouponType couponType);
 }

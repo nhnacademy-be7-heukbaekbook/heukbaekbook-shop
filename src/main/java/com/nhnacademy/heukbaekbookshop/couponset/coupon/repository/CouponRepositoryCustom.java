@@ -10,6 +10,7 @@ import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountTyp
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface CouponRepositoryCustom {
@@ -24,4 +25,6 @@ public interface CouponRepositoryCustom {
     Page<Coupon> findAllByDiscountType(DiscountType discountType, Pageable pageable);
 
     Optional<Long> findAvailableCouponIdByCouponType(CouponType couponType);
+
+    List<Coupon> findDownloadableCouponsByBookId(Long bookId);
 }

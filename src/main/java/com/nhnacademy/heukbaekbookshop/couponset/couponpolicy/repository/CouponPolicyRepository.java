@@ -6,7 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 public interface CouponPolicyRepository extends JpaRepository<CouponPolicy, Long> {
     Page<CouponPolicy> findCouponPolicyByDiscountTypeOrderByMinimumPurchaseAmount(DiscountType discountType, Pageable pageable);
@@ -14,5 +16,7 @@ public interface CouponPolicyRepository extends JpaRepository<CouponPolicy, Long
     Page<CouponPolicy> findAllByOrderByDiscountTypeAscDiscountAmountAsc(Pageable pageable);
 
     List<CouponPolicy> findAllByOrderByDiscountTypeAscDiscountAmountAsc();
+
+    CouponPolicy findCouponPolicyByDiscountTypeAndDiscountAmount(DiscountType discountType, BigDecimal discountAmount);
 }
 

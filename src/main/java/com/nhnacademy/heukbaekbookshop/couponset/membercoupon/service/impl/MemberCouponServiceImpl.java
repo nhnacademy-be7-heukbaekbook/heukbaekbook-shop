@@ -1,11 +1,18 @@
 package com.nhnacademy.heukbaekbookshop.couponset.membercoupon.service.impl;
 
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.BookCoupon;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.Coupon;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponStatus;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.BookCouponResponse;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponResponse;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.repository.BookCouponRepository;
 import com.nhnacademy.heukbaekbookshop.couponset.couponhistory.domain.CouponHistory;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.mapper.CouponMapper;
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.domain.MemberCoupon;
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.dto.response.MemberCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.exception.CouponNotFoundException;
+import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.dto.response.UserBookCouponResponse;
+import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.exception.MemberCouponAlreadyExistsException;
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.exception.MemberCouponNotFoundException;
 import com.nhnacademy.heukbaekbookshop.couponset.couponhistory.repository.CouponHistoryRepository;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.repository.CouponRepository;
@@ -16,11 +23,11 @@ import com.nhnacademy.heukbaekbookshop.memberset.member.exception.MemberNotFound
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import com.nhnacademy.heukbaekbookshop.order.repository.OrderBookRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +38,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
     private final CouponRepository couponRepository;
     private final CouponHistoryRepository couponHistoryRepository;
     private final OrderBookRepository orderBookRepository;
+    private final BookCouponRepository bookCouponRepository;
 
     @Override
     @Transactional
@@ -40,6 +48,10 @@ public class MemberCouponServiceImpl implements MemberCouponService {
 
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new CouponNotFoundException("해당 ID의 쿠폰을 찾을 수 없습니다: " + couponId));
+
+        if(memberCouponRepository.existsByMemberAndCoupon(member, coupon)) {
+            throw new MemberCouponAlreadyExistsException();
+        }
 
         MemberCoupon memberCoupon = CouponMapper.toMemberCouponEntity(member, coupon, coupon.getAvailableDuration());
 
@@ -71,6 +83,12 @@ public class MemberCouponServiceImpl implements MemberCouponService {
     public Page<MemberCouponResponse> getUserCoupons(Pageable pageable, Long memberId) {
         Page<MemberCoupon> memberCoupons = memberCouponRepository.findByMemberId(pageable, memberId);
         return CouponMapper.fromMemberCouponPageableEntity(memberCoupons);
+    }
+
+    @Override
+    public Page<UserBookCouponResponse> getUserBookCouponsDownloadList(Long customerId, Long bookId, Pageable pageable) {
+        Page<BookCoupon> bookCoupons = bookCouponRepository.findAllByBookIdAndCouponStatus(bookId, CouponStatus.ABLE, pageable);
+        return CouponMapper.fromPageableBookCoupon(bookCoupons);
     }
 }
 
