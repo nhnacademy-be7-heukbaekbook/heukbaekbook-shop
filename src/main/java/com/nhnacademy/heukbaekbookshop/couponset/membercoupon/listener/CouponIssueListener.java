@@ -7,11 +7,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class CouponIssueListener {
     private static final String TOPIC_PREFIX = "sse:publish:customerId:%d";
@@ -20,9 +22,9 @@ public class CouponIssueListener {
 //    private final RedisPublisher redisPublisher;
 
     @Transactional
-    @RabbitListener(queues = "heukbaekbook.coupon-issue.queue", concurrency = "1")
+    @RabbitListener(queues = "heukbaekbook.coupon.queue", concurrency = "1")
     public void receiveMessage(CouponIssueRequest issueMessage) {
-        if(!isValidMessage(issueMessage)) {
+        if(isValidMessage(issueMessage)) {
             log.debug("Received RabbitMQ Message is not valid");
             throw new AmqpException("Invalid message received");
         }

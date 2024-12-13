@@ -58,6 +58,7 @@ public class CouponMapper {
     public static Coupon toEntity(CouponRequest couponRequest, CouponPolicy couponPolicy) {
         return Coupon.builder()
                 .couponPolicy(couponPolicy)
+                .couponQuantity(couponRequest.couponQuantity())
                 .availableDuration(couponRequest.availableDuration())
                 .couponTimeStart(couponRequest.couponTimeStart())
                 .couponTimeEnd(couponRequest.couponTimeEnd())
