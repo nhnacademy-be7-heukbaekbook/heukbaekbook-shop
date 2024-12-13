@@ -159,14 +159,6 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    @Transactional
-    public void subtractQuantity(Long couponId) {
-        Coupon coupon = couponRepository.findById(couponId)
-                .orElseThrow(CouponNotFoundException::new);
-        coupon.setCouponQuantity(coupon.getCouponQuantity() - 1);
-    }
-
-    @Override
     public CouponPageResponse getCouponPageResponse(Long customerId, Pageable pageable) {
         Page<CouponResponse> normalCoupons = CouponMapper.fromPageableEntity(couponRepository.findAllNormalCoupons(pageable)) ;
         Page<BookCouponResponse> bookCoupons = couponRepository.findAllBookCoupons(pageable);
@@ -176,17 +168,9 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public CouponResponse getCouponsByTypeAndStatus(CouponType couponType) {
-        return CouponMapper.fromEntity(
-                couponRepository.findByCouponTypeAndCouponStatus(couponType, CouponStatus.ABLE));
-    }
-
-    @Override
     public Long getCouponIdByCouponType(CouponType couponType) {
         return couponRepository.findAvailableCouponIdByCouponType(couponType)
                 .orElseThrow(CouponNotFoundException::new);
 
     }
-
-
 }
