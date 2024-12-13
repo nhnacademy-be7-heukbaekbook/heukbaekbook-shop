@@ -1,12 +1,10 @@
 package com.nhnacademy.heukbaekbookshop.order.controller;
 
 import com.nhnacademy.heukbaekbookshop.order.dto.request.PaymentApprovalRequest;
-import com.nhnacademy.heukbaekbookshop.order.dto.request.RefundCreateRequest;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentApprovalFailResponse;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentApprovalResponse;
 import com.nhnacademy.heukbaekbookshop.order.dto.response.PaymentDetailResponse;
-import com.nhnacademy.heukbaekbookshop.order.dto.response.RefundCreateResponse;
-import com.nhnacademy.heukbaekbookshop.order.service.PaymentService;
+import com.nhnacademy.heukbaekbookshop.order.service.template.PersonalPaymentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +17,10 @@ import java.util.List;
 @Slf4j
 public class PaymentController {
 
-    private final PaymentService paymentService;
+    private final PersonalPaymentService paymentService;
 
-    public PaymentController(PaymentService paymentService) {
-        this.paymentService = paymentService;
+    public PaymentController(PersonalPaymentService personalPaymentService) {
+        this.paymentService = personalPaymentService;
     }
 
     @PostMapping("/confirm")
