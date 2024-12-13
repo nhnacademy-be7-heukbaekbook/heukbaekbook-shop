@@ -22,6 +22,7 @@ import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.dto.response.Membe
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.dto.response.UserBookCouponResponse;
 import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
+import com.nhnacademy.heukbaekbookshop.memberset.member.dto.mapper.MemberMapper;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -57,6 +58,7 @@ public class CouponMapper {
     public static Coupon toEntity(CouponRequest couponRequest, CouponPolicy couponPolicy) {
         return Coupon.builder()
                 .couponPolicy(couponPolicy)
+                .couponQuantity(couponRequest.couponQuantity())
                 .availableDuration(couponRequest.availableDuration())
                 .couponTimeStart(couponRequest.couponTimeStart())
                 .couponTimeEnd(couponRequest.couponTimeEnd())
@@ -105,24 +107,23 @@ public class CouponMapper {
                 category);
     }
 
-    public static MemberCoupon toMemberCouponEntity(Member member, Coupon coupon, int availableDate) {
+    public static MemberCoupon toMemberCouponEntity(Member member, Coupon coupon, LocalDateTime couponExpirationDate) {
         return MemberCoupon.builder()
                 .member(member)
                 .coupon(coupon)
-                .issuedAt(LocalDateTime.now())
-                .expirationDate(LocalDateTime.now().plusDays(availableDate)).build();
+                .expirationDate(couponExpirationDate).build();
     }
 
     public static MemberCouponResponse fromMemberCouponEntity(MemberCoupon memberCoupon) {
+
         return new MemberCouponResponse(
-                memberCoupon.getId(),
-                memberCoupon.getCoupon().getId(),
-                memberCoupon.getCoupon().getCouponName(),
-                memberCoupon.getCoupon().getCouponDescription(),
+                CouponMapper.fromEntity(memberCoupon.getCoupon()),
+                MemberMapper.createMemberResponse(memberCoupon.getMember()),
                 memberCoupon.isCouponUsed(),
                 memberCoupon.getCouponIssuedAt(),
                 memberCoupon.getCouponExpirationDate()
         );
+
     }
 
     public static CouponHistory toCouponHistoryEntity(MemberCoupon memberCoupon, OrderBook orderBook) {
@@ -152,7 +153,7 @@ public class CouponMapper {
                 couponPolicyList,
                 DiscountType.values(),
                 CouponStatus.values(),
-                CouponType.values()
+                new CouponType[]{CouponType.GENERAL, CouponType.BIRTHDAY, CouponType.WELCOME}
         );
     }
 }

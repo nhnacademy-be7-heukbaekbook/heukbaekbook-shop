@@ -34,29 +34,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberCouponServiceImpl implements MemberCouponService {
 
     private final MemberCouponRepository memberCouponRepository;
-    private final MemberRepository memberRepository;
-    private final CouponRepository couponRepository;
+
     private final CouponHistoryRepository couponHistoryRepository;
     private final OrderBookRepository orderBookRepository;
     private final BookCouponRepository bookCouponRepository;
 
-    @Override
-    @Transactional
-    public MemberCouponResponse issueCoupon(Long memberId, Long couponId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(MemberNotFoundException::new);
-
-        Coupon coupon = couponRepository.findById(couponId)
-                .orElseThrow(() -> new CouponNotFoundException("해당 ID의 쿠폰을 찾을 수 없습니다: " + couponId));
-
-        if(memberCouponRepository.existsByMemberAndCoupon(member, coupon)) {
-            throw new MemberCouponAlreadyExistsException();
-        }
-
-        MemberCoupon memberCoupon = CouponMapper.toMemberCouponEntity(member, coupon, coupon.getAvailableDuration());
-
-        return CouponMapper.fromMemberCouponEntity(memberCouponRepository.save(memberCoupon));
-    }
 
     @Override
     @Transactional

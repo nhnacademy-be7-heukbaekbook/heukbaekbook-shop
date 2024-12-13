@@ -62,7 +62,7 @@ class CouponRedisServiceTest {
                 CouponType.GENERAL
         );
 
-        String key = "coupon=1";
+        String key = "coupon:1";
         Map<String, Object> couponData = Map.of(
                 "couponId", couponResponse.couponId(),
                 "couponQuantity", couponResponse.couponQuantity(),
@@ -79,7 +79,7 @@ class CouponRedisServiceTest {
     @Test
     void deleteCouponFromRedis() {
         Long couponId = 1L;
-        String key = "coupon=" + couponId;
+        String key = "coupon:" + couponId;
 
         couponRedisService.deleteCouponFromRedis(couponId);
 
