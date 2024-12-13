@@ -3,7 +3,12 @@ spring:
     name: shop
   config:
     import: optional:configserver:http://localhost:9000
-
+  rabbitmq:
+    host: "133.186.241.167"
+    port: 5672
+    username: admin
+    password: nhnacademy123!
+    virtual-host: vh1_dev
 
 cloud:
   nhn:
@@ -11,3 +16,5 @@ cloud:
       url: https://api-image.nhncloudservice.com/image/v2.0/appkeys/rUN43QEwj1P6jThk
       app-key: rUN43QEwj1P6jThk
       secret-id: I1XLVufp
+
+
