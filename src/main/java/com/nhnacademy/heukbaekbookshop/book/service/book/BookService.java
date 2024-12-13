@@ -347,6 +347,8 @@ public class BookService {
             }
         }
 
+        bookRepository.save(book);
+
         return new BookUpdateResponse(
                 book.getTitle(),
                 book.getIndex(),
