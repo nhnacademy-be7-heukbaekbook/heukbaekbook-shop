@@ -25,11 +25,8 @@ public interface CouponService {
     Page<CouponResponse> getCouponsByStatus(CouponStatus couponStatus, Pageable pageable);
     CouponResponse updateCoupon(Long couponId, CouponRequest couponRequest);
     void changeCouponStatus(Long couponId, CouponStatus couponStatus);
-    void subtractQuantity(Long couponId);
 
     CouponPageResponse getCouponPageResponse(Long customerId, Pageable pageable);
-
-    CouponResponse getCouponsByTypeAndStatus(CouponType couponType);
 
     Long getCouponIdByCouponType(CouponType couponType);
 }
