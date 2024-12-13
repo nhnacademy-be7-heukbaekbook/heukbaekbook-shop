@@ -1,4 +1,4 @@
-package com.nhnacademy.heukbaekbookshop.contributor;
+package com.nhnacademy.heukbaekbookshop.contributor.service;
 
 import com.nhnacademy.heukbaekbookshop.contributor.domain.Contributor;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.request.ContributorCreateRequest;
@@ -10,13 +10,14 @@ import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorUpdat
 import com.nhnacademy.heukbaekbookshop.contributor.exception.ContributorAlreadyExistException;
 import com.nhnacademy.heukbaekbookshop.contributor.exception.ContributorNotFoundException;
 import com.nhnacademy.heukbaekbookshop.contributor.repository.ContributorRepository;
-import com.nhnacademy.heukbaekbookshop.contributor.service.ContributorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -190,5 +191,35 @@ public class ContributorServiceTest {
 
         verify(contributorRepository, times(1)).findById(contributorId);
         verify(contributorRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    public void getContributors_Success() {
+        // Given
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("name").ascending());
+        Contributor contributor1 = new Contributor();
+        contributor1.setId(1L);
+        contributor1.setName("John Doe");
+        contributor1.setDescription("Fantasy Writer");
+
+        Contributor contributor2 = new Contributor();
+        contributor2.setId(2L);
+        contributor2.setName("Jane Smith");
+        contributor2.setDescription("Mystery Writer");
+
+        Page<Contributor> contributors = new PageImpl<>(List.of(contributor1, contributor2), pageable, 2);
+
+        when(contributorRepository.findAll(pageable)).thenReturn(contributors);
+
+        // When
+        Page<ContributorDetailResponse> response = contributorService.getContributors(pageable);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(2, response.getTotalElements());
+        assertEquals("John Doe", response.getContent().get(0).name());
+        assertEquals("Jane Smith", response.getContent().get(1).name());
+
+        verify(contributorRepository, times(1)).findAll(pageable);
     }
 }

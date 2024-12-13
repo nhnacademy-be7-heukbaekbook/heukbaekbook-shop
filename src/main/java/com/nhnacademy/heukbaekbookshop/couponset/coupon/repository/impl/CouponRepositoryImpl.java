@@ -20,9 +20,13 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.nhnacademy.heukbaekbookshop.book.domain.QBookCategory.bookCategory;
+import static com.nhnacademy.heukbaekbookshop.category.domain.QCategory.category;
 import static com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.QBookCoupon.bookCoupon;
 import static com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.QCategoryCoupon.categoryCoupon;
 import static com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.QCoupon.coupon;
@@ -219,4 +223,105 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
                 .fetchOne()
         );
     }
+
+    @Override
+    public List<Coupon> findDownloadableCouponsByBookId(Long bookId) {
+        // 1. 책에 직접 연결된 쿠폰 가져오기
+        List<Coupon> bookCoupons = queryFactory
+                .select(Projections.constructor(Coupon.class,
+                        bookCoupon.id,
+                        bookCoupon.couponPolicy,
+                        bookCoupon.couponQuantity,
+                        bookCoupon.couponStatus,
+                        bookCoupon.availableDuration,
+                        bookCoupon.couponTimeStart,
+                        bookCoupon.couponTimeEnd,
+                        bookCoupon.couponName,
+                        bookCoupon.couponDescription,
+                        bookCoupon.couponCreatedAt,
+                        bookCoupon.couponType))
+                .from(bookCoupon)
+                .join(bookCoupon.couponPolicy, couponPolicy)
+                .where(
+                        bookCoupon.book.id.eq(bookId),
+                        bookCoupon.couponStatus.eq(CouponStatus.ABLE),
+                        bookCoupon.couponTimeStart.loe(LocalDateTime.now()),
+                        bookCoupon.couponTimeEnd.goe(LocalDateTime.now())
+                )
+                .fetch();
+
+        // 2. 책의 카테고리 가져오기
+        List<Long> bookCategoryIds = queryFactory
+                .select(bookCategory.category.id)
+                .from(bookCategory)
+                .where(bookCategory.book.id.eq(bookId))
+                .fetch();
+
+        // 3. 카테고리 및 상위 카테고리 가져오기
+        List<Long> allCategoryIds = new ArrayList<>(bookCategoryIds);
+
+        for (Long categoryId : bookCategoryIds) {
+            fetchParentCategories(categoryId, allCategoryIds);
+        }
+
+        // 4. 카테고리 쿠폰 가져오기
+        List<Coupon> categoryCoupons = queryFactory
+                .select(Projections.constructor(Coupon.class,
+                        categoryCoupon.id,
+                        categoryCoupon.couponPolicy,
+                        categoryCoupon.couponQuantity,
+                        categoryCoupon.couponStatus,
+                        categoryCoupon.availableDuration,
+                        categoryCoupon.couponTimeStart,
+                        categoryCoupon.couponTimeEnd,
+                        categoryCoupon.couponName,
+                        categoryCoupon.couponDescription,
+                        categoryCoupon.couponCreatedAt,
+                        categoryCoupon.couponType))
+                .from(categoryCoupon)
+                .join(categoryCoupon.couponPolicy, couponPolicy)
+                .where(
+                        categoryCoupon.category.id.in(allCategoryIds),
+                        categoryCoupon.couponStatus.eq(CouponStatus.ABLE),
+                        categoryCoupon.couponTimeStart.loe(LocalDateTime.now()),
+                        categoryCoupon.couponTimeEnd.goe(LocalDateTime.now())
+                )
+                .fetch();
+
+        // 5. 일반 쿠폰 가져오기
+        List<Coupon> generalCoupons = queryFactory
+                .select(coupon)
+                .from(coupon)
+                .join(coupon.couponPolicy, couponPolicy).fetchJoin()
+                .where(
+                        coupon.couponType.eq(CouponType.GENERAL),
+                        coupon.couponStatus.eq(CouponStatus.ABLE),
+                        coupon.couponTimeStart.loe(LocalDateTime.now()),
+                        coupon.couponTimeEnd.goe(LocalDateTime.now())
+                )
+                .fetch();
+
+        // 6. 모든 쿠폰 병합
+        List<Coupon> allCoupons = new ArrayList<>();
+        allCoupons.addAll(bookCoupons);
+        allCoupons.addAll(categoryCoupons);
+        allCoupons.addAll(generalCoupons);
+
+        return allCoupons;
+    }
+
+    private void fetchParentCategories(Long categoryId, List<Long> allCategoryIds) {
+        Long parentCategoryId = queryFactory
+                .select(category.parentCategory.id)
+                .from(category)
+                .where(category.id.eq(categoryId))
+                .fetchOne();
+
+        if (parentCategoryId != null && !allCategoryIds.contains(parentCategoryId)) {
+            allCategoryIds.add(parentCategoryId);
+            fetchParentCategories(parentCategoryId, allCategoryIds);
+        }
+    }
+
+
 }

@@ -28,11 +28,14 @@ import com.nhnacademy.heukbaekbookshop.order.exception.WrappingPaperNotFoundExce
 import com.nhnacademy.heukbaekbookshop.order.repository.*;
 import com.nhnacademy.heukbaekbookshop.order.service.OrderService;
 import com.nhnacademy.heukbaekbookshop.point.history.domain.PointHistory;
+import com.nhnacademy.heukbaekbookshop.point.history.event.CancelEvent;
+import com.nhnacademy.heukbaekbookshop.point.history.event.PointUseEvent;
 import com.nhnacademy.heukbaekbookshop.point.history.exception.PointNotFoundException;
 import com.nhnacademy.heukbaekbookshop.point.history.repository.PointHistoryRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -59,7 +62,7 @@ public class OrderServiceImpl implements OrderService {
     private final PaymentRepository paymentRepository;
     private final MemberRepository memberRepository;
     private final WrappingPaperRepository wrappingPaperRepository;
-    private final PointHistoryRepository pointHistoryRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -141,6 +144,10 @@ public class OrderServiceImpl implements OrderService {
                     }
                 });
 
+
+        if (memberRepository.existsById(customer.getId())) {
+            processPointUseEvent(orderCreateRequest, savedOrder.getId());
+        }
 
         return orderId;
     }
@@ -340,14 +347,11 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findByTossOrderId(tossOrderId)
                 .orElseThrow(() -> new OrderNotFoundException(tossOrderId + " Order not found"));
 
+        order.setStatus(OrderStatus.CANCELED);
 
-        Optional<PointHistory> result = pointHistoryRepository.findByOrderId(order.getId());
-        if (result.isPresent()) {
-            PointHistory pointHistory = result.get();
-            pointHistoryRepository.delete(pointHistory);
+        if (memberRepository.existsById(order.getCustomer().getId())) {
+            eventPublisher.publishEvent(new CancelEvent(order.getCustomer().getId(), order.getId()));
         }
-
-        orderRepository.delete(order);
     }
 
     @Override
@@ -387,5 +391,25 @@ public class OrderServiceImpl implements OrderService {
                 book.getDiscountRate(),
                 Formatter.formatPrice(salePrice.multiply(BigDecimal.valueOf(orderBook.getQuantity())))
         );
+    }
+
+    private static BigDecimal convertStringToBigDecimal(String value) {
+        if (value == null || value.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        try {
+            String sanitizedValue = value.replaceAll("[^\\d.]", "");
+            return new BigDecimal(sanitizedValue);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid number format: " + value, e);
+        }
+    }
+
+    private void processPointUseEvent(OrderCreateRequest orderCreateRequest, Long orderId) {
+        BigDecimal usedPoint = convertStringToBigDecimal(orderCreateRequest.usedPoint());
+
+        if (usedPoint.compareTo(BigDecimal.ZERO) > 0) {
+            eventPublisher.publishEvent(new PointUseEvent(orderCreateRequest.customerId(), orderId, usedPoint));
+        }
     }
 }

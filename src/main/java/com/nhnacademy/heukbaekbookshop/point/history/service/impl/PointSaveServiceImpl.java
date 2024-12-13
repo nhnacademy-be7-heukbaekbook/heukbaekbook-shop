@@ -23,6 +23,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -62,11 +64,16 @@ public class PointSaveServiceImpl implements PointSaveService {
         return PointHistoryMapper.toResponse(savedPointHistory);
     }
 
+    @Override
+    public List<PointHistory> getPointHistories(Long customerId, Long orderId, PointType type) {
+        return pointHistoryRepository.findByOrderIdAndType(orderId, type);
+    }
+
 
     private BigDecimal calculateAdjustedAmount(BigDecimal amount, PointType type) {
         return switch (type) {
-            case EARNED, CANCELLED -> amount;
-            case USED -> amount.negate();
+            case EARNED -> amount;
+            case USED, CANCELLED -> amount.negate();
             default -> throw new IllegalArgumentException("Unsupported PointType: " + type);
         };
     }
