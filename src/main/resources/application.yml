@@ -3,12 +3,6 @@ spring:
     name: shop
   config:
     import: optional:configserver:http://localhost:9000
-  rabbitmq:
-    host: 133.186.241.167
-    port: 5672
-    username: admin
-    password: nhnacademy123!
-    virtual-host: vh1_dev
 
 cloud:
   nhn:

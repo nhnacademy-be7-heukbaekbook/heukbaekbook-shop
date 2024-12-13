@@ -153,7 +153,7 @@ public class CouponMapper {
                 couponPolicyList,
                 DiscountType.values(),
                 CouponStatus.values(),
-                CouponType.values()
+                new CouponType[]{CouponType.GENERAL, CouponType.BIRTHDAY, CouponType.WELCOME}
         );
     }
 }
