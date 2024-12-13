@@ -13,7 +13,7 @@ import java.util.Map;
 public class CouponRedisService {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private static final String KEY_PREFIX = "coupon=";
+    private static final String KEY_PREFIX = "coupon:";
 
     public void saveCouponToRedis(CouponResponse couponResponse) {
         String key = KEY_PREFIX + couponResponse.couponId();
@@ -32,4 +32,5 @@ public class CouponRedisService {
         String key = KEY_PREFIX + couponId;
         redisTemplate.delete(key);
     }
+
 }
