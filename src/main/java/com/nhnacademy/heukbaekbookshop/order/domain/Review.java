@@ -91,11 +91,11 @@ public class Review {
         review.content = reviewContent;
         review.createdAt = LocalDateTime.now();
         for (MultipartFile file : reviewImages) {
-            String imageUrl = uploadFunction.apply(file); // 업로드 후 URL 반환
+            String imageUrl = uploadFunction.apply(file);
             ReviewImage reviewImage = new ReviewImage();
             reviewImage.setUrl(imageUrl);
-            reviewImage.setReview(review); // 양방향 관계 설정
-            reviewImage.setType(ImageType.REVIEW); // imageType 설정
+            reviewImage.setReview(review);
+            reviewImage.setType(ImageType.REVIEW);
             review.reviewImages.add(reviewImage);
         }        return review;
     }

@@ -1,4 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.review.dto.response;
 
-public record ReviewCreateResponse (String title) {
+import java.util.List;
+
+public record ReviewCreateResponse (String title, List<String> url) {
 }
