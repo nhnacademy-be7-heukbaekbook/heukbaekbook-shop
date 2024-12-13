@@ -7,7 +7,6 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 
 import java.util.List;
-
 @RequiredArgsConstructor
 public class BookDocumentRepositoryImpl implements BookDocumentRepositoryCustom {
     private final ElasticsearchOperations elasticsearchOperations;
