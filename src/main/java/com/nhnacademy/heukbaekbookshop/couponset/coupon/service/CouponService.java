@@ -1,6 +1,5 @@
 package com.nhnacademy.heukbaekbookshop.couponset.coupon.service;
 
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.Coupon;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponStatus;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponType;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request.CouponRequest;

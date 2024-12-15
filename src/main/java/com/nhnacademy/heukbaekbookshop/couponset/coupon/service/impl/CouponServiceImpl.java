@@ -16,6 +16,7 @@ import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CategoryCou
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponPageResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.exception.CouponNotFoundException;
+import com.nhnacademy.heukbaekbookshop.couponset.coupon.repository.CouponRepository;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.service.CouponService;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
@@ -24,7 +25,6 @@ import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.mapper.CouponP
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.exception.CouponPolicyNotFoundException;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.repository.CouponPolicyRepository;
 import lombok.RequiredArgsConstructor;
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.repository.CouponRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

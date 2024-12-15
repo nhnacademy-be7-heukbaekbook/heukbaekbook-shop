@@ -1,7 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.memberset.member.dto.request;
 
 import jakarta.validation.constraints.*;
-import org.hibernate.validator.constraints.Length;
 
 import java.sql.Date;
 

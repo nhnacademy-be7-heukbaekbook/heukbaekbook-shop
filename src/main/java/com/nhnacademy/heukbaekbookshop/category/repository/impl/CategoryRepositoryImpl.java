@@ -1,14 +1,13 @@
 package com.nhnacademy.heukbaekbookshop.category.repository.impl;
 
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
-import com.nhnacademy.heukbaekbookshop.category.domain.QCategory;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 
 import java.util.List;
 
-import static com.nhnacademy.heukbaekbookshop.category.domain.QCategory.*;
+import static com.nhnacademy.heukbaekbookshop.category.domain.QCategory.category;
 
 public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
 

@@ -4,7 +4,6 @@ import com.nhnacademy.heukbaekbookshop.contributor.dto.response.ContributorSumma
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherSummaryResponse;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 

@@ -1,8 +1,8 @@
 package com.nhnacademy.heukbaekbookshop.couponset.couponhistory.repository;
 
+import com.nhnacademy.heukbaekbookshop.couponset.couponhistory.domain.CouponHistory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import com.nhnacademy.heukbaekbookshop.couponset.couponhistory.domain.CouponHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CouponHistoryRepository extends JpaRepository<CouponHistory, Long> {

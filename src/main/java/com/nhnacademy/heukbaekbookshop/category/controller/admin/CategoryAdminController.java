@@ -1,10 +1,10 @@
 package com.nhnacademy.heukbaekbookshop.category.controller.admin;
 
-import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryDetailResponse;
 import com.nhnacademy.heukbaekbookshop.category.dto.request.CategoryCreateRequest;
 import com.nhnacademy.heukbaekbookshop.category.dto.request.CategoryUpdateRequest;
 import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryCreateResponse;
 import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryDeleteResponse;
+import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryDetailResponse;
 import com.nhnacademy.heukbaekbookshop.category.dto.response.CategoryUpdateResponse;
 import com.nhnacademy.heukbaekbookshop.category.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;

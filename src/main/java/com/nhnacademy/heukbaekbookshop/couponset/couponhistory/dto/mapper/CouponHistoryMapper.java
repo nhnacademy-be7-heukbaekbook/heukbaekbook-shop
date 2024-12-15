@@ -1,8 +1,8 @@
 package com.nhnacademy.heukbaekbookshop.couponset.couponhistory.dto.mapper;
 
 import com.nhnacademy.heukbaekbookshop.couponset.couponhistory.domain.CouponHistory;
-import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.domain.MemberCoupon;
 import com.nhnacademy.heukbaekbookshop.couponset.couponhistory.dto.response.CouponHistoryResponse;
+import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.domain.MemberCoupon;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 
 import java.time.LocalDateTime;

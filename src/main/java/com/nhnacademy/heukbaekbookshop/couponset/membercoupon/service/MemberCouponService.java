@@ -1,6 +1,5 @@
 package com.nhnacademy.heukbaekbookshop.couponset.membercoupon.service;
 
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.dto.response.MemberCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.dto.response.UserBookCouponResponse;
 import org.springframework.data.domain.Page;

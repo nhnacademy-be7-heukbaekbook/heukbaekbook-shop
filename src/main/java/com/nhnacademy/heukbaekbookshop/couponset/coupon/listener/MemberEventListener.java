@@ -3,7 +3,6 @@ package com.nhnacademy.heukbaekbookshop.couponset.coupon.listener;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponType;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.service.CouponService;
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.service.CouponIssueService;
-import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.service.MemberCouponService;
 import com.nhnacademy.heukbaekbookshop.point.history.event.SignupEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

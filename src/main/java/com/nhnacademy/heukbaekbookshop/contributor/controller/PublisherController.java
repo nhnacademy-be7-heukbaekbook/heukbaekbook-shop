@@ -7,7 +7,6 @@ import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherDeleteR
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherDetailResponse;
 import com.nhnacademy.heukbaekbookshop.contributor.dto.response.PublisherUpdateResponse;
 import com.nhnacademy.heukbaekbookshop.contributor.service.PublisherService;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -4,7 +4,6 @@ import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponStatu
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponType;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyResponse;
-import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
