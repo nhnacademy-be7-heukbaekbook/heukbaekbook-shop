@@ -27,6 +27,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -178,5 +180,87 @@ class ReviewServiceTest {
         assertNotNull(responses);
         assertEquals(2, responses.size());
         verify(reviewRepository, times(1)).findAllByCustomerId(customerId);
+    }
+
+    @Test
+    void deleteReview_ShouldDeleteReview() {
+        // Given
+        Long customerId = 1L;
+        Long orderId = 10L;
+        Long bookId = 100L;
+
+        Review review = mock(Review.class);
+        when(reviewRepository.findByOrderIdAndBookIdAndCustomerId(orderId, bookId, customerId))
+                .thenReturn(review);
+
+        // When
+        reviewService.deleteReview(customerId, orderId, bookId);
+
+        // Then
+        verify(reviewRepository, times(1)).findByOrderIdAndBookIdAndCustomerId(orderId, bookId, customerId);
+        verify(reviewRepository, times(1)).delete(review);
+    }
+
+    @Test
+    void hasReview_ShouldReturnTrueIfReviewExists() {
+        // Given
+        Long customerId = 1L;
+        Long orderId = 10L;
+        Long bookId = 100L;
+
+        Review review = mock(Review.class);
+        when(reviewRepository.findByOrderIdAndBookIdAndCustomerId(orderId, bookId, customerId))
+                .thenReturn(review);
+
+        // When
+        boolean result = reviewService.hasReview(customerId, orderId, bookId);
+
+        // Then
+        assertTrue(result);
+        verify(reviewRepository, times(1)).findByOrderIdAndBookIdAndCustomerId(orderId, bookId, customerId);
+    }
+
+    @Test
+    void hasReview_ShouldReturnFalseIfReviewNotFound() {
+        // Given
+        Long customerId = 1L;
+        Long orderId = 10L;
+        Long bookId = 100L;
+
+        when(reviewRepository.findByOrderIdAndBookIdAndCustomerId(orderId, bookId, customerId))
+                .thenReturn(null);
+
+        // When
+        boolean result = reviewService.hasReview(customerId, orderId, bookId);
+
+        // Then
+        assertFalse(result);
+        verify(reviewRepository, times(1)).findByOrderIdAndBookIdAndCustomerId(orderId, bookId, customerId);
+    }
+
+    @Test
+    void getReviewsByOrder_ShouldReturnListOfReviewDetailResponses() {
+        // Given
+        Long orderId = 10L;
+
+        Review review1 = mock(Review.class);
+        Review review2 = mock(Review.class);
+
+        when(reviewRepository.findAllByOrderId(orderId)).thenReturn(Arrays.asList(review1, review2));
+
+        ReviewImage image1 = new ReviewImage(review1);
+        ReviewImage image2 = new ReviewImage(review2);
+        when(reviewImageRepository.findAllByReview(review1)).thenReturn(Collections.singletonList(image1));
+        when(reviewImageRepository.findAllByReview(review2)).thenReturn(Collections.singletonList(image2));
+
+        // When
+        List<ReviewDetailResponse> responses = reviewService.getReviewsByOrder(orderId);
+
+        // Then
+        assertNotNull(responses);
+        assertEquals(2, responses.size());
+        verify(reviewRepository, times(1)).findAllByOrderId(orderId);
+        verify(reviewImageRepository, times(1)).findAllByReview(review1);
+        verify(reviewImageRepository, times(1)).findAllByReview(review2);
     }
 }

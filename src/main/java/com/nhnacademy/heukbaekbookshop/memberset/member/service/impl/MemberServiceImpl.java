@@ -34,6 +34,7 @@ import com.nhnacademy.heukbaekbookshop.order.dto.response.*;
 import com.nhnacademy.heukbaekbookshop.order.exception.OrderNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.repository.OrderRepository;
 import com.nhnacademy.heukbaekbookshop.point.history.domain.PointHistory;
+import com.nhnacademy.heukbaekbookshop.point.history.domain.PointType;
 import com.nhnacademy.heukbaekbookshop.point.history.event.SignupEvent;
 import com.nhnacademy.heukbaekbookshop.point.history.exception.PointNotFoundException;
 import com.nhnacademy.heukbaekbookshop.point.history.repository.PointHistoryRepository;
@@ -208,5 +209,4 @@ public class MemberServiceImpl implements MemberService {
                 memberRepository.findGradeByMemberId(customerId)
                         .orElseThrow(MemberNotFoundException::new));
     }
-
 }

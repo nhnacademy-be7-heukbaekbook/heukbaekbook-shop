@@ -53,7 +53,7 @@ public class CouponIssueServiceImpl implements CouponIssueService {
     @Override
     @Transactional
     public MemberCouponResponse issueCouponAsync(CouponIssueRequest couponIssueRequest) {
-            MemberCoupon memberCoupon = createMemberCouponProxy(couponIssueRequest);
+        MemberCoupon memberCoupon = createMemberCouponProxy(couponIssueRequest);
         return CouponMapper.fromMemberCouponEntity(memberCouponRepository.save(memberCoupon));
     }
 

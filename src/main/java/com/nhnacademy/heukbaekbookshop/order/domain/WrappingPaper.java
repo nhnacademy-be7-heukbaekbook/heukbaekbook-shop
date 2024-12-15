@@ -34,4 +34,11 @@ public class WrappingPaper {
 
     @OneToOne(mappedBy = "wrappingPaper", fetch = FetchType.LAZY)
     private WrappingPaperImage wrappingPaperImage;
+
+    public static WrappingPaper createWrappingPaper(String name, BigDecimal price) {
+        WrappingPaper wrappingPaper = new WrappingPaper();
+        wrappingPaper.setName(name);
+        wrappingPaper.setPrice(price);
+        return wrappingPaper;
+    }
 }

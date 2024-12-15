@@ -13,6 +13,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -209,6 +213,109 @@ public class CategoryServiceTest {
                 .hasMessage("존재하지 않는 카테고리 입니다.");
         verify(categoryRepository).findById(99L);
         verify(categoryRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    void getCategory_ShouldReturnCategoryDetailResponse() {
+        // Given
+        Long categoryId = 1L;
+        Category parentCategory = new Category();
+        parentCategory.setId(0L);
+        parentCategory.setName("Parent Category");
+
+        Category category = new Category();
+        category.setId(categoryId);
+        category.setName("Child Category");
+        category.setParentCategory(parentCategory);
+
+        when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
+
+        // When
+        CategoryDetailResponse response = categoryService.getCategory(categoryId);
+
+        // Then
+        assertThat(response)
+                .isNotNull()
+                .extracting(CategoryDetailResponse::id, CategoryDetailResponse::parentId, CategoryDetailResponse::name)
+                .containsExactly(categoryId, parentCategory.getId(), "Child Category");
+
+        verify(categoryRepository, times(1)).findById(categoryId);
+    }
+
+    @Test
+    void getCategory_ShouldThrowExceptionWhenNotFound() {
+        // Given
+        Long categoryId = 1L;
+        when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThatThrownBy(() -> categoryService.getCategory(categoryId))
+                .isInstanceOf(CategoryNotFoundException.class)
+                .hasMessage("존재하지 않는 카테고리입니다.");
+
+        verify(categoryRepository, times(1)).findById(categoryId);
+    }
+
+    @Test
+    void getCategories_ShouldReturnPaginatedCategoryResponses() {
+        // Given
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Category parentCategory = new Category();
+        parentCategory.setId(0L);
+        parentCategory.setName("Parent Category");
+
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("Child Category");
+        category.setParentCategory(parentCategory);
+
+        Page<Category> categoryPage = new PageImpl<>(List.of(category));
+        when(categoryRepository.findAllBy(pageable)).thenReturn(categoryPage);
+
+        // When
+        Page<CategoryDetailResponse> responses = categoryService.getCategories(pageable);
+
+        // Then
+        assertThat(responses)
+                .isNotNull()
+                .hasSize(1);
+
+        assertThat(responses.getContent().getFirst())
+                .extracting(CategoryDetailResponse::id, CategoryDetailResponse::parentId, CategoryDetailResponse::name)
+                .containsExactly(category.getId(), parentCategory.getId(), "Child Category");
+
+        verify(categoryRepository, times(1)).findAllBy(pageable);
+    }
+
+    @Test
+    void getCategoryPaths_ShouldReturnCategoryPaths() {
+        // Given
+        Category rootCategory = new Category();
+        rootCategory.setId(1L);
+        rootCategory.setName("Root");
+
+        Category childCategory = new Category();
+        childCategory.setId(2L);
+        childCategory.setName("Child");
+        childCategory.setParentCategory(rootCategory);
+
+        Category subChildCategory = new Category();
+        subChildCategory.setId(3L);
+        subChildCategory.setName("SubChild");
+        subChildCategory.setParentCategory(childCategory);
+
+        when(categoryRepository.findAll()).thenReturn(List.of(rootCategory, childCategory, subChildCategory));
+
+        // When
+        List<String> categoryPaths = categoryService.getCategoryPaths();
+
+        // Then
+        assertThat(categoryPaths)
+                .isNotNull()
+                .containsExactlyInAnyOrder("Root", "Root>Child", "Root>Child>SubChild");
+
+        verify(categoryRepository, times(1)).findAll();
     }
 
     @Test

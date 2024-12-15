@@ -8,7 +8,6 @@ import com.nhnacademy.heukbaekbookshop.cart.dto.CartBookSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.cart.dto.CartCreateRequest;
 import com.nhnacademy.heukbaekbookshop.cart.repository.CartRepository;
 import com.nhnacademy.heukbaekbookshop.cart.service.impl.CartServiceImpl;
-import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
 import java.util.Optional;
