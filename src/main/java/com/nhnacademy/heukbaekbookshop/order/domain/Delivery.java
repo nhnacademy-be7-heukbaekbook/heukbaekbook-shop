@@ -1,10 +1,9 @@
 package com.nhnacademy.heukbaekbookshop.order.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import lombok.*;
-import org.hibernate.validator.constraints.Length;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 

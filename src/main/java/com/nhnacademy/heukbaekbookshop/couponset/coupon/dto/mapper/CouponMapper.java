@@ -20,14 +20,12 @@ import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.mapper.CouponP
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.domain.MemberCoupon;
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.dto.response.MemberCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.dto.response.UserBookCouponResponse;
-import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.mapper.MemberMapper;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
-
 
 import java.time.LocalDateTime;
 import java.util.List;

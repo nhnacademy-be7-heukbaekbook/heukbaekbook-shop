@@ -1,9 +1,9 @@
 package com.nhnacademy.heukbaekbookshop.category.service;
 
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
-import com.nhnacademy.heukbaekbookshop.category.dto.response.*;
 import com.nhnacademy.heukbaekbookshop.category.dto.request.CategoryCreateRequest;
 import com.nhnacademy.heukbaekbookshop.category.dto.request.CategoryUpdateRequest;
+import com.nhnacademy.heukbaekbookshop.category.dto.response.*;
 import com.nhnacademy.heukbaekbookshop.category.exception.CategoryAlreadyExistsException;
 import com.nhnacademy.heukbaekbookshop.category.exception.CategoryNotFoundException;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;

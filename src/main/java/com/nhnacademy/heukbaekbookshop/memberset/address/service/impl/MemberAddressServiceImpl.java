@@ -8,10 +8,10 @@ import com.nhnacademy.heukbaekbookshop.memberset.address.exception.AddressLimitE
 import com.nhnacademy.heukbaekbookshop.memberset.address.exception.MemberAddressAlreadyExistsException;
 import com.nhnacademy.heukbaekbookshop.memberset.address.exception.MemberAddressNotFoundException;
 import com.nhnacademy.heukbaekbookshop.memberset.address.repository.MemberAddressRepository;
+import com.nhnacademy.heukbaekbookshop.memberset.address.service.MemberAddressService;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
-import com.nhnacademy.heukbaekbookshop.memberset.address.service.MemberAddressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

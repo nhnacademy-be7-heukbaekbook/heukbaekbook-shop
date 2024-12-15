@@ -2,9 +2,9 @@ package com.nhnacademy.heukbaekbookshop.review.service;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
-import com.nhnacademy.heukbaekbookshop.image.service.ImageManagerService;
 import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import com.nhnacademy.heukbaekbookshop.image.domain.ReviewImage;
+import com.nhnacademy.heukbaekbookshop.image.service.ImageManagerService;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.repository.CustomerRepository;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
@@ -12,8 +12,6 @@ import com.nhnacademy.heukbaekbookshop.order.domain.Order;
 import com.nhnacademy.heukbaekbookshop.order.domain.Review;
 import com.nhnacademy.heukbaekbookshop.order.domain.ReviewPK;
 import com.nhnacademy.heukbaekbookshop.order.repository.OrderRepository;
-import com.nhnacademy.heukbaekbookshop.point.history.domain.PointType;
-import com.nhnacademy.heukbaekbookshop.point.history.dto.request.PointHistoryRequest;
 import com.nhnacademy.heukbaekbookshop.point.history.event.ReviewEvent;
 import com.nhnacademy.heukbaekbookshop.point.history.repository.PointHistoryRepository;
 import com.nhnacademy.heukbaekbookshop.point.history.service.PointSaveService;
@@ -29,8 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

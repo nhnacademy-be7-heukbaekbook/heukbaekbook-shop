@@ -3,7 +3,9 @@ package com.nhnacademy.heukbaekbookshop.order.domain;
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 

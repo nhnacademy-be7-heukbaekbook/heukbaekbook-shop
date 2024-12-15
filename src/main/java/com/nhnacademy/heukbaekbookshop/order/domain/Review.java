@@ -1,9 +1,7 @@
 package com.nhnacademy.heukbaekbookshop.order.domain;
 
-import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import com.nhnacademy.heukbaekbookshop.image.domain.ReviewImage;
-import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

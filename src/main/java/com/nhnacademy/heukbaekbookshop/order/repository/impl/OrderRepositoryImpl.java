@@ -13,12 +13,12 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
-import static com.nhnacademy.heukbaekbookshop.memberset.customer.domain.QCustomer.*;
-import static com.nhnacademy.heukbaekbookshop.order.domain.QDelivery.*;
-import static com.nhnacademy.heukbaekbookshop.order.domain.QDeliveryFee.*;
-import static com.nhnacademy.heukbaekbookshop.order.domain.QOrder.*;
-import static com.nhnacademy.heukbaekbookshop.order.domain.QPayment.*;
-import static com.nhnacademy.heukbaekbookshop.order.domain.QPaymentType.*;
+import static com.nhnacademy.heukbaekbookshop.memberset.customer.domain.QCustomer.customer;
+import static com.nhnacademy.heukbaekbookshop.order.domain.QDelivery.delivery;
+import static com.nhnacademy.heukbaekbookshop.order.domain.QDeliveryFee.deliveryFee;
+import static com.nhnacademy.heukbaekbookshop.order.domain.QOrder.order;
+import static com.nhnacademy.heukbaekbookshop.order.domain.QPayment.payment;
+import static com.nhnacademy.heukbaekbookshop.order.domain.QPaymentType.paymentType;
 
 public class OrderRepositoryImpl implements OrderRepositoryCustom {
 

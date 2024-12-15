@@ -1,6 +1,5 @@
 package com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.controller;
 
-import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.CouponPolicy;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyRequest;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.dto.CouponPolicyResponse;

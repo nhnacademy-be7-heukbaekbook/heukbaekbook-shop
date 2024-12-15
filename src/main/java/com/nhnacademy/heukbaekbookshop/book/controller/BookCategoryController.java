@@ -1,8 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.book.controller;
 
-import com.nhnacademy.heukbaekbookshop.book.repository.book.BookCategoryRepository;
 import com.nhnacademy.heukbaekbookshop.book.service.book.BookCategoryService;
-import com.nhnacademy.heukbaekbookshop.category.dto.response.CategorySummaryResponse;
 import com.nhnacademy.heukbaekbookshop.category.dto.response.ParentCategoryResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

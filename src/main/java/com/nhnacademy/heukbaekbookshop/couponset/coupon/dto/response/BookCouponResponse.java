@@ -4,7 +4,6 @@ import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponStatu
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponType;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
 
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 

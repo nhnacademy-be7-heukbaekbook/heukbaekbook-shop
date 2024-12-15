@@ -1,8 +1,8 @@
 package com.nhnacademy.heukbaekbookshop.book.controller;
 
-import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookDetailResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookResponse;
+import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookViewResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.like.LikeCreateResponse;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.like.LikeDeleteResponse;

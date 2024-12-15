@@ -3,7 +3,6 @@ package com.nhnacademy.heukbaekbookshop.order.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
 

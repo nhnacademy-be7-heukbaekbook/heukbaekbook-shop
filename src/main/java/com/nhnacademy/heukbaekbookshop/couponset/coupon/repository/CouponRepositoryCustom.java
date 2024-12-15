@@ -6,7 +6,6 @@ import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponType;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.BookCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CategoryCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.couponpolicy.domain.DiscountType;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

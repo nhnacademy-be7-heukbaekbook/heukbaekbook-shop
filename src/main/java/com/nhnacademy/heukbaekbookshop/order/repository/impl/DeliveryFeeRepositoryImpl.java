@@ -1,16 +1,14 @@
 package com.nhnacademy.heukbaekbookshop.order.repository.impl;
 
 import com.nhnacademy.heukbaekbookshop.order.domain.DeliveryFee;
-import com.nhnacademy.heukbaekbookshop.order.domain.QDeliveryFee;
 import com.nhnacademy.heukbaekbookshop.order.repository.DeliveryFeeRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
 
-import static com.nhnacademy.heukbaekbookshop.order.domain.QDeliveryFee.*;
+import static com.nhnacademy.heukbaekbookshop.order.domain.QDeliveryFee.deliveryFee;
 
 public class DeliveryFeeRepositoryImpl implements DeliveryFeeRepositoryCustom {
 

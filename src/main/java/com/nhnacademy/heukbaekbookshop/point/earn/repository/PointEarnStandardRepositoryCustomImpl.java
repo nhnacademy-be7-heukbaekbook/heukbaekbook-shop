@@ -5,7 +5,6 @@ import com.nhnacademy.heukbaekbookshop.point.earn.domain.PointEarnStandard;
 import com.nhnacademy.heukbaekbookshop.point.earn.domain.PointEarnStandardStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;

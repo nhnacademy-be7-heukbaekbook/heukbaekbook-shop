@@ -1,13 +1,13 @@
 package com.nhnacademy.heukbaekbookshop.couponset.couponhistory.service.impl;
 
 import com.nhnacademy.heukbaekbookshop.couponset.couponhistory.domain.CouponHistory;
-import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.domain.MemberCoupon;
 import com.nhnacademy.heukbaekbookshop.couponset.couponhistory.dto.mapper.CouponHistoryMapper;
 import com.nhnacademy.heukbaekbookshop.couponset.couponhistory.dto.request.CouponHistoryRequest;
 import com.nhnacademy.heukbaekbookshop.couponset.couponhistory.dto.response.CouponHistoryResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.couponhistory.repository.CouponHistoryRepository;
-import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.repository.MemberCouponRepository;
 import com.nhnacademy.heukbaekbookshop.couponset.couponhistory.service.CouponHistoryService;
+import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.domain.MemberCoupon;
+import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.repository.MemberCouponRepository;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBookId;
 import com.nhnacademy.heukbaekbookshop.order.exception.OrderBookNotFoundException;
