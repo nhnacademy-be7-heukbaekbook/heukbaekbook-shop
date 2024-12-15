@@ -9,6 +9,8 @@ import com.nhnacademy.heukbaekbookshop.couponset.couponhistory.repository.Coupon
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.repository.MemberCouponRepository;
 import com.nhnacademy.heukbaekbookshop.couponset.couponhistory.service.CouponHistoryService;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
+import com.nhnacademy.heukbaekbookshop.order.domain.OrderBookId;
+import com.nhnacademy.heukbaekbookshop.order.exception.OrderBookNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.repository.OrderBookRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,12 +32,8 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
                 .orElseThrow(() -> new IllegalStateException("해당 ID의 회원 쿠폰을 찾을 수 없습니다 : " +
                         couponHistoryRequest.memberCouponId()));
 
-        OrderBook orderBook = orderBookRepository.findByOrderIdAndBookId(
-                couponHistoryRequest.orderId(), couponHistoryRequest.bookId());
-        if (orderBook == null) {
-            throw new IllegalStateException("해당 주문 ID에 대한 주문 도서를 찾을 수 없습니다 : " +
-                    couponHistoryRequest.orderId() + " 해당 도서 ID에 대한 주문 도서를 찾을 수 없습니다 : " + couponHistoryRequest.bookId());
-        }
+        OrderBook orderBook = orderBookRepository.findById(new OrderBookId(couponHistoryRequest.bookId(), couponHistoryRequest.orderId()))
+                .orElseThrow(() -> new OrderBookNotFoundException("order book not found"));
 
         CouponHistory couponHistory = CouponHistoryMapper.toCouponHistoryEntity(memberCoupon, orderBook);
 
@@ -46,7 +44,7 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
     @Override
     @Transactional(readOnly = true)
     public Page<CouponHistoryResponse> getCouponHistoryByCustomerId(Long memberId, Pageable pageable) {
-        return couponHistoryRepository.findByMemberCoupon_Member_Id(pageable, memberId)
+        return couponHistoryRepository.findAllByMemberCoupon(pageable, memberId)
                 .map(CouponHistoryMapper::toResponse);
     }
 }

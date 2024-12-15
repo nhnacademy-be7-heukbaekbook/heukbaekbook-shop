@@ -17,6 +17,7 @@ import com.nhnacademy.heukbaekbookshop.order.strategy.PaymentStrategy;
 import com.nhnacademy.heukbaekbookshop.order.strategy.PaymentStrategyFactory;
 import com.nhnacademy.heukbaekbookshop.point.history.event.OrderEvent;
 import jakarta.persistence.EntityManager;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -193,6 +195,38 @@ class PaymentServiceTest {
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Failed to set field '" + fieldName + "' on target.", e);
         }
+    }
+
+    @Test
+    void testApprovePayment() {
+        // Given
+        PaymentApprovalRequest request = new PaymentApprovalRequest(
+                "paymentKey123",
+                "VALID_ORDER_ID",
+                100L, // amount as BigDecimal
+                "credit_card"
+        );
+
+        PaymentStrategy paymentStrategy = mock(PaymentStrategy.class);
+        when(paymentStrategyFactory.getStrategy("credit_card")).thenReturn(paymentStrategy);
+        when(paymentStrategy.approvePayment(request)).thenReturn(new PaymentGatewayApprovalResponse(
+                "paymentKey123",
+                ZonedDateTime.now().minusDays(1).toString(),
+                ZonedDateTime.now().toString(),
+                new BigDecimal("0.00"),
+                "Credit Card"
+        ));
+
+        PaymentType paymentType = new PaymentType();
+
+        when(orderRepository.findByTossOrderId("VALID_ORDER_ID")).thenReturn(Optional.of(existingOrder));
+        when(paymentTypeRepository.findByName("Credit Card")).thenReturn(Optional.of(existingPaymentType));
+
+        //when
+        PaymentApprovalResponse paymentApprovalResponse = paymentService.approvePayment(request);
+
+        //then
+        assertThat(paymentApprovalResponse).isNotNull();
     }
 
     @Test

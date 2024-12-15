@@ -17,10 +17,6 @@ public interface OrderService {
 
     OrderDetailResponse getOrderDetailResponse(String tossOrderId);
 
-    MyPageRefundableOrderDetailListResponse getRefundableOrders(String customerId);
-
-    MyPageRefundableOrderDetailResponse getRefundableOrderDetail(String customerId, Long orderId);
-
     void deleteOrder(String tossOrderId);
 
     OrderResponse getOrders(Pageable pageable);

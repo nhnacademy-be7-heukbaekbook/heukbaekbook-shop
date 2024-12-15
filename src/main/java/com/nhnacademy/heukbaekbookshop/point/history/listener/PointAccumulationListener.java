@@ -71,6 +71,7 @@ public class PointAccumulationListener {
                 );
                 pointSaveService.createPointHistory(userId, pointHistoryRequest);
             } catch (Exception e) {
+                log.error(e.getMessage());
                 log.error("Point 적립 실패, OrderId: {}, MemberId: {}", orderId, userId);
             }
         }

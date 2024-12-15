@@ -2,12 +2,14 @@ package com.nhnacademy.heukbaekbookshop.order.domain;
 
 import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 
+import com.nhnacademy.heukbaekbookshop.point.history.domain.PointHistory;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -55,6 +57,9 @@ public class Order {
     @OneToOne(mappedBy = "order", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @Setter
     private Delivery delivery;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)
+    private List<PointHistory> pointHistories;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delivery_fee_id")

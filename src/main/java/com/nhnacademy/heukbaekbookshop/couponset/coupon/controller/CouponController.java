@@ -109,8 +109,7 @@ public class CouponController {
     @GetMapping("/type/discount/{type}")
     public ResponseEntity<Page<CouponResponse>> getCouponsByType(@PathVariable("type") DiscountType discountType, Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(couponService.getCouponsByType(discountType,pageable)
-                );
+                .body(couponService.getCouponsByType(discountType,pageable));
     }
 
     /**

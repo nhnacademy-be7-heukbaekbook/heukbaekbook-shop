@@ -1,6 +1,5 @@
 package com.nhnacademy.heukbaekbookshop.memberset.customer.service.impl;
 
-import com.nhnacademy.heukbaekbookshop.memberset.customer.exception.CustomerNotFoundException;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.service.CustomerService;
 import com.nhnacademy.heukbaekbookshop.order.domain.Order;
 import com.nhnacademy.heukbaekbookshop.order.dto.request.OrderSearchCondition;

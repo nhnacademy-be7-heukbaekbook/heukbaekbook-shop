@@ -100,7 +100,7 @@ class OrderControllerTest {
         String orderId = "order-123";
         OrderDetailResponse response = new OrderDetailResponse(
                 "toss-123", "John Doe", "3000", "10000", "Card", "Jane Doe",
-                12345L, "Road Name", "Detail Address", "8000", "2000", "10000",
+                12345L, "Road Name", "Detail Address", "8000", "2000", "10000", "1000",
                 "Paid", List.of(new OrderBookResponse(1L, "thumbnailUrl", "title", "10000", 5, "9000", BigDecimal.valueOf(10), "45000"))
         );
 

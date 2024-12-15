@@ -2,6 +2,8 @@ package com.nhnacademy.heukbaekbookshop.order.dto.response;
 
 import com.nhnacademy.heukbaekbookshop.common.util.Formatter;
 import com.nhnacademy.heukbaekbookshop.order.domain.Order;
+import com.nhnacademy.heukbaekbookshop.point.history.domain.PointHistory;
+import com.nhnacademy.heukbaekbookshop.point.history.domain.PointType;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,6 +21,7 @@ public record OrderDetailResponse(
         String detailAddress,
         String totalBookPrice,
         String totalBookDiscountPrice,
+        String point,
         String totalPrice,
         String status,
         List<OrderBookResponse> books) {
@@ -27,6 +30,15 @@ public record OrderDetailResponse(
         BigDecimal totalBookPrice = calculateTotalBookPrice(order);
         BigDecimal totalDiscount = calculateTotalDiscount(order);
         BigDecimal totalPriceWithDelivery = totalBookPrice.add(order.getDeliveryFee().getFee());
+        BigDecimal point = BigDecimal.ZERO;
+        if (order.getPointHistories() != null) {
+            List<PointHistory> pointHistories = order.getPointHistories();
+            for (PointHistory pointHistory : pointHistories) {
+                if (pointHistory.getType().equals(PointType.USED)) {
+                    point = point.add(pointHistory.getAmount());
+                }
+            }
+        }
 
         return new OrderDetailResponse(
                 order.getTossOrderId(),
@@ -40,6 +52,7 @@ public record OrderDetailResponse(
                 order.getDelivery().getDetailAddress(),
                 Formatter.formatPrice(totalBookPrice),
                 Formatter.formatPrice(totalDiscount),
+                Formatter.formatPrice(point),
                 Formatter.formatPrice(totalPriceWithDelivery),
                 order.getStatus().getKorean(),
                 order.getOrderBooks().stream()

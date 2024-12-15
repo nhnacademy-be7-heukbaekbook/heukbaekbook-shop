@@ -154,23 +154,6 @@ public class ReviewService {
         }
     }
 
-    private void saveReviewPoints(Long customerId, Long orderId, int points) {
-        boolean alreadyAdded = pointHistoryRepository.existsByMemberIdAndOrderId(customerId, orderId);
-
-        if (alreadyAdded) {
-            throw new IllegalArgumentException("이미 리뷰 작성으로 포인트가 적립되었습니다.");
-        }
-
-        PointHistoryRequest pointRequest = new PointHistoryRequest(
-                orderId,
-                "리뷰 작성으로 인한 포인트 적립",
-                BigDecimal.valueOf(points),
-                LocalDateTime.now(),
-                PointType.EARNED
-        );
-        pointSaveService.createPointHistory(customerId, pointRequest);
-    }
-
     @Transactional(readOnly = true)
     public List<ReviewDetailResponse> getReviewsByBook(Long bookId) {
         List<Review> reviews = reviewRepository.findAllByBookId(bookId);
@@ -232,5 +215,4 @@ public class ReviewService {
             return convertToResponse(review, imageUrls);
         }).collect(Collectors.toList());
     }
-
 }

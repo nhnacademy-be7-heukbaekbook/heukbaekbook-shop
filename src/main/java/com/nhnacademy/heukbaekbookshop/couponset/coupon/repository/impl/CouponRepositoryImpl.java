@@ -322,6 +322,4 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
             fetchParentCategories(parentCategoryId, allCategoryIds);
         }
     }
-
-
 }

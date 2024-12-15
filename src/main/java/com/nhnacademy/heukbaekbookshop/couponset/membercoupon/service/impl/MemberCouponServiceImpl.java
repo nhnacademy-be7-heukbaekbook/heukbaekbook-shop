@@ -22,6 +22,8 @@ import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
+import com.nhnacademy.heukbaekbookshop.order.domain.OrderBookId;
+import com.nhnacademy.heukbaekbookshop.order.exception.OrderBookNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.repository.OrderBookRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -50,7 +52,8 @@ public class MemberCouponServiceImpl implements MemberCouponService {
             throw new IllegalStateException("쿠폰이 이미 사용되었습니다.");
         }
 
-        OrderBook orderBook = orderBookRepository.findByOrderIdAndBookId(orderId, bookId);
+        OrderBook orderBook = orderBookRepository.findById(new OrderBookId(orderId, bookId))
+                        .orElseThrow(() -> new OrderBookNotFoundException("order book not found"));
 
         memberCoupon.markAsUsed();
         memberCouponRepository.save(memberCoupon);
