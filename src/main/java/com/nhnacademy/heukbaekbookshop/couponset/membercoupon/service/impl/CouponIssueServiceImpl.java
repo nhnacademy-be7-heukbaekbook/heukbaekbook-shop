@@ -74,5 +74,4 @@ public class CouponIssueServiceImpl implements CouponIssueService {
     private LocalDateTime getEarlierDateTime(LocalDateTime dateTime1, LocalDateTime dateTime2) {
         return dateTime1.isBefore(dateTime2) ? dateTime1 : dateTime2;
     }
-
 }
