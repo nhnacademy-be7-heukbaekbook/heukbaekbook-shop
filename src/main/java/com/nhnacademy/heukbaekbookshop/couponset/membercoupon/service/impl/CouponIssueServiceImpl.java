@@ -16,6 +16,7 @@ import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberReposit
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -32,7 +33,7 @@ public class CouponIssueServiceImpl implements CouponIssueService {
     private final CouponRepository couponRepository;
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public MemberCouponResponse issueCouponSync(Long customerId, Long couponId) {
         Member member = memberRepository.findById(customerId)
                 .orElseThrow(MemberNotFoundException::new);
@@ -73,5 +74,4 @@ public class CouponIssueServiceImpl implements CouponIssueService {
     private LocalDateTime getEarlierDateTime(LocalDateTime dateTime1, LocalDateTime dateTime2) {
         return dateTime1.isBefore(dateTime2) ? dateTime1 : dateTime2;
     }
-
 }
