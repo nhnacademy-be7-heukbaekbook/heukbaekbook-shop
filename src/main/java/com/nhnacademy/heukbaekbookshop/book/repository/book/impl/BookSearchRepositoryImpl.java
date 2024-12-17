@@ -5,8 +5,6 @@ import com.nhnacademy.heukbaekbookshop.book.domain.SortCondition;
 import com.nhnacademy.heukbaekbookshop.book.domain.document.BookDocument;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookSearchRepository;
 import com.nhnacademy.heukbaekbookshop.book.util.SynonymUtil;
-import com.nhnacademy.heukbaekbookshop.category.domain.Category;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

@@ -3,7 +3,10 @@ package com.nhnacademy.heukbaekbookshop.cart.domain;
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -28,6 +31,7 @@ public class Cart {
     private Member member;
 
     @Column(name = "book_amount")
+    @Setter
     private int amount;
 
     public static Cart createCart(Long bookId, Long customerId, Book book, Member member, int amount) {

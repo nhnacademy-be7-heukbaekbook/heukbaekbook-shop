@@ -1,7 +1,6 @@
 package com.nhnacademy.heukbaekbookshop.point.earn.dto.request;
 
 import com.nhnacademy.heukbaekbookshop.point.earn.domain.PointEarnStandardStatus;
-
 import com.nhnacademy.heukbaekbookshop.point.earn.domain.PointEarnType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

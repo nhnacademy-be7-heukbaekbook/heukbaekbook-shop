@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
 
@@ -34,4 +33,11 @@ public class WrappingPaper {
 
     @OneToOne(mappedBy = "wrappingPaper", fetch = FetchType.LAZY)
     private WrappingPaperImage wrappingPaperImage;
+
+    public static WrappingPaper createWrappingPaper(String name, BigDecimal price) {
+        WrappingPaper wrappingPaper = new WrappingPaper();
+        wrappingPaper.setName(name);
+        wrappingPaper.setPrice(price);
+        return wrappingPaper;
+    }
 }

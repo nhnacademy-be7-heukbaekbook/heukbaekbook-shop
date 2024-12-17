@@ -10,8 +10,8 @@ import java.util.List;
 public record ReviewCreateRequest(
         Long orderId,
         Long bookId,
-        String content,
         String title,
+        String content,
         int score,
         List<MultipartFile> images // Base64 인코딩된 이미지 리스트
 ) {}

@@ -3,6 +3,7 @@ package com.nhnacademy.heukbaekbookshop.couponset.membercoupon.controller;
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.dto.request.UseCouponRequest;
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.dto.response.MemberCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.dto.response.UserBookCouponResponse;
+import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.service.CouponIssueService;
 import com.nhnacademy.heukbaekbookshop.couponset.membercoupon.service.MemberCouponService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ public class MemberCouponController {
     public static final String X_USER_ID = "X-USER-ID";
 
     private final MemberCouponService memberCouponService;
+    private final CouponIssueService couponIssueService;
 
 
     @PostMapping("/coupons/{couponId}")
@@ -25,7 +27,7 @@ public class MemberCouponController {
             @RequestHeader(X_USER_ID) Long customerId,
             @PathVariable Long couponId
     ) {
-        MemberCouponResponse response = memberCouponService.issueCoupon(customerId, couponId);
+        MemberCouponResponse response = couponIssueService.issueCouponSync(customerId, couponId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

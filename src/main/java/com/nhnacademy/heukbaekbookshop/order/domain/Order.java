@@ -1,20 +1,23 @@
 package com.nhnacademy.heukbaekbookshop.order.domain;
 
 import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
-
+import com.nhnacademy.heukbaekbookshop.point.history.domain.PointHistory;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "orders")
-@ToString
 public class Order {
 
     @Id
@@ -49,26 +52,28 @@ public class Order {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "order", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @Setter
     private Payment payment;
 
-    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "order", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @Setter
     private Delivery delivery;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)
+    private List<PointHistory> pointHistories;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delivery_fee_id")
     private DeliveryFee deliveryFee;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<OrderBook> orderBooks = new HashSet<>();
 
     private void setCustomer(Customer customer) {
         this.customer = customer;
         customer.getOrders().add(this);
     }
-
 
     public static Order createOrder(BigDecimal totalPrice,
                                     String customerName,

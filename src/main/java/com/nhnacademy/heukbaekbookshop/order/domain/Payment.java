@@ -2,14 +2,15 @@ package com.nhnacademy.heukbaekbookshop.order.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @Table(name = "payments")
 public class Payment {
@@ -18,13 +19,12 @@ public class Payment {
     @Column(name = "payment_id")
     private String id;
 
-    @OneToOne
-    @JoinColumn(name = "order_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", unique = true)
     private Order order;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_type_id")
-    @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
 
     @NotNull
@@ -39,11 +39,6 @@ public class Payment {
     @Column(name = "payment_price")
     protected BigDecimal price;
 
-//    private void setOrder(Order order) {
-//        this.order = order;
-//        order.setPayment(this);
-//    }
-
     @Builder
     public Payment(String id, Order order, PaymentType paymentType, LocalDateTime requestedAt, LocalDateTime approvedAt, BigDecimal price) {
         this.id = id;
@@ -53,5 +48,4 @@ public class Payment {
         this.approvedAt = approvedAt;
         this.price = price;
     }
-
 }

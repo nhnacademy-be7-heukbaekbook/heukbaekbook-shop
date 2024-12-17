@@ -8,8 +8,8 @@ import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
-import static com.nhnacademy.heukbaekbookshop.image.domain.QWrappingPaperImage.*;
-import static com.nhnacademy.heukbaekbookshop.order.domain.QWrappingPaper.*;
+import static com.nhnacademy.heukbaekbookshop.image.domain.QWrappingPaperImage.wrappingPaperImage;
+import static com.nhnacademy.heukbaekbookshop.order.domain.QWrappingPaper.wrappingPaper;
 
 public class WrappingPaperRepositoryImpl implements WrappingPaperRepositoryCustom {
 

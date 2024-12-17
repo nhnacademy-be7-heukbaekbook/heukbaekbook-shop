@@ -7,7 +7,7 @@ import com.nhnacademy.heukbaekbookshop.contributor.exception.PublisherNotFoundEx
 import com.nhnacademy.heukbaekbookshop.image.exception.ImageNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.exception.DeliveryFeeNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.exception.DeliveryNotFoundException;
-import com.nhnacademy.heukbaekbookshop.order.exception.PaymentFailureException;
+import com.nhnacademy.heukbaekbookshop.order.exception.OrderNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.exception.WrappingPaperNotFoundException;
 import org.hibernate.metamodel.mapping.ordering.ast.OrderByComplianceViolation;
 import org.springframework.http.HttpStatus;
@@ -33,7 +33,8 @@ public class WebControllerAdvice {
             OrderByComplianceViolation.class,
             DeliveryNotFoundException.class,
             DeliveryFeeNotFoundException.class,
-            WrappingPaperNotFoundException.class
+            WrappingPaperNotFoundException.class,
+            OrderNotFoundException.class
     })
     public ResponseEntity<ErrorResponse> handleNotFoundException(Exception ex) {
         ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), 404, ZonedDateTime.now());

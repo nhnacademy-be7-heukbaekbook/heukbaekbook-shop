@@ -2,14 +2,12 @@ package com.nhnacademy.heukbaekbookshop.point.history.listener;
 
 import com.nhnacademy.heukbaekbookshop.point.earn.domain.EventCode;
 import com.nhnacademy.heukbaekbookshop.point.earn.domain.PointEarnType;
-import com.nhnacademy.heukbaekbookshop.point.history.event.OrderEvent;
-import com.nhnacademy.heukbaekbookshop.point.history.event.PointUseEvent;
-import com.nhnacademy.heukbaekbookshop.point.history.event.ReviewEvent;
-import com.nhnacademy.heukbaekbookshop.point.history.event.SignupEvent;
 import com.nhnacademy.heukbaekbookshop.point.earn.dto.response.PointEarnStandardResponse;
 import com.nhnacademy.heukbaekbookshop.point.earn.service.PointEarnStandardService;
+import com.nhnacademy.heukbaekbookshop.point.history.domain.PointHistory;
 import com.nhnacademy.heukbaekbookshop.point.history.domain.PointType;
 import com.nhnacademy.heukbaekbookshop.point.history.dto.request.PointHistoryRequest;
+import com.nhnacademy.heukbaekbookshop.point.history.event.*;
 import com.nhnacademy.heukbaekbookshop.point.history.service.PointSaveService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,8 +47,13 @@ public class PointAccumulationListener {
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handlerOrderEvent(PointUseEvent event) {
+    public void handlePointUseEvent(PointUseEvent event) {
         processUseEvent(event.orderId(), event.customerId(), event.usePointAmount());
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleCancelEvent(CancelEvent event) {
+        processCancelEvent(event.orderId(), event.customerId());
     }
 
     private void processEarnEvent(EventCode eventCode, Long orderId, Long userId, BigDecimal orderAmount) {
@@ -68,6 +71,7 @@ public class PointAccumulationListener {
                 );
                 pointSaveService.createPointHistory(userId, pointHistoryRequest);
             } catch (Exception e) {
+                log.error(e.getMessage());
                 log.error("Point 적립 실패, OrderId: {}, MemberId: {}", orderId, userId);
             }
         }
@@ -83,6 +87,25 @@ public class PointAccumulationListener {
         );
 
         pointSaveService.createPointHistory(userId, pointHistoryRequest);
+    }
+
+    private void processCancelEvent(Long orderId, Long userId) {
+        List<PointHistory> histories = pointSaveService.getPointHistories(userId, orderId, PointType.EARNED);
+
+        for (PointHistory history : histories) {
+            try {
+                PointHistoryRequest cancelRequest = new PointHistoryRequest(
+                        orderId,
+                        "주문 취소",
+                        history.getAmount(),
+                        LocalDateTime.now(),
+                        PointType.CANCELLED
+                );
+                pointSaveService.createPointHistory(userId, cancelRequest);
+            } catch (Exception e) {
+                log.error("Point 적립 취소 실패, OrderId: {}, MemberId: {}", orderId, userId);
+            }
+        }
     }
 
     private BigDecimal calculatePoints(PointEarnStandardResponse standard, BigDecimal orderAmount) {

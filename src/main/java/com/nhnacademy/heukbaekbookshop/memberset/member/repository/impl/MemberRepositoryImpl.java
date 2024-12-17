@@ -9,8 +9,8 @@ import jakarta.persistence.EntityManager;
 
 import java.util.Optional;
 
-import static com.nhnacademy.heukbaekbookshop.memberset.grade.domain.QGrade.*;
-import static com.nhnacademy.heukbaekbookshop.memberset.member.domain.QMember.*;
+import static com.nhnacademy.heukbaekbookshop.memberset.grade.domain.QGrade.grade;
+import static com.nhnacademy.heukbaekbookshop.memberset.member.domain.QMember.member;
 
 
 public class MemberRepositoryImpl implements MemberRepositoryCustom {

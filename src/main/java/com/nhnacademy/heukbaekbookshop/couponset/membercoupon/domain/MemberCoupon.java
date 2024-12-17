@@ -41,12 +41,12 @@ public class MemberCoupon {
 
 
     @Builder
-    private MemberCoupon(Member member, Coupon coupon, LocalDateTime issuedAt, LocalDateTime expirationDate) {
+    private MemberCoupon(Member member, Coupon coupon, LocalDateTime expirationDate) {
         this.member = member;
         this.coupon = coupon;
-        this.couponIssuedAt = issuedAt;
-        this.couponExpirationDate = expirationDate;
         this.isCouponUsed = false;
+        this.couponIssuedAt = LocalDateTime.now();
+        this.couponExpirationDate = expirationDate;
     }
 
     public void markAsUsed() {

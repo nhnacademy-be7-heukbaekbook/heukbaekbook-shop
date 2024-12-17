@@ -1,9 +1,9 @@
 package com.nhnacademy.heukbaekbookshop.category.service;
 
 import com.nhnacademy.heukbaekbookshop.category.domain.Category;
-import com.nhnacademy.heukbaekbookshop.category.dto.response.*;
 import com.nhnacademy.heukbaekbookshop.category.dto.request.CategoryCreateRequest;
 import com.nhnacademy.heukbaekbookshop.category.dto.request.CategoryUpdateRequest;
+import com.nhnacademy.heukbaekbookshop.category.dto.response.*;
 import com.nhnacademy.heukbaekbookshop.category.exception.CategoryAlreadyExistsException;
 import com.nhnacademy.heukbaekbookshop.category.exception.CategoryNotFoundException;
 import com.nhnacademy.heukbaekbookshop.category.repository.CategoryRepository;
@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
@@ -27,6 +29,7 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
+    @Transactional
     public CategoryCreateResponse registerCategory(CategoryCreateRequest request) {
         Category parentCategory = null;
         if (request.parentId() != null) {
@@ -45,6 +48,7 @@ public class CategoryService {
         return new CategoryCreateResponse(parentId, category.getName());
     }
 
+    @Transactional
     public CategoryUpdateResponse updateCategory(Long id, CategoryUpdateRequest request) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new CategoryNotFoundException("존재하지 않는 카테고리입니다."));
@@ -60,10 +64,11 @@ public class CategoryService {
 
         categoryRepository.save(category);
 
-        Long parentId = (parentCategory != null) ? parentCategory.getId() : null;
+        Long parentId = parentCategory.getId();
         return new CategoryUpdateResponse(parentId, category.getName());
     }
 
+    @Transactional
     public CategoryDeleteResponse deleteCategory(Long id) {
         if (categoryRepository.findById(id).isEmpty()) {
             throw new CategoryNotFoundException("존재하지 않는 카테고리 입니다.");

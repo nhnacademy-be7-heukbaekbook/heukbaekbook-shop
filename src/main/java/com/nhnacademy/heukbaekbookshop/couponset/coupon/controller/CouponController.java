@@ -2,7 +2,6 @@ package com.nhnacademy.heukbaekbookshop.couponset.coupon.controller;
 
 
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponStatus;
-import com.nhnacademy.heukbaekbookshop.couponset.coupon.domain.enums.CouponType;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.request.CouponRequest;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.BookCouponResponse;
 import com.nhnacademy.heukbaekbookshop.couponset.coupon.dto.response.CategoryCouponResponse;
@@ -110,14 +109,8 @@ public class CouponController {
     @GetMapping("/type/discount/{type}")
     public ResponseEntity<Page<CouponResponse>> getCouponsByType(@PathVariable("type") DiscountType discountType, Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(couponService.getCouponsByType(discountType,pageable)
-                );
+                .body(couponService.getCouponsByType(discountType,pageable));
     }
-
-//    @GetMapping("/coupon-type/{couponType}")
-//    public ResponseEntity<CouponResponse> getCouponByCouponType(@PathVariable("couponType") CouponType couponType) {
-//
-//    }
 
     /**
      * 쿠폰 생성 요청 시 사용되는 메서드입니다.
@@ -131,20 +124,6 @@ public class CouponController {
                 .body(couponService.createCoupon(couponRequest)
                 );
     }
-//
-//    @PostMapping("/{bookId}")
-//    public ResponseEntity<CouponResponse> createBookCoupon(@PathVariable Long bookId, @Valid @RequestBody CouponRequest couponRequest) {
-//        return ResponseEntity.status(HttpStatus.CREATED)
-//                .body(couponService.createCoupon(couponRequest)
-//                );
-//    }
-//
-//    @PostMapping("/{categoryId}")
-//    public ResponseEntity<CouponResponse> createCategoryCoupon(@PathVariable Long categoryId, @Valid @RequestBody CouponRequest couponRequest) {
-//        return ResponseEntity.status(HttpStatus.CREATED)
-//                .body(couponService.createCoupon(couponRequest)
-//                );
-//    }
 
     /**
      * 쿠폰 수정 요청 시 사용되는 메서드입니다.

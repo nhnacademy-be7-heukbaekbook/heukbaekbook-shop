@@ -4,8 +4,6 @@ import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
 import com.nhnacademy.heukbaekbookshop.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import com.nhnacademy.heukbaekbookshop.order.domain.Order;
-import com.nhnacademy.heukbaekbookshop.order.domain.Review;
-import com.nhnacademy.heukbaekbookshop.order.domain.ReviewPK;
 import com.nhnacademy.heukbaekbookshop.order.exception.OrderNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.repository.OrderRepository;
 import com.nhnacademy.heukbaekbookshop.point.history.domain.PointHistory;
@@ -16,13 +14,13 @@ import com.nhnacademy.heukbaekbookshop.point.history.dto.response.PointHistoryRe
 import com.nhnacademy.heukbaekbookshop.point.history.exception.InsufficientPointsException;
 import com.nhnacademy.heukbaekbookshop.point.history.repository.PointHistoryRepository;
 import com.nhnacademy.heukbaekbookshop.point.history.service.PointSaveService;
-import com.nhnacademy.heukbaekbookshop.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -62,11 +60,16 @@ public class PointSaveServiceImpl implements PointSaveService {
         return PointHistoryMapper.toResponse(savedPointHistory);
     }
 
+    @Override
+    public List<PointHistory> getPointHistories(Long customerId, Long orderId, PointType type) {
+        return pointHistoryRepository.findByOrderIdAndType(orderId, type);
+    }
+
 
     private BigDecimal calculateAdjustedAmount(BigDecimal amount, PointType type) {
         return switch (type) {
-            case EARNED, CANCELLED -> amount;
-            case USED -> amount.negate();
+            case EARNED -> amount;
+            case USED, CANCELLED -> amount.negate();
             default -> throw new IllegalArgumentException("Unsupported PointType: " + type);
         };
     }

@@ -1,10 +1,10 @@
 package com.nhnacademy.heukbaekbookshop.memberset.member.controller;
 
 
-import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
-import com.nhnacademy.heukbaekbookshop.memberset.member.domain.MemberStatus;
 import com.nhnacademy.heukbaekbookshop.book.dto.response.book.BookDetailResponse;
 import com.nhnacademy.heukbaekbookshop.book.service.like.LikeService;
+import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
+import com.nhnacademy.heukbaekbookshop.memberset.member.domain.MemberStatus;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberCreateRequest;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberUpdateRequest;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.OAuthMemberCreateRequest;
@@ -16,10 +16,12 @@ import com.nhnacademy.heukbaekbookshop.memberset.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 /**
@@ -147,10 +149,11 @@ public class MemberController {
     }
 
     @GetMapping("/my-page")
-    public MyPageResponse getMyPageResponse(@RequestHeader(X_USER_ID) Long customerId) {
-        log.info("customerId: {}", customerId);
+    public MyPageResponse getMyPageResponse(@RequestHeader(X_USER_ID) Long customerId,
+                                            Pageable pageable) {
+        log.info("customerId: {}, pageable : {}", customerId, pageable);
 
-        return memberService.getMyPageResponse(customerId);
+        return memberService.getMyPageResponse(customerId, pageable);
     }
 
     @GetMapping("/orders/{orderId}")

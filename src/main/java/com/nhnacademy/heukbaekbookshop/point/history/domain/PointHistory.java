@@ -29,7 +29,7 @@ public class PointHistory {
     @JoinColumn(name = "customer_id")
     private Member member;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
 
@@ -52,4 +52,11 @@ public class PointHistory {
 
     @Column(name = "point_name")
     private String name;
+
+    public void setOrder(Order order) {
+        if (order != null) {
+            this.order = order;
+            order.getPointHistories().add(this);
+        }
+    }
 }

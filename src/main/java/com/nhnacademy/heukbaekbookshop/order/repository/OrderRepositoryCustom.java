@@ -1,13 +1,15 @@
 package com.nhnacademy.heukbaekbookshop.order.repository;
 
 import com.nhnacademy.heukbaekbookshop.order.domain.Order;
-import com.nhnacademy.heukbaekbookshop.order.dto.response.OrderDetailResponse;
+import com.nhnacademy.heukbaekbookshop.order.dto.request.OrderSearchCondition;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface OrderRepositoryCustom {
-    Optional<Order> searchByTossOrderId(String tossOrderId);
+    Optional<Order> searchByOrderSearchCondition(OrderSearchCondition orderSearchCondition);
 
-    List<Order> searchByCustomerId(Long customerId);
+    Page<Order> searchAllByOrderSearchCondition(OrderSearchCondition orderSearchCondition,
+                                         Pageable pageable);
 }

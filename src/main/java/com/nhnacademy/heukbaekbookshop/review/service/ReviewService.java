@@ -2,19 +2,16 @@ package com.nhnacademy.heukbaekbookshop.review.service;
 
 import com.nhnacademy.heukbaekbookshop.book.domain.Book;
 import com.nhnacademy.heukbaekbookshop.book.repository.book.BookRepository;
-import com.nhnacademy.heukbaekbookshop.image.service.ImageManagerService;
 import com.nhnacademy.heukbaekbookshop.image.domain.ImageType;
 import com.nhnacademy.heukbaekbookshop.image.domain.ReviewImage;
+import com.nhnacademy.heukbaekbookshop.image.service.ImageManagerService;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
 import com.nhnacademy.heukbaekbookshop.memberset.customer.repository.CustomerRepository;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import com.nhnacademy.heukbaekbookshop.order.domain.Order;
-import com.nhnacademy.heukbaekbookshop.order.domain.OrderStatus;
 import com.nhnacademy.heukbaekbookshop.order.domain.Review;
 import com.nhnacademy.heukbaekbookshop.order.domain.ReviewPK;
 import com.nhnacademy.heukbaekbookshop.order.repository.OrderRepository;
-import com.nhnacademy.heukbaekbookshop.point.history.domain.PointType;
-import com.nhnacademy.heukbaekbookshop.point.history.dto.request.PointHistoryRequest;
 import com.nhnacademy.heukbaekbookshop.point.history.event.ReviewEvent;
 import com.nhnacademy.heukbaekbookshop.point.history.repository.PointHistoryRepository;
 import com.nhnacademy.heukbaekbookshop.point.history.service.PointSaveService;
@@ -30,8 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,9 +58,9 @@ public class ReviewService {
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 주문 ID입니다."));
 
         // 주문 상태 확인
-        if (!OrderStatus.DELIVERED.equals(order.getStatus())) {
-            throw new IllegalArgumentException("주문이 배송 완료 상태가 아닙니다. 리뷰를 작성할 수 없습니다.");
-        }
+//        if (!OrderStatus.DELIVERED.equals(order.getStatus())) {
+//            throw new IllegalArgumentException("주문이 배송 완료 상태가 아닙니다. 리뷰를 작성할 수 없습니다.");
+//        }
 
         Book book = bookRepository.findById(request.bookId())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 도서 ID입니다."));
@@ -155,23 +150,6 @@ public class ReviewService {
         }
     }
 
-    private void saveReviewPoints(Long customerId, Long orderId, int points) {
-        boolean alreadyAdded = pointHistoryRepository.existsByMemberIdAndOrderId(customerId, orderId);
-
-        if (alreadyAdded) {
-            throw new IllegalArgumentException("이미 리뷰 작성으로 포인트가 적립되었습니다.");
-        }
-
-        PointHistoryRequest pointRequest = new PointHistoryRequest(
-                orderId,
-                "리뷰 작성으로 인한 포인트 적립",
-                BigDecimal.valueOf(points),
-                LocalDateTime.now(),
-                PointType.EARNED
-        );
-        pointSaveService.createPointHistory(customerId, pointRequest);
-    }
-
     @Transactional(readOnly = true)
     public List<ReviewDetailResponse> getReviewsByBook(Long bookId) {
         List<Review> reviews = reviewRepository.findAllByBookId(bookId);
@@ -200,6 +178,30 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public List<ReviewDetailResponse> getReviewsByCustomer(Long customerId) {
         List<Review> reviews = reviewRepository.findAllByCustomerId(customerId);
+
+        return reviews.stream().map(review -> {
+            List<String> imageUrls = reviewImageRepository.findAllByReview(review)
+                    .stream()
+                    .map(ReviewImage::getUrl)
+                    .collect(Collectors.toList());
+            return convertToResponse(review, imageUrls);
+        }).collect(Collectors.toList());
+    }
+
+    public void deleteReview(Long customerId, Long orderId, Long bookId) {
+        Review review = reviewRepository.findByOrderIdAndBookIdAndCustomerId(orderId, bookId, customerId);
+
+        reviewRepository.delete(review);
+    }
+    
+    public boolean hasReview(Long customerId, Long orderId, Long bookId) {
+        Review review = reviewRepository.findByOrderIdAndBookIdAndCustomerId(orderId, bookId, customerId);
+        return review != null;
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewDetailResponse> getReviewsByOrder(Long orderId) {
+        List<Review> reviews = reviewRepository.findAllByOrderId(orderId);
 
         return reviews.stream().map(review -> {
             List<String> imageUrls = reviewImageRepository.findAllByReview(review)

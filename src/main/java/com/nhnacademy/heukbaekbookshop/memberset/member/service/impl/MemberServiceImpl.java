@@ -1,14 +1,15 @@
 package com.nhnacademy.heukbaekbookshop.memberset.member.service.impl;
 
-import com.nhnacademy.heukbaekbookshop.book.exception.book.BookNotFoundException;
-import com.nhnacademy.heukbaekbookshop.common.util.Converter;
-import com.nhnacademy.heukbaekbookshop.common.util.Formatter;
 import com.nhnacademy.heukbaekbookshop.memberset.address.domain.MemberAddress;
 import com.nhnacademy.heukbaekbookshop.memberset.address.dto.MemberAddressResponse;
-import com.nhnacademy.heukbaekbookshop.memberset.customer.domain.Customer;
+import com.nhnacademy.heukbaekbookshop.memberset.address.repository.MemberAddressRepository;
+import com.nhnacademy.heukbaekbookshop.memberset.customer.repository.CustomerRepository;
 import com.nhnacademy.heukbaekbookshop.memberset.grade.domain.Grade;
 import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.GradeDto;
 import com.nhnacademy.heukbaekbookshop.memberset.grade.dto.mapper.GradeMapper;
+import com.nhnacademy.heukbaekbookshop.memberset.grade.repository.GradeRepository;
+import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
+import com.nhnacademy.heukbaekbookshop.memberset.member.domain.MemberStatus;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.mapper.MemberMapper;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberCreateRequest;
 import com.nhnacademy.heukbaekbookshop.memberset.member.dto.request.MemberUpdateRequest;
@@ -20,31 +21,31 @@ import com.nhnacademy.heukbaekbookshop.memberset.member.dto.response.MyPageRespo
 import com.nhnacademy.heukbaekbookshop.memberset.member.exception.InvalidPasswordException;
 import com.nhnacademy.heukbaekbookshop.memberset.member.exception.MemberAlreadyExistException;
 import com.nhnacademy.heukbaekbookshop.memberset.member.exception.MemberNotFoundException;
-import com.nhnacademy.heukbaekbookshop.memberset.member.domain.Member;
-import com.nhnacademy.heukbaekbookshop.memberset.member.domain.MemberStatus;
-import com.nhnacademy.heukbaekbookshop.memberset.customer.repository.CustomerRepository;
-import com.nhnacademy.heukbaekbookshop.memberset.grade.repository.GradeRepository;
-import com.nhnacademy.heukbaekbookshop.memberset.address.repository.MemberAddressRepository;
 import com.nhnacademy.heukbaekbookshop.memberset.member.repository.MemberRepository;
 import com.nhnacademy.heukbaekbookshop.memberset.member.service.MemberService;
 import com.nhnacademy.heukbaekbookshop.order.domain.Order;
-import com.nhnacademy.heukbaekbookshop.order.domain.OrderBook;
-import com.nhnacademy.heukbaekbookshop.order.dto.response.*;
+import com.nhnacademy.heukbaekbookshop.order.dto.request.OrderSearchCondition;
+import com.nhnacademy.heukbaekbookshop.order.dto.response.OrderDetailResponse;
+import com.nhnacademy.heukbaekbookshop.order.dto.response.OrderResponse;
+import com.nhnacademy.heukbaekbookshop.order.dto.response.OrderSummaryResponse;
 import com.nhnacademy.heukbaekbookshop.order.exception.OrderNotFoundException;
 import com.nhnacademy.heukbaekbookshop.order.repository.OrderRepository;
 import com.nhnacademy.heukbaekbookshop.point.history.domain.PointHistory;
 import com.nhnacademy.heukbaekbookshop.point.history.event.SignupEvent;
-import com.nhnacademy.heukbaekbookshop.point.history.exception.PointNotFoundException;
 import com.nhnacademy.heukbaekbookshop.point.history.repository.PointHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -143,15 +144,14 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findById(customerId)
                 .orElseThrow(MemberNotFoundException::new);
 
-        PointHistory pointHistory = pointHistoryRepository.findFirstByMemberIdOrderByCreatedAtDesc(customerId)
-                .orElseThrow(() -> new PointNotFoundException(customerId + " point history not found"));
+        Optional<PointHistory> result = pointHistoryRepository.findFirstByMemberIdOrderByCreatedAtDesc(customerId);
 
         return new MemberDetailResponse(
                 member.getId(),
                 member.getName(),
                 member.getPhoneNumber(),
                 member.getEmail(),
-                pointHistory.getBalance(),
+                result.isPresent() ? result.get().getBalance() : BigDecimal.ZERO,
                 member.getMemberAddresses().stream()
                         .map(memberAddress -> new MemberAddressResponse(
                                 memberAddress.getId(),
@@ -164,48 +164,17 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public MyPageResponse getMyPageResponse(Long customerId) {
+    public MyPageResponse getMyPageResponse(Long customerId, Pageable pageable) {
         Member member = memberRepository.searchByCustomerId(customerId)
                 .orElseThrow(MemberNotFoundException::new);
 
         GradeDto gradeDto = GradeMapper.createGradeResponse(member.getGrade());
 
-        List<Order> orders = orderRepository.searchByCustomerId(customerId);
+        Page<Order> result = orderRepository.searchAllByOrderSearchCondition(new OrderSearchCondition(null, null, customerId), pageable);
 
-        List<OrderSummaryResponse> orderSummaryResponses = orders.stream()
-                .map(this::createOrderSummaryResponse)
-                .collect(Collectors.toList());
-
-        return new MyPageResponse(gradeDto, new OrderResponse(orderSummaryResponses));
+        return new MyPageResponse(gradeDto, new OrderResponse(result.map(OrderSummaryResponse::of)));
     }
 
-    private OrderSummaryResponse createOrderSummaryResponse(Order order) {
-        // 제목 생성 로직
-        String title = createOrderTitle(order);
-
-        int size = order.getOrderBooks().size();
-        String totalPrice = Formatter.formatPrice(order.getTotalPrice());
-
-        // OrderSummaryResponse 생성
-        return new OrderSummaryResponse(
-                order.getCreatedAt().toLocalDate(),
-                order.getTossOrderId(),
-                title,
-                order.getStatus().getKorean(),
-                order.getCustomerName(),
-                totalPrice + "/" + size,
-                new DeliverySummaryResponse(order.getDelivery().getRecipient())
-        );
-    }
-
-    private String createOrderTitle(Order order) {
-        int size = order.getOrderBooks().size() - 1;
-        String title = order.getOrderBooks().stream()
-                .findFirst()
-                .map(orderBook -> orderBook.getBook().getTitle())
-                .orElse("제목 없음");
-        return size > 0 ? title + " 외 " + size + "종" : title;
-    }
 
     @Override
     public MyPageOrderDetailResponse getMyPageDetailResponse(Long customerId, String tossOrderId) {
@@ -215,7 +184,7 @@ public class MemberServiceImpl implements MemberService {
         Grade grade = member.getGrade();
         GradeDto gradeDto = GradeMapper.createGradeResponse(grade);
 
-        Order order = orderRepository.searchByTossOrderId(tossOrderId)
+        Order order = orderRepository.searchByOrderSearchCondition(new OrderSearchCondition(tossOrderId, null, null))
                 .orElseThrow(() -> new OrderNotFoundException(tossOrderId + " order not found"));
 
         OrderDetailResponse orderDetailResponse = OrderDetailResponse.of(order);
@@ -237,5 +206,4 @@ public class MemberServiceImpl implements MemberService {
                 memberRepository.findGradeByMemberId(customerId)
                         .orElseThrow(MemberNotFoundException::new));
     }
-
 }

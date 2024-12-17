@@ -17,7 +17,7 @@ import java.util.Optional;
 
 import static com.nhnacademy.heukbaekbookshop.book.domain.QBook.book;
 import static com.nhnacademy.heukbaekbookshop.book.domain.QBookCategory.bookCategory;
-import static com.nhnacademy.heukbaekbookshop.contributor.domain.QPublisher.*;
+import static com.nhnacademy.heukbaekbookshop.contributor.domain.QPublisher.publisher;
 import static com.nhnacademy.heukbaekbookshop.image.domain.QBookImage.bookImage;
 
 public class BookRepositoryImpl implements BookRepositoryCustom {
